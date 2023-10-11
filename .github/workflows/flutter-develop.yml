@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - develop
+    paths:
+      - 'flutter/**'
 
 jobs:
   build-test-upload:
@@ -52,3 +54,4 @@ jobs:
           docker build . -t ${IMAGE_TAG}
         env:
           DOCKER_REPO_NAME: ${{ secrets.DOCKER_REPO_NAME }}
+        working-directory: ./flutter

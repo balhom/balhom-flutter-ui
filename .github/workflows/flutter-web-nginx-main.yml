@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'flutter/**'
 
 jobs:
   build-test-upload:
@@ -45,3 +47,4 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_REPO_NAME: ${{ secrets.DOCKER_REPO_NAME }}
+        working-directory: ./flutter
