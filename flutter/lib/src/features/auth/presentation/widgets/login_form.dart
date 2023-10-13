@@ -5,8 +5,8 @@ import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_fie
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_check_box.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/login_password.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/email.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/login_password_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
 import 'package:balance_home_app/src/core/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:balance_home_app/src/features/statistics/presentation/views/statistics_view.dart';
@@ -37,17 +37,17 @@ class LoginForm extends ConsumerStatefulWidget {
 
 class _LoginFormState extends ConsumerState<LoginForm> {
   @visibleForTesting
-  UserEmail? email;
+  EmailValue? email;
   @visibleForTesting
-  LoginPassword? password;
+  LoginPasswordValue? password;
   @visibleForTesting
   bool storeCredentials = false;
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    email = UserEmail(appLocalizations, widget.emailController.text);
-    password = LoginPassword(appLocalizations, widget.passwordController.text);
+    email = EmailValue(appLocalizations, widget.emailController.text);
+    password = LoginPasswordValue(appLocalizations, widget.passwordController.text);
     final auth = ref.watch(authControllerProvider);
     final authController = ref.read(authControllerProvider.notifier);
     final emailCode = ref.watch(emailCodeControllerProvider);
@@ -76,7 +76,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 title: appLocalizations.emailAddress,
                 controller: widget.emailController,
                 onChanged: (value) =>
-                    email = UserEmail(appLocalizations, value),
+                    email = EmailValue(appLocalizations, value),
                 validator: (value) => email?.validate,
               ),
               verticalSpace(),
@@ -86,7 +86,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 title: appLocalizations.password,
                 controller: widget.passwordController,
                 onChanged: (value) =>
-                    password = LoginPassword(appLocalizations, value),
+                    password = LoginPasswordValue(appLocalizations, value),
                 validator: (value) => password?.validate,
               ),
               verticalSpace(),
@@ -110,9 +110,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                         }
                         if (email == null) return;
                         if (password == null) return;
-                        (await authController.signIn(
+                        (await authController.login(
                                 email!, password!, appLocalizations,
-                                store: storeCredentials))
+                                rememberMe: storeCredentials))
                             .fold((failure) async {
                           if (failure.detail ==
                               appLocalizations.emailNotVerified) {

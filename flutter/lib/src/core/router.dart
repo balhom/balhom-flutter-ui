@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:balance_home_app/src/core/clients/api_client.dart';
-import 'package:balance_home_app/src/core/presentation/views/app_info_loading_view.dart';
+import 'package:balance_home_app/src/core/providers.dart';
+import 'package:balance_home_app/src/features/version/presentation/views/version_loading_view.dart';
 import 'package:balance_home_app/src/core/presentation/views/fade_transition_view.dart';
 import 'package:balance_home_app/src/features/account/presentation/views/account_delete_view.dart';
 import 'package:balance_home_app/src/features/account/presentation/views/account_edit_view.dart';
@@ -162,9 +162,9 @@ final router = GoRouter(
                         )),
               ]),
           GoRoute(
-            name: AppInfoLoadingView.routeName,
-            path: AppInfoLoadingView.routePath,
-            builder: (context, state) => const AppInfoLoadingView(),
+            name: VersionLoadingView.routeName,
+            path: VersionLoadingView.routePath,
+            builder: (context, state) => const VersionLoadingView(),
           ),
           GoRoute(
             name: AppLoadingView.routeName,
@@ -206,7 +206,7 @@ String? appGuard(BuildContext context, GoRouterState state) {
 String? rootGuard(BuildContext context, GoRouterState state) {
   final goingToRoot = state.matchedLocation == '/';
   if (goingToRoot) {
-    return "/${AppInfoLoadingView.routePath}";
+    return "/${VersionLoadingView.routePath}";
   }
   return null;
 }

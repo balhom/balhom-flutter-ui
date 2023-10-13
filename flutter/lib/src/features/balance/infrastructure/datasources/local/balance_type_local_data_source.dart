@@ -1,7 +1,7 @@
 import 'package:balance_home_app/src/core/clients/local_db_client.dart';
 import 'package:balance_home_app/src/core/domain/failures/empty_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/no_local_entity_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
 import 'package:flutter/material.dart';
@@ -21,12 +21,12 @@ class BalanceTypeLocalDataSource {
       final jsonObj = await localDbClient.getById(tableName: tableName, id: id);
       if (jsonObj == null) {
         return left(
-            const NoLocalEntityFailure(entityName: tableName, detail: ""));
+            const NoLocalEntryFailure(entityName: tableName, detail: ""));
       }
       return right(BalanceTypeEntity.fromJson(jsonObj));
     } on Exception {
       return left(
-          const NoLocalEntityFailure(entityName: tableName, detail: ""));
+          const NoLocalEntryFailure(entityName: tableName, detail: ""));
     }
   }
 
@@ -55,12 +55,12 @@ class BalanceTypeLocalDataSource {
       }
       if (res.isEmpty) {
         return left(
-            const NoLocalEntityFailure(entityName: tableName, detail: ""));
+            const NoLocalEntryFailure(entityName: tableName, detail: ""));
       }
       return right(res);
     } on Exception {
       return left(
-          const NoLocalEntityFailure(entityName: tableName, detail: ""));
+          const NoLocalEntryFailure(entityName: tableName, detail: ""));
     }
   }
 

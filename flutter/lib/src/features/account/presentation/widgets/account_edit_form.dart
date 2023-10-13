@@ -1,6 +1,6 @@
 import 'package:balance_home_app/config/app_colors.dart';
 import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/no_local_entity_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/double_form_field.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_field.dart';
@@ -8,8 +8,8 @@ import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
 import 'package:balance_home_app/src/features/account/domain/entities/account_entity.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/email.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_name.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_name_value.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_quantity.dart';
 import 'package:balance_home_app/src/features/currency/presentation/widgets/dropdown_picker_field.dart';
@@ -45,8 +45,8 @@ class AccountEditForm extends ConsumerStatefulWidget {
 }
 
 class _UserEditFormState extends ConsumerState<AccountEditForm> {
-  UserName? username;
-  UserEmail? email;
+  RegisterNameValue? username;
+  EmailValue? email;
   BalanceQuantity? expectedMonthlyBalance;
   BalanceQuantity? expectedAnnualBalance;
   String? prefCoinType;
@@ -71,8 +71,8 @@ class _UserEditFormState extends ConsumerState<AccountEditForm> {
         widget.expectedAnnualBalanceController.text.isEmpty
             ? widget.user.expectedAnnualBalance.toString().replaceAll(".", ",")
             : widget.expectedAnnualBalanceController.text;
-    username = UserName(appLocalizations, widget.usernameController.text);
-    email = UserEmail(appLocalizations, widget.emailController.text);
+    username = RegisterNameValue(appLocalizations, widget.usernameController.text);
+    email = EmailValue(appLocalizations, widget.emailController.text);
     expectedMonthlyBalance = BalanceQuantity(
         appLocalizations,
         double.tryParse(
@@ -91,7 +91,7 @@ class _UserEditFormState extends ConsumerState<AccountEditForm> {
       return currencyTypes.when(data: (data) {
         return data.fold((failure) {
           if (failure is HttpConnectionFailure ||
-              failure is NoLocalEntityFailure) {
+              failure is NoLocalEntryFailure) {
             return showError(
                 icon: Icons.network_wifi_1_bar,
                 text: appLocalizations.noConnection);
@@ -130,7 +130,7 @@ class _UserEditFormState extends ConsumerState<AccountEditForm> {
                   AppTextFormField(
                     readOnly: !widget.edit,
                     onChanged: (value) =>
-                        username = UserName(appLocalizations, value),
+                        username = RegisterNameValue(appLocalizations, value),
                     title: appLocalizations.username,
                     validator: (value) => username?.validate,
                     maxCharacters: 15,
@@ -141,7 +141,7 @@ class _UserEditFormState extends ConsumerState<AccountEditForm> {
                   AppTextFormField(
                     readOnly: true,
                     onChanged: (value) =>
-                        email = UserEmail(appLocalizations, value),
+                        email = EmailValue(appLocalizations, value),
                     title: appLocalizations.emailAddress,
                     validator: (value) => email?.validate,
                     maxCharacters: 300,
@@ -177,7 +177,7 @@ class _UserEditFormState extends ConsumerState<AccountEditForm> {
                           items: currencyTypes.map((e) => e.code).toList(),
                           onChanged: (value) async {
                             if (value! == widget.user.prefCoinType) return;
-                            (await userEditController.getExchange(
+                            (await userEditController.getCurrencyConversion(
                                     widget.user.balance,
                                     widget.user.prefCoinType,
                                     value,

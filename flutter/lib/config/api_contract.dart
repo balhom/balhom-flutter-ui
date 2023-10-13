@@ -1,22 +1,37 @@
 /// Defines the relative URLs for the backend server endpoints.
 class APIContract {
   /*
-   * ============ Frontend version ============ *
+   * ============ Version ============ *
    */
-  /// [GET] Returns last version of frontend app
-  static const String frontendVersion = "/api/v1/frontend/version";
+
+  /// `GET` Returns last version
+  static const String version = "/api/v1/version";
 
   /*
-   * ============ User ============ *
+   * ============ Account ============ *
    */
-  /// [GET], [PUT], [PATCH], [DEL] User profile info
-  static const String userProfile = "/api/v1/user/profile";
 
-  /// [POST] User creation
-  static const String userCreation = "/api/v1/user";
+  /// `POST` Account creation
+  static const String accountCreation = "/api/v1/account";
+
+  /// `GET`, `PUT`, `PATCH`, `DEL` Account
+  static const String accountProfile = "/api/v1/account/profile";
+
+  /*
+   * ============ Auth ============ *
+   */
+
+  /// `POST` Access tokens
+  static const String authAccess = "/api/v1/auth/access";
+
+  /// `POST` Refresh tokens
+  static const String authRefresh = "/api/v1/auth/refresh";
+
+  /// `POST` Logout session
+  static const String authLogout = "/api/v1/auth/logout";
 
   /// [POST] User password reset send code
-  static const String userPasswordReset = "/api/v1/user/password/reset";
+  static const String authPasswordReset = "/api/v1/auth/password/reset";
 
   /// [POST] User password change
   static const String userPasswordChange = "/api/v1/user/password/change";

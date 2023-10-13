@@ -11,7 +11,7 @@ class ResetPasswordRemoteDataSource {
 
   Future<Either<Failure, void>> request(String email) async {
     final response = await apiClient.postRequest(
-        APIContract.userPasswordReset,
+        APIContract.authPasswordReset,
         data: {"email": email});
     // Check if there is a request failure
     return response.fold((failure) => left(failure), (_) => right(null));

@@ -114,6 +114,7 @@ class _AppPasswordTextFormFieldState extends State<AppPasswordTextFormField> {
                       showPassword = !showPassword;
                     });
                   },
+                  focusNode: FocusNode(skipTraversal: true),
                   child: (showPassword)
                       ? Icon(Icons.visibility, color: widget.textColor)
                       : Icon(Icons.visibility_off, color: widget.textColor),

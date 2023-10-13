@@ -1,13 +1,11 @@
 import 'package:balance_home_app/src/core/domain/failures/api_bad_request_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/input_bad_request_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/unprocessable_entity_failure.dart';
-import 'package:balance_home_app/src/features/auth/domain/entities/reset_password_entity.dart';
-import 'package:balance_home_app/src/features/auth/domain/failures/failure_constants.dart';
+import 'package:balance_home_app/src/core/domain/failures/unprocessable_value_failure.dart';
+import 'package:balance_home_app/src/features/auth/domain/failures/register_failure_constants.dart';
 import 'package:balance_home_app/src/features/auth/domain/repositories/reset_password_repository_interface.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/email.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_password.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/verification_code.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_password_value.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -24,7 +22,7 @@ class ResetPasswordController
   }
 
   Future<Either<Failure, bool>> requestCode(
-      UserEmail email, AppLocalizations appLocalizations,
+      EmailValue email, AppLocalizations appLocalizations,
       {bool retry = false}) async {
     state = const AsyncValue.loading();
     return await email.value.fold((failure) {
@@ -40,26 +38,26 @@ class ResetPasswordController
             : const AsyncValue.data(ResetPasswordProgress.started);
         if (failure is ApiBadRequestFailure) {
           if (failure.errorCode == resetPasswordRetriesFailure) {
-            return left(UnprocessableEntityFailure(
+            return left(UnprocessableValueFailure(
                 detail: appLocalizations.resetPasswordTooManyTries));
           }
-          return left(UnprocessableEntityFailure(detail: failure.detail));
+          return left(UnprocessableValueFailure(detail: failure.detail));
         } else if (failure is InputBadRequestFailure) {
           if (failure.containsFieldName("email")) {
-            return left(UnprocessableEntityFailure(
+            return left(UnprocessableValueFailure(
                 detail: appLocalizations.emailNotValid));
           } else if (failure.containsFieldName("inv_code")) {
-            return left(UnprocessableEntityFailure(
+            return left(UnprocessableValueFailure(
                 detail: appLocalizations.invitationCodeNotValid));
           } else if (failure.containsFieldName("email")) {
             return left(
-                UnprocessableEntityFailure(detail: appLocalizations.emailUsed));
+                UnprocessableValueFailure(detail: appLocalizations.emailUsed));
           } else if (failure.containsFieldName("username")) {
-            return left(UnprocessableEntityFailure(
+            return left(UnprocessableValueFailure(
                 detail: appLocalizations.usernameUsed));
           }
         }
-        return left(UnprocessableEntityFailure(
+        return left(UnprocessableValueFailure(
             detail: appLocalizations.errorSendingCode));
       }, (_) {
         state = const AsyncValue.data(ResetPasswordProgress.started);
@@ -69,9 +67,9 @@ class ResetPasswordController
   }
 
   Future<Either<Failure, bool>> verifyCode(
-      UserEmail email,
+      EmailValue email,
       VerificationCode code,
-      UserPassword password,
+      RegisterPasswordValue password,
       AppLocalizations appLocalizations) async {
     state = const AsyncValue.loading();
     return await email.value.fold((failure) {
@@ -91,17 +89,17 @@ class ResetPasswordController
           return res.fold((failure) {
             state = const AsyncValue.data(ResetPasswordProgress.started);
             if (failure is ApiBadRequestFailure) {
-              return left(UnprocessableEntityFailure(detail: failure.detail));
+              return left(UnprocessableValueFailure(detail: failure.detail));
             } else if (failure is InputBadRequestFailure) {
               if (failure.containsFieldName("new_password")) {
-                return left(UnprocessableEntityFailure(
+                return left(UnprocessableValueFailure(
                     detail: failure.getFieldDetail("new_password")));
               } else if (failure.containsFieldName("code")) {
-                return left(UnprocessableEntityFailure(
+                return left(UnprocessableValueFailure(
                     detail: failure.getFieldDetail("code")));
               }
             }
-            return left(UnprocessableEntityFailure(
+            return left(UnprocessableValueFailure(
                 detail: appLocalizations.errorVerifyingCode));
           }, (_) {
             state = const AsyncValue.data(ResetPasswordProgress.verified);

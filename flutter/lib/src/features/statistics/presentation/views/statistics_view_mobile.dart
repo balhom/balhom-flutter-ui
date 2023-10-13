@@ -1,7 +1,7 @@
 import 'package:balance_home_app/config/app_colors.dart';
 import 'package:balance_home_app/config/app_theme.dart';
 import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/no_local_entity_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date_mode.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
@@ -24,7 +24,7 @@ class StatisticsViewMobile extends ConsumerWidget {
     return ref.watch(statisticsControllerProvider).when<Widget>(data: (data) {
       return data.fold((failure) {
         if (failure is HttpConnectionFailure ||
-            failure is NoLocalEntityFailure) {
+            failure is NoLocalEntryFailure) {
           return showError(
               icon: Icons.network_wifi_1_bar,
               text: appLocalizations.noConnection);

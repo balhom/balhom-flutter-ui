@@ -1,15 +1,9 @@
 import 'package:balance_home_app/src/core/domain/failures/empty_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
 import 'package:balance_home_app/src/features/auth/domain/entities/credentials_entity.dart';
-import 'package:balance_home_app/src/features/account/infrastructure/datasources/local/account_local_data_source.dart';
 import 'package:balance_home_app/src/features/auth/infrastructure/datasources/remote/jwt_remote_data_source.dart';
-import 'package:balance_home_app/src/features/account/infrastructure/datasources/remote/account_remote_data_source.dart';
-import 'package:balance_home_app/src/features/account/domain/entities/account_entity.dart';
-import 'package:balance_home_app/src/features/auth/domain/entities/register_entity.dart';
 import 'package:balance_home_app/src/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:balance_home_app/src/features/auth/infrastructure/datasources/local/jwt_local_data_source.dart';
-import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 
 /// Repository that handles authorization and persists session
@@ -20,56 +14,11 @@ class AuthRepository implements AuthRepositoryInterface {
   /// Local jwt storage provider
   final JwtLocalDataSource jwtLocalDataSource;
 
-  /// Remote user data provider
-  final UserRemoteDataSource userRemoteDataSource;
-
-  /// Local user data provider
-  final UserLocalDataSource userLocalDataSource;
-
   /// Default constructor
   AuthRepository({
     required this.jwtRemoteDataSource,
     required this.jwtLocalDataSource,
-    required this.userRemoteDataSource,
-    required this.userLocalDataSource,
   });
-
-  @override
-  Future<Either<Failure, void>> createUser(RegisterEntity registration) async {
-    return await userRemoteDataSource.create(registration);
-  }
-
-  @override
-  Future<Either<Failure, AccountEntity>> updateUser(AccountEntity user) async {
-    return await userRemoteDataSource.update(user);
-  }
-
-  @override
-  Future<Either<Failure, void>> updateUserImage(
-      Uint8List imageBytes, String imageType) async {
-    return await userRemoteDataSource.updateImage(imageBytes, imageType);
-  }
-
-  @override
-  Future<Either<Failure, AccountEntity>> getUser() async {
-    final response = await userRemoteDataSource.get();
-    return await response.fold((failure) async {
-      if (failure is HttpConnectionFailure) {
-        return await userLocalDataSource.get();
-      }
-      return left(failure);
-    }, (remoteUser) async {
-      // Store user data
-      await userLocalDataSource.put(remoteUser);
-      return right(remoteUser);
-    });
-  }
-
-  @override
-  Future<Either<Failure, void>> deleteUser() async {
-    await userLocalDataSource.delete();
-    return await userRemoteDataSource.delete();
-  }
 
   @override
   Future<Either<Failure, void>> trySignIn() async {
@@ -85,7 +34,7 @@ class AuthRepository implements AuthRepositoryInterface {
   }
 
   @override
-  Future<Either<Failure, void>> signIn(CredentialsEntity credentials,
+  Future<Either<Failure, void>> login(CredentialsEntity credentials,
       {bool store = false}) async {
     final response = await jwtRemoteDataSource.get(credentials);
     // Check if there is a request failure
@@ -97,11 +46,9 @@ class AuthRepository implements AuthRepositoryInterface {
   }
 
   @override
-  Future<Either<Failure, bool>> signOut() async {
+  Future<Either<Failure, bool>> logout() async {
     if (!await jwtLocalDataSource.remove()) return left(const EmptyFailure());
     jwtRemoteDataSource.removeJwt();
-    // Delete user data
-    await userLocalDataSource.delete();
     return right(true);
   }
 }

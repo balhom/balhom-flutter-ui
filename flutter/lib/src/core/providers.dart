@@ -1,13 +1,8 @@
+import 'package:balance_home_app/config/app_environment.dart';
 import 'package:balance_home_app/config/app_theme.dart';
-import 'package:balance_home_app/src/core/application/app_version_controller.dart';
-import 'package:balance_home_app/src/core/clients/api_client.dart';
+import 'package:balance_home_app/src/core/clients/api_client/api_client.dart';
 import 'package:balance_home_app/src/core/clients/local_db_client.dart';
 import 'package:balance_home_app/src/core/clients/local_preferences_client.dart';
-import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/repositories/app_info_repository_interface.dart';
-import 'package:balance_home_app/src/core/infrastructure/datasources/remote/app_version_remote_data_source.dart';
-import 'package:balance_home_app/src/core/infrastructure/repositories/app_info_repository.dart';
-import 'package:balance_home_app/src/core/presentation/models/app_version.dart';
 import 'package:balance_home_app/src/core/presentation/states/app_localizations_state.dart';
 import 'package:balance_home_app/src/core/presentation/states/theme_data_state.dart';
 import 'package:balance_home_app/src/features/account/infrastructure/datasources/local/account_local_data_source.dart';
@@ -21,8 +16,18 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:universal_io/io.dart';
+
+/// Triggered from bootstrap() to complete futures
+Future<void> initializeProviders(ProviderContainer container) async {
+  usePathUrlStrategy();
+
+  /// Core
+  container.read(localPreferencesClientProvider);
+  container.read(localDbClientProvider);
+  container.read(balhomApiClientProvider);
+  container.read(currencyConversionClientProvider);
+}
 
 ///
 /// Infrastructure dependencies
@@ -43,40 +48,24 @@ final localDbClientProvider =
           MonthlyBalanceLocalDataSource.tableName,
         }));
 
-/// Exposes [HttpClient] instance
-final apiClientProvider = Provider((ref) {
-  return ApiClient();
+/// Exposes balhom [ApiClient] instance
+final balhomApiClientProvider = Provider((ref) {
+  return ApiClient(baseUrl: AppEnvironment.balhomApiUrl);
 });
 
-/// Triggered from bootstrap() to complete futures
-Future<void> initializeProviders(ProviderContainer container) async {
-  usePathUrlStrategy();
-
-  /// Core
-  container.read(localPreferencesClientProvider);
-  container.read(localDbClientProvider);
-  container.read(apiClientProvider);
-}
-
-final appInfoRepositoryProvider = Provider<AppInfoRepositoryInterface>((ref) {
-  return AppInfoRepository(
-      appVersionRemoteDataSource:
-          AppVersionRemoteDataSource(apiClient: ref.read(apiClientProvider)));
-});
-
-///
-/// Application dependencies
-///
-
-final appVersionController = StateNotifierProvider<AppVersionController,
-    AsyncValue<Either<Failure, AppVersion>>>((ref) {
-  final repo = ref.read(appInfoRepositoryProvider);
-  return AppVersionController(repository: repo);
+/// Exposes currency conversion [ApiClient] instance
+final currencyConversionClientProvider = Provider((ref) {
+  return ApiClient(baseUrl: AppEnvironment.currencyConversionApiUrl)
+    ..setHeader(HttpHeaders.authorizationHeader,
+        AppEnvironment.currencyConversionApiKey);
 });
 
 ///
 /// Presentation dependencies
 ///
+
+/// Provides a [ValueNotifier] to the app to check http connection state
+final connectionStateListenable = ValueNotifier<bool>(true);
 
 final themeDataProvider =
     StateNotifierProvider<ThemeDataState, ThemeData>((ref) {

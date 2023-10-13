@@ -3,7 +3,7 @@ import 'package:balance_home_app/src/core/clients/api_client.dart';
 import 'package:balance_home_app/src/core/router.dart';
 import 'package:balance_home_app/config/app_theme.dart';
 import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/no_local_entity_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/views/app_title.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
@@ -45,7 +45,7 @@ class _BalanceEditViewState extends ConsumerState<BalanceEditView> {
     return balanceList.when(data: (data) {
       return data.fold((failure) {
         if (failure is HttpConnectionFailure ||
-            failure is NoLocalEntityFailure) {
+            failure is NoLocalEntryFailure) {
           return showError(
               icon: Icons.network_wifi_1_bar,
               text: appLocalizations.noConnection);

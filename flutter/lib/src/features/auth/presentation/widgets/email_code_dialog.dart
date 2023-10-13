@@ -1,7 +1,7 @@
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_field.dart';
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/email.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/verification_code.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +79,7 @@ class _EmailCodeDialogState extends ConsumerState<EmailCodeDialog> {
             }
             if (code == null) return;
             final res = await emailCodeController.verifyCode(
-                UserEmail(appLocalizations, widget.email),
+                EmailValue(appLocalizations, widget.email),
                 code!,
                 appLocalizations);
             res.fold((_) {}, (_) {

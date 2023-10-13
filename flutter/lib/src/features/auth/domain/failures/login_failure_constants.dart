@@ -1,0 +1,1 @@
+const wrongCredentialsFailureCode = 11;

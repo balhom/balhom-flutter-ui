@@ -1,6 +1,6 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/no_local_entity_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date_mode.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_repository_interface.dart';
@@ -42,7 +42,7 @@ class StatisticsController
         dateFrom: balanceDate.dateFrom,
         dateTo: balanceDate.dateTo);
     state = await revenues.fold((failure) {
-      if (failure is NoLocalEntityFailure) {
+      if (failure is NoLocalEntryFailure) {
         return AsyncValue.data(left(failure));
       }
       return AsyncValue.error(failure.detail, StackTrace.empty);
@@ -59,7 +59,7 @@ class StatisticsController
             dateFrom: balanceDate.dateFrom,
             dateTo: balanceDate.dateTo);
         return await expenses.fold((failure) {
-          if (failure is NoLocalEntityFailure) {
+          if (failure is NoLocalEntryFailure) {
             return AsyncValue.data(left(failure));
           }
           return AsyncValue.error(failure.detail, StackTrace.empty);
@@ -74,7 +74,7 @@ class StatisticsController
             final monthlyBalances = await monthlyBalanceRepository
                 .getMonthlyBalances(year: selectedSavingsDate.year);
             return await monthlyBalances.fold((failure) {
-              if (failure is NoLocalEntityFailure) {
+              if (failure is NoLocalEntryFailure) {
                 return AsyncValue.data(left(failure));
               }
               return AsyncValue.error(failure.detail, StackTrace.empty);
@@ -83,7 +83,7 @@ class StatisticsController
               final annualBalances =
                   await annualBalanceRepository.getAnnualBalances();
               return await annualBalances.fold((failure) {
-                if (failure is NoLocalEntityFailure) {
+                if (failure is NoLocalEntryFailure) {
                   return AsyncValue.data(left(failure));
                 }
                 return AsyncValue.error(failure.detail, StackTrace.empty);
@@ -92,7 +92,7 @@ class StatisticsController
                 final currencyTypes =
                     await currencyTypeRepository.getCurrencyTypes();
                 return await currencyTypes.fold((failure) {
-                  if (failure is NoLocalEntityFailure) {
+                  if (failure is NoLocalEntryFailure) {
                     return AsyncValue.data(left(failure));
                   }
                   return AsyncValue.error(failure.detail, StackTrace.empty);

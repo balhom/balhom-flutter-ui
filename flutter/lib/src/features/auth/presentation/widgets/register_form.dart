@@ -3,11 +3,11 @@ import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.d
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_field.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/invitation_code.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/email.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_name.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_password.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_repeat_password.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/invitation_code_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_name_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_password_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_repeat_password_value.dart';
 import 'package:balance_home_app/src/core/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/currency_type_entity.dart';
@@ -50,13 +50,13 @@ class RegisterForm extends ConsumerStatefulWidget {
 
 class _RegisterFormState extends ConsumerState<RegisterForm> {
   @visibleForTesting
-  UserName? username;
+  RegisterNameValue? username;
   @visibleForTesting
-  UserEmail? email;
+  EmailValue? email;
   @visibleForTesting
-  UserPassword? password;
+  RegisterPasswordValue? password;
   @visibleForTesting
-  UserRepeatPassword? repeatPassword;
+  RegisterRepeatPasswordValue? repeatPassword;
   @visibleForTesting
   InvitationCode? invitationCode;
   @visibleForTesting
@@ -65,10 +65,10 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    username = UserName(appLocalizations, widget.usernameController.text);
-    email = UserEmail(appLocalizations, widget.emailController.text);
-    password = UserPassword(appLocalizations, widget.passwordController.text);
-    repeatPassword = UserRepeatPassword(appLocalizations,
+    username = RegisterNameValue(appLocalizations, widget.usernameController.text);
+    email = EmailValue(appLocalizations, widget.emailController.text);
+    password = RegisterPasswordValue(appLocalizations, widget.passwordController.text);
+    repeatPassword = RegisterRepeatPasswordValue(appLocalizations,
         widget.passwordController.text, widget.password2Controller.text);
     invitationCode =
         InvitationCode(appLocalizations, widget.invitationCodeController.text);
@@ -100,7 +100,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                 title: appLocalizations.username,
                 controller: widget.usernameController,
                 onChanged: (value) =>
-                    username = UserName(appLocalizations, value),
+                    username = RegisterNameValue(appLocalizations, value),
                 validator: (value) => username?.validate,
               ),
               verticalSpace(),
@@ -110,7 +110,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                 maxCharacters: 300,
                 controller: widget.emailController,
                 onChanged: (value) =>
-                    email = UserEmail(appLocalizations, value),
+                    email = EmailValue(appLocalizations, value),
                 validator: (value) => email?.validate,
               ),
               verticalSpace(),
@@ -120,7 +120,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                 maxCharacters: 400,
                 controller: widget.passwordController,
                 onChanged: (value) =>
-                    password = UserPassword(appLocalizations, value),
+                    password = RegisterPasswordValue(appLocalizations, value),
                 validator: (value) => password?.validate,
               ),
               verticalSpace(),
@@ -129,7 +129,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                 maxWidth: 400,
                 maxCharacters: 400,
                 controller: widget.password2Controller,
-                onChanged: (value) => repeatPassword = UserRepeatPassword(
+                onChanged: (value) => repeatPassword = RegisterRepeatPasswordValue(
                     appLocalizations, widget.passwordController.text, value),
                 validator: (value) => repeatPassword?.validate,
               ),

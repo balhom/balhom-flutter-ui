@@ -1,5 +1,5 @@
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/features/auth/application/settings_controller.dart';
+import 'package:balance_home_app/src/features/settings/application/settings_controller.dart';
 import 'package:balance_home_app/src/features/settings/domain/repositories/settings_repository_interface.dart';
 import 'package:balance_home_app/src/features/settings/infrastructure/datasources/local/theme_local_data_source.dart';
 import 'package:balance_home_app/src/features/settings/infrastructure/repositories/settings_repository.dart';

@@ -4,9 +4,9 @@ import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_fie
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
 import 'package:balance_home_app/src/features/auth/application/reset_password_controller.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/email.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_password.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_repeat_password.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_password_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_repeat_password_value.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/verification_code.dart';
 import 'package:balance_home_app/src/features/auth/presentation/views/auth_view.dart';
 import 'package:balance_home_app/src/core/utils/dialog_utils.dart';
@@ -40,26 +40,26 @@ class ResetPasswordForm extends ConsumerStatefulWidget {
 
 class _ResetPasswordFormState extends ConsumerState<ResetPasswordForm> {
   @visibleForTesting
-  UserEmail? email;
+  EmailValue? email;
   @visibleForTesting
-  UserPassword? password;
+  RegisterPasswordValue? password;
   @visibleForTesting
-  UserRepeatPassword? repeatPassword;
+  RegisterRepeatPasswordValue? repeatPassword;
   @visibleForTesting
   VerificationCode? code;
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    email = UserEmail(appLocalizations, widget.emailController.text);
+    email = EmailValue(appLocalizations, widget.emailController.text);
     final res = ref.watch(resetPasswordControllerProvider);
     final resetPasswordController =
         ref.read(resetPasswordControllerProvider.notifier);
     return res.when(data: (progress) {
       if (progress == ResetPasswordProgress.started) {
         password =
-            UserPassword(appLocalizations, widget.passwordController.text);
-        repeatPassword = UserRepeatPassword(
+            RegisterPasswordValue(appLocalizations, widget.passwordController.text);
+        repeatPassword = RegisterRepeatPasswordValue(
             appLocalizations,
             widget.passwordController.text,
             widget.repeatPasswordController.text);
@@ -75,7 +75,7 @@ class _ResetPasswordFormState extends ConsumerState<ResetPasswordForm> {
               verticalSpace(),
               AppTextFormField(
                 onChanged: (value) =>
-                    email = UserEmail(appLocalizations, value),
+                    email = EmailValue(appLocalizations, value),
                 title: appLocalizations.emailAddress,
                 validator: (value) => email?.validate,
                 readOnly: progress != ResetPasswordProgress.none,
@@ -86,7 +86,7 @@ class _ResetPasswordFormState extends ConsumerState<ResetPasswordForm> {
               verticalSpace(),
               AppPasswordTextFormField(
                 onChanged: (value) =>
-                    password = UserPassword(appLocalizations, value),
+                    password = RegisterPasswordValue(appLocalizations, value),
                 title: appLocalizations.password,
                 validator: (value) => password?.validate,
                 readOnly: progress != ResetPasswordProgress.started,
@@ -95,7 +95,7 @@ class _ResetPasswordFormState extends ConsumerState<ResetPasswordForm> {
                 controller: widget.passwordController,
               ),
               AppPasswordTextFormField(
-                onChanged: (value) => repeatPassword = UserRepeatPassword(
+                onChanged: (value) => repeatPassword = RegisterRepeatPasswordValue(
                     appLocalizations, widget.passwordController.text, value),
                 title: appLocalizations.repeatPassword,
                 validator: (value) => repeatPassword?.validate,

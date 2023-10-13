@@ -33,7 +33,7 @@ import 'package:fpdart/fpdart.dart';
 final balanceTypeRepositoryProvider = Provider<BalanceTypeRepositoryInterface>(
     (ref) => BalanceTypeRepository(
         balanceTypeRemoteDataSource:
-            BalanceTypeRemoteDataSource(apiClient: ref.read(apiClientProvider)),
+            BalanceTypeRemoteDataSource(apiClient: ref.read(balhomApiClientProvider)),
         balanceTypeLocalDataSource: BalanceTypeLocalDataSource(
             localDbClient: ref.read(localDbClientProvider))));
 
@@ -41,7 +41,7 @@ final balanceTypeRepositoryProvider = Provider<BalanceTypeRepositoryInterface>(
 final balanceRepositoryProvider = Provider<BalanceRepositoryInterface>((ref) =>
     BalanceRepository(
         balanceRemoteDataSource:
-            BalanceRemoteDataSource(apiClient: ref.read(apiClientProvider)),
+            BalanceRemoteDataSource(apiClient: ref.read(balhomApiClientProvider)),
         balanceLocalDataSource: BalanceLocalDataSource(
             localDbClient: ref.read(localDbClientProvider))));
 

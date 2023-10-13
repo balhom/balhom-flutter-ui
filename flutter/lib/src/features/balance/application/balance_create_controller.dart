@@ -1,5 +1,5 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/unprocessable_entity_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/unprocessable_value_failure.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_repository_interface.dart';
@@ -58,7 +58,7 @@ class BalanceCreateController
                 _balanceTypeMode);
             return res.fold((failure) {
               state = const AsyncValue.data(null);
-              return left(UnprocessableEntityFailure(
+              return left(UnprocessableValueFailure(
                   detail: appLocalizations.genericError));
             }, (value) {
               state = AsyncValue.data(value);

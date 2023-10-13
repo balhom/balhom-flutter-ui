@@ -1,0 +1,1 @@
+const emailAlreadyUsedFailureCode = 6;

@@ -29,7 +29,7 @@ import 'package:fpdart/fpdart.dart';
 final annualBalanceRepositoryProvider =
     Provider<AnnualBalanceRepositoryInterface>((ref) => AnnualBalanceRepository(
         annualBalanceRemoteDataSource: AnnualBalanceRemoteDataSource(
-            apiClient: ref.read(apiClientProvider)),
+            apiClient: ref.read(balhomApiClientProvider)),
         annualBalanceLocalDataSource: AnnualBalanceLocalDataSource(
             localDbClient: ref.read(localDbClientProvider))));
 
@@ -38,7 +38,7 @@ final monthlyBalanceRepositoryProvider =
     Provider<MonthlyBalanceRepositoryInterface>((ref) =>
         MonthlyBalanceRepository(
             monthlyBalanceRemoteDataSource: MonthlyBalanceRemoteDataSource(
-                apiClient: ref.read(apiClientProvider)),
+                apiClient: ref.read(balhomApiClientProvider)),
             monthlyBalanceLocalDataSource: MonthlyBalanceLocalDataSource(
                 localDbClient: ref.read(localDbClientProvider))));
 

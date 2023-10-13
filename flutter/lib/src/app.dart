@@ -16,13 +16,6 @@ class BalanceHomeApp extends ConsumerStatefulWidget {
 class BalanceHomeAppState extends ConsumerState<BalanceHomeApp> {
   @override
   Widget build(BuildContext context) {
-    // Change language header if aplication language changes
-    ref
-        .read(apiClientProvider)
-        .setLanguage(ref.read(appLocalizationsProvider).localeName);
-    ref.listen(appLocalizationsProvider, (_, value) {
-      ref.read(apiClientProvider).setLanguage(value.localeName);
-    });
     // Change aplication language at user sign in
     ref.listen(authControllerProvider, (_, value) {
       if (value.asData != null && value.asData!.value != null) {

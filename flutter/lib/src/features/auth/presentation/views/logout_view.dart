@@ -19,7 +19,7 @@ class LogoutView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authController = ref.read(authControllerProvider.notifier);
     Future.delayed(Duration.zero, () async {
-      final value = await authController.signOut();
+      final value = await authController.logout();
       value.fold((_) {
         AppErrorView.go();
       }, (_) {

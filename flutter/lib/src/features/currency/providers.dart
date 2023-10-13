@@ -31,7 +31,7 @@ final currencyTypeListsControllerProvider = StateNotifierProvider<
 final currencyTypeRepositoryProvider =
     Provider<CurrencyTypeRepositoryInterface>((ref) => CurrencyTypeRepository(
         currencyTypeRemoteDataSource: CurrencyTypeRemoteDataSource(
-            apiClient: ref.read(apiClientProvider)),
+            apiClient: ref.read(balhomApiClientProvider)),
         currencyTypeLocalDataSource: CurrencyTypeLocalDataSource(
             localDbClient: ref.read(localDbClientProvider))));
 
@@ -41,4 +41,4 @@ final currencyConversionRepositoryProvider =
         CurrencyConversionRepository(
             currencyConversionRemoteDataSource:
                 CurrencyConversionRemoteDataSource(
-                    apiClient: ref.read(apiClientProvider))));
+                    apiClient: ref.read(balhomApiClientProvider))));
