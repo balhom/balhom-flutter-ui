@@ -2,12 +2,12 @@ import 'package:balance_home_app/src/core/router.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_password_text_form_field.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_field.dart';
-import 'package:balance_home_app/src/core/presentation/widgets/app_text_check_box.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
+import 'package:balance_home_app/src/features/auth/domain/dtos/login_values_dto.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/login_password_value.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
-import 'package:balance_home_app/src/core/utils/dialog_utils.dart';
+import 'package:balance_home_app/src/features/auth/presentation/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:balance_home_app/src/features/statistics/presentation/views/statistics_view.dart';
 import 'package:flutter/material.dart';
@@ -15,14 +15,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginForm extends ConsumerStatefulWidget {
-  @visibleForTesting
   final cache = ValueNotifier<Widget>(Container());
 
-  @visibleForTesting
   final formKey = GlobalKey<FormState>();
-  @visibleForTesting
+
   final TextEditingController emailController;
-  @visibleForTesting
   final TextEditingController passwordController;
 
   LoginForm(
@@ -36,32 +33,35 @@ class LoginForm extends ConsumerStatefulWidget {
 }
 
 class _LoginFormState extends ConsumerState<LoginForm> {
-  @visibleForTesting
-  EmailValue? email;
-  @visibleForTesting
-  LoginPasswordValue? password;
-  @visibleForTesting
-  bool storeCredentials = false;
+  LoginValuesDto? loginValuesDto;
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    email = EmailValue(appLocalizations, widget.emailController.text);
-    password = LoginPasswordValue(appLocalizations, widget.passwordController.text);
-    final auth = ref.watch(authControllerProvider);
+
+    loginValuesDto ??= LoginValuesDto(
+        emailValue: EmailValue(appLocalizations, widget.emailController.text),
+        passwordValue: LoginPasswordValue(
+            appLocalizations, widget.passwordController.text));
+
+    final authState = ref.watch(authControllerProvider);
     final authController = ref.read(authControllerProvider.notifier);
-    final emailCode = ref.watch(emailCodeControllerProvider);
-    final emailCodeController = ref.read(emailCodeControllerProvider.notifier);
-    final isLoading = auth.maybeWhen(
-          data: (_) => auth.isRefreshing,
+    final emailVerificationState =
+        ref.watch(emailVerificationControllerProvider);
+    final emailVerificationController =
+        ref.read(emailVerificationControllerProvider.notifier);
+
+    final isLoading = authState.maybeWhen(
+          data: (_) => authState.isRefreshing,
           loading: () => true,
           orElse: () => false,
         ) ||
-        emailCode.maybeWhen(
-          data: (_) => auth.isRefreshing,
+        emailVerificationState.maybeWhen(
+          data: (_) => emailVerificationState.isRefreshing,
           loading: () => true,
           orElse: () => false,
         );
+
     widget.cache.value = SingleChildScrollView(
       child: Form(
         key: widget.formKey,
@@ -70,34 +70,29 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
+              // Email Text Field
               AppTextFormField(
                 maxWidth: 400,
                 maxCharacters: 300,
                 title: appLocalizations.emailAddress,
                 controller: widget.emailController,
-                onChanged: (value) =>
-                    email = EmailValue(appLocalizations, value),
-                validator: (value) => email?.validate,
+                onChanged: (value) => loginValuesDto!
+                    .copyWith(emailValue: EmailValue(appLocalizations, value)),
+                validator: (value) => loginValuesDto!.emailValue.validate,
               ),
               verticalSpace(),
+              // Password Text Field
               AppPasswordTextFormField(
                 maxWidth: 400,
                 maxCharacters: 400,
                 title: appLocalizations.password,
                 controller: widget.passwordController,
-                onChanged: (value) =>
-                    password = LoginPasswordValue(appLocalizations, value),
-                validator: (value) => password?.validate,
+                onChanged: (value) => loginValuesDto!.copyWith(
+                    passwordValue: LoginPasswordValue(appLocalizations, value)),
+                validator: (value) => loginValuesDto!.passwordValue.validate,
               ),
               verticalSpace(),
-              AppTextCheckBox(
-                title: appLocalizations.storeCredentials,
-                fillColor: const Color.fromARGB(255, 65, 65, 65),
-                onChanged: (value) {
-                  storeCredentials = value!;
-                },
-              ),
-              verticalSpace(),
+              // Login Button
               SizedBox(
                   height: 50,
                   width: 200,
@@ -108,26 +103,15 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                             !widget.formKey.currentState!.validate()) {
                           return;
                         }
-                        if (email == null) return;
-                        if (password == null) return;
                         (await authController.login(
-                                email!, password!, appLocalizations,
-                                rememberMe: storeCredentials))
+                                loginValuesDto!, appLocalizations))
                             .fold((failure) async {
                           if (failure.detail ==
                               appLocalizations.emailNotVerified) {
-                            bool sendCode =
-                                await showCodeAdviceDialog(appLocalizations);
-                            if (sendCode) {
-                              (await emailCodeController.requestCode(
-                                      email!, appLocalizations))
-                                  .fold((failure) {
-                                showErrorEmailSendCodeDialog(
-                                    appLocalizations, failure.detail);
-                              }, (_) {
-                                showCodeSendDialog(widget.emailController.text);
-                              });
-                            }
+                            await showEmailVerificationDialog(
+                                emailVerificationController,
+                                loginValuesDto!.emailValue,
+                                appLocalizations);
                           } else {
                             showErrorLoginDialog(
                                 appLocalizations, failure.detail);
@@ -138,11 +122,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                       },
                       text: appLocalizations.signIn)),
               verticalSpace(),
+              // Forgot Password Button
               TextButton(
                 onPressed: () {
-                  ref
-                      .read(resetPasswordControllerProvider.notifier)
-                      .resetProgress();
                   showResetPasswordAdviceDialog(appLocalizations);
                 },
                 child: Text(

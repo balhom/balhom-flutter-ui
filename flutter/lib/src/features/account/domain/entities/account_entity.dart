@@ -14,7 +14,7 @@ class AccountEntity with _$AccountEntity {
   /// [expectedAnnualBalance] - [double] expected annual balance
   /// [expectedMonthlyBalance] - [double] expected monthly balance
   /// [language] - [double] language
-  /// [prefCoinType] - [double] preferred coin type
+  /// [prefCurrencyType] - [double] preferred coin type
   /// [image] - [double] profile image
   /// [lastLogin] - [DateTime] last login date
   // ignore: invalid_annotation_target
@@ -27,7 +27,7 @@ class AccountEntity with _$AccountEntity {
     required double expectedAnnualBalance,
     required double expectedMonthlyBalance,
     required String language,
-    required String prefCoinType,
+    required String prefCurrencyType,
     // ignore: invalid_annotation_target
     @JsonKey(includeIfNull: false) required String? image,
     // ignore: invalid_annotation_target

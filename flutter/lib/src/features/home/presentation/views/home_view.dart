@@ -1,5 +1,5 @@
 import 'package:adaptive_navigation/adaptive_navigation.dart';
-import 'package:balance_home_app/src/core/clients/api_client.dart';
+import 'package:balance_home_app/src/core/presentation/widgets/app_will_pop_scope.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/platform_utils.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
@@ -10,10 +10,7 @@ import 'package:balance_home_app/src/features/statistics/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:universal_io/io.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-final lastExitPressState = ValueNotifier<DateTime?>(null);
 
 class HomeView extends ConsumerStatefulWidget {
   final HomeTab selectedSection;
@@ -36,23 +33,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
         showNoConnectionSnackBar(appLocalizations);
       });
     }
-    return WillPopScope(
-      onWillPop: () async {
-        final now = DateTime.now();
-        if (lastExitPressState.value != null &&
-            now.difference(lastExitPressState.value!) <
-                const Duration(seconds: 2)) {
-          exit(0);
-        } else {
-          lastExitPressState.value = now;
-          final snackBar = SnackBar(
-              content: Text(appLocalizations.exitRepeatMessage,
-                  textAlign: TextAlign.center),
-              duration: const Duration(seconds: 2));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          return false;
-        }
-      },
+    return AppWillPopScope(
+      snackBarText: appLocalizations.exitRepeatMessage,
       child: AdaptiveNavigationScaffold(
         appBar: const PreferredSize(
             preferredSize: Size.fromHeight(40), child: CustomAppBar()),

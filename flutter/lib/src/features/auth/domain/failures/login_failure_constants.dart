@@ -1,1 +1,0 @@
-const wrongCredentialsFailureCode = 11;

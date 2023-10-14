@@ -66,7 +66,7 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
                     );
                   }).toList(),
                   onChanged: (coin) {
-                    selectedExchangeState.setCoinFrom(coin!);
+                    selectedExchangeState.setCurrencyFrom(coin!);
                   }),
             ),
             Container(
@@ -83,7 +83,7 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
                     );
                   }).toList(),
                   onChanged: (coin) {
-                    selectedExchangeState.setCoinTo(coin!);
+                    selectedExchangeState.setCurrencyTo(coin!);
                   }),
             )
           ],

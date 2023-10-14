@@ -1,1 +1,0 @@
-const emailAlreadyUsedFailureCode = 6;

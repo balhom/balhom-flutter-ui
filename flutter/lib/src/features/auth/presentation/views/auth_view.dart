@@ -1,8 +1,9 @@
 import 'package:balance_home_app/config/app_colors.dart';
 import 'package:balance_home_app/config/app_layout.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/views/app_title.dart';
+import 'package:balance_home_app/src/core/presentation/widgets/app_will_pop_scope.dart';
 import 'package:balance_home_app/src/features/auth/presentation/views/auth_background_view.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_language_picker_dropdown.dart';
 import 'package:balance_home_app/src/core/providers.dart';
@@ -14,9 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:language_picker/languages.dart';
-import 'package:universal_io/io.dart';
-
-final lastExitPressState = ValueNotifier<DateTime?>(null);
 
 class AuthView extends ConsumerWidget {
   /// Named route for [AuthView]
@@ -27,13 +25,12 @@ class AuthView extends ConsumerWidget {
 
   final loginEmailController = TextEditingController();
   final loginPasswordController = TextEditingController();
+
   final registerUsernameController = TextEditingController();
   final registerEmailController = TextEditingController();
   final registerPasswordController = TextEditingController();
-  final registerPassword2Controller = TextEditingController();
-  final registerInvitationCodeController = TextEditingController();
+  final registerRepeatPasswordController = TextEditingController();
 
-  @visibleForTesting
   final cache = ValueNotifier<Widget>(Container());
 
   AuthView({super.key});
@@ -43,20 +40,11 @@ class AuthView extends ConsumerWidget {
     final appLocalizations = ref.watch(appLocalizationsProvider);
     final appLocalizationStateNotifier =
         ref.read(appLocalizationsProvider.notifier);
+
     final currencyTypeListController =
         ref.watch(currencyTypeListsControllerProvider);
-    return WillPopScope(
-      onWillPop: () async {
-        final now = DateTime.now();
-        if (lastExitPressState.value != null &&
-            now.difference(lastExitPressState.value!) <
-                const Duration(seconds: 2)) {
-          exit(0);
-        } else {
-          lastExitPressState.value = now;
-          return false;
-        }
-      },
+
+    return AppWillPopScope(
       child: Scaffold(
         appBar: AppBar(
             title: const AppTitle(fontSize: 30),
@@ -126,10 +114,8 @@ class AuthView extends ConsumerWidget {
                                 usernameController: registerUsernameController,
                                 emailController: registerEmailController,
                                 passwordController: registerPasswordController,
-                                password2Controller:
-                                    registerPassword2Controller,
-                                invitationCodeController:
-                                    registerInvitationCodeController,
+                                repeatPasswordController:
+                                    registerRepeatPasswordController,
                                 currencyTypes: currencyTypes)
                           ])),
                         ],

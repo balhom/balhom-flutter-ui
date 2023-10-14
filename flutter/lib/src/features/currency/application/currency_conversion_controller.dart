@@ -1,23 +1,21 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/unprocessable_value_failure.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/currency_conversion_entity.dart';
-import 'package:balance_home_app/src/features/currency/domain/repositories/currency_conversion_repository_interface.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:balance_home_app/src/features/currency/domain/repositories/currency_repository_interface.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class CurrencyConversionController extends StateNotifier<AsyncValue<void>> {
-  final CurrencyConversionRepositoryInterface currencyConversionRepository;
+class CurrencyConversionController {
+  final CurrencyRepositoryInterface currencyRepository;
 
-  CurrencyConversionController({required this.currencyConversionRepository})
-      : super(const AsyncValue.data(null));
+  CurrencyConversionController({required this.currencyRepository});
 
   Future<Either<Failure, double>> getCurrencyConversion(
       final double quantity,
       final String currencyFrom,
       final String currencyTo,
       final AppLocalizations appLocalizations) async {
-    return (await currencyConversionRepository
+    return (await currencyRepository
             .getCurrencyConversion(currencyFrom))
         .fold(
             (failure) => left(UnprocessableValueFailure(

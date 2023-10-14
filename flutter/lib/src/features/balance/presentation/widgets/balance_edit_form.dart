@@ -11,10 +11,10 @@ import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
-import 'package:balance_home_app/src/features/balance/domain/values/balance_date.dart';
-import 'package:balance_home_app/src/features/balance/domain/values/balance_description.dart';
-import 'package:balance_home_app/src/features/balance/domain/values/balance_name.dart';
-import 'package:balance_home_app/src/features/balance/domain/values/balance_quantity.dart';
+import 'package:balance_home_app/src/features/balance/domain/values/balance_date_value.dart';
+import 'package:balance_home_app/src/features/balance/domain/values/balance_description_value.dart';
+import 'package:balance_home_app/src/features/balance/domain/values/balance_name_value.dart';
+import 'package:balance_home_app/src/features/balance/domain/values/balance_quantity_value.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_type_dropdown_picker.dart';
 import 'package:balance_home_app/src/features/balance/providers.dart';
@@ -59,13 +59,13 @@ class BalanceEditForm extends ConsumerStatefulWidget {
 
 class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
   @visibleForTesting
-  BalanceName? name;
+  BalanceNameValue? name;
   @visibleForTesting
-  BalanceDescription? description;
+  BalanceDescriptionValue? description;
   @visibleForTesting
-  BalanceQuantity? quantity;
+  BalanceQuantityValue? quantity;
   @visibleForTesting
-  BalanceDate? date;
+  BalanceDateValue? date;
   @visibleForTesting
   String? coinType;
   @visibleForTesting
@@ -83,12 +83,12 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
       widget.dateController.text =
           widget.dateFormatter.format(widget.balance.date);
     }
-    name = BalanceName(appLocalizations, widget.nameController.text);
+    name = BalanceNameValue(appLocalizations, widget.nameController.text);
     description =
-        BalanceDescription(appLocalizations, widget.descriptionController.text);
-    quantity = BalanceQuantity(appLocalizations,
+        BalanceDescriptionValue(appLocalizations, widget.descriptionController.text);
+    quantity = BalanceQuantityValue(appLocalizations,
         double.tryParse(widget.quantityController.text.replaceAll(",", ".")));
-    date = BalanceDate(
+    date = BalanceDateValue(
         appLocalizations,
         DateTime(
             int.parse(widget.dateController.text.split("/")[2]),
@@ -141,7 +141,7 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                       AppTextFormField(
                         readOnly: !widget.edit,
                         onChanged: (value) =>
-                            name = BalanceName(appLocalizations, value),
+                            name = BalanceNameValue(appLocalizations, value),
                         title: appLocalizations.balanceName,
                         validator: (value) => name?.validate,
                         maxCharacters: 40,
@@ -152,7 +152,7 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                       AppTextFormField(
                         readOnly: !widget.edit,
                         onChanged: (value) => description =
-                            BalanceDescription(appLocalizations, value),
+                            BalanceDescriptionValue(appLocalizations, value),
                         title: appLocalizations.balanceDescription,
                         validator: (value) => description?.validate,
                         maxCharacters: 2000,
@@ -170,7 +170,7 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                           DoubleFormField(
                             readOnly: !widget.edit,
                             onChanged: (value) => quantity =
-                                BalanceQuantity(appLocalizations, value),
+                                BalanceQuantityValue(appLocalizations, value),
                             title: appLocalizations.balanceQuantity,
                             validator: (value) => quantity?.validate,
                             maxWidth: 200,
@@ -206,7 +206,7 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                                 firstDate: DateTime(2000),
                                 lastDate: DateTime.now());
                             if (newDate != null) {
-                              date = BalanceDate(appLocalizations, newDate);
+                              date = BalanceDateValue(appLocalizations, newDate);
                               widget.dateController.text =
                                   widget.dateFormatter.format(newDate);
                             }

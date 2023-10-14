@@ -1,14 +1,11 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http/api_bad_request_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http/input_bad_request_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/unprocessable_value_failure.dart';
+import 'package:balance_home_app/src/features/account/domain/dtos/account_edit_values_dto.dart';
 import 'package:balance_home_app/src/features/account/domain/dtos/register_values_dto.dart';
 import 'package:balance_home_app/src/features/account/domain/entities/account_entity.dart';
+import 'package:balance_home_app/src/features/account/domain/failures/account_edit_failure.dart';
+import 'package:balance_home_app/src/features/account/domain/failures/register_failure.dart';
 import 'package:balance_home_app/src/features/account/domain/repositories/account_repository_interface.dart';
-import 'package:balance_home_app/src/features/auth/domain/failures/register_failure.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_name_value.dart';
-import 'package:balance_home_app/src/features/balance/domain/values/balance_quantity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
@@ -51,64 +48,20 @@ class AccountController extends StateNotifier<AsyncValue<AccountEntity?>> {
   }
 
   Future<Either<Failure, AccountEntity>> update(
-      AccountEntity oldUser,
-      RegisterNameValue username,
-      EmailValue email,
-      BalanceQuantity expectedMonthlyBalance,
-      BalanceQuantity expectedAnnualBalance,
-      String prefCurrencyType,
-      AppLocalizations appLocalizations) async {
+      final AccountEditValuesDto accountEditValuesDto,
+      final AppLocalizations appLocalizations) async {
     state = const AsyncValue.loading();
-    return await username.value.fold((failure) {
+    return await accountEditValuesDto.toEntity().fold((failure) {
       state = const AsyncValue.data(null);
       return left(failure);
-    }, (username) async {
-      return await email.value.fold((failure) {
+    }, (accountEntity) async {
+      final res = await accountRepository.update(accountEntity);
+      return res.fold((failure) {
         state = const AsyncValue.data(null);
-        return left(failure);
-      }, (email) async {
-        return await expectedMonthlyBalance.value.fold((failure) {
-          state = const AsyncValue.data(null);
-          return left(failure);
-        }, (expectedMonthlyBalance) async {
-          return await expectedAnnualBalance.value.fold((failure) {
-            state = const AsyncValue.data(null);
-            return left(failure);
-          }, (expectedAnnualBalance) async {
-            final res = await accountRepository.update(
-              AccountEntity(
-                  username: username,
-                  email: email,
-                  receiveEmailBalance: oldUser.receiveEmailBalance,
-                  balance: oldUser.balance,
-                  expectedAnnualBalance: expectedAnnualBalance,
-                  expectedMonthlyBalance: expectedMonthlyBalance,
-                  language: oldUser.language,
-                  prefCoinType: prefCurrencyType,
-                  lastLogin: null,
-                  image: null),
-            );
-            return res.fold((failure) {
-              state = const AsyncValue.data(null);
-              if (failure is ApiBadRequestFailure) {
-                return left(UnprocessableValueFailure(detail: failure.detail));
-              } else if (failure is InputBadRequestFailure) {
-                if (failure.containsFieldName("pref_currency_type")) {
-                  return left(UnprocessableValueFailure(
-                      detail: appLocalizations.userEditPrefCurrencyTypeError));
-                } else if (failure.containsFieldName("username")) {
-                  return left(UnprocessableValueFailure(
-                      detail: appLocalizations.usernameUsed));
-                }
-              }
-              return left(UnprocessableValueFailure(
-                  detail: appLocalizations.genericError));
-            }, (value) {
-              state = const AsyncValue.data(null);
-              return right(value);
-            });
-          });
-        });
+        return left(AccountEditFailure.fromFailure(failure, appLocalizations));
+      }, (value) {
+        state = const AsyncValue.data(null);
+        return right(value);
       });
     });
   }
@@ -120,7 +73,7 @@ class AccountController extends StateNotifier<AsyncValue<AccountEntity?>> {
     return res.fold((_) {
       state = const AsyncValue.data(null);
       return left(UnprocessableValueFailure(
-          detail: appLocalizations.userEditImageError));
+          detail: appLocalizations.accountEditImageError));
     }, (value) {
       state = const AsyncValue.data(null);
       return right(value);

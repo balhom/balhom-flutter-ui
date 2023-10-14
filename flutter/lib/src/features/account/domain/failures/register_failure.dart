@@ -1,7 +1,7 @@
-import 'package:balance_home_app/src/core/domain/failures/api_bad_request_failure.dart';
+import 'package:balance_home_app/src/core/domain/constants/requests_failure_constants.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/input_bad_request_failure.dart';
-import 'package:balance_home_app/src/features/auth/domain/failures/register_failure_constants.dart';
+import 'package:balance_home_app/src/core/domain/failures/http/api_bad_request_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/http/input_bad_request_failure.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegisterFailure extends Failure {
@@ -12,8 +12,10 @@ class RegisterFailure extends Failure {
     // Bad Request Failure case
     if (failure is ApiBadRequestFailure) {
       switch (failure.errorCode) {
-        case emailAlreadyUsedFailureCode:
+        case RequestsFailureConstants.emailAlreadyUsedFailureCode:
           return RegisterFailure(detail: appLocalizations.emailUsed);
+        case RequestsFailureConstants.usernameAlreadyUsedFailureCode:
+          return RegisterFailure(detail: appLocalizations.usernameUsed);
         default:
       }
     }

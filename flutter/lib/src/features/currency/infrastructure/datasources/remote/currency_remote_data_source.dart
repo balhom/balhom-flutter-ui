@@ -1,25 +1,19 @@
 import 'package:balance_home_app/config/api_contract.dart';
-import 'package:balance_home_app/src/core/clients/api_client.dart';
+import 'package:balance_home_app/src/core/clients/api_client/api_client.dart';
 import 'package:balance_home_app/src/core/domain/entities/pagination_entity.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_request_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/http/http_request_failure.dart';
+import 'package:balance_home_app/src/features/currency/domain/entities/currency_conversion_list_entity.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/currency_type_entity.dart';
+import 'package:balance_home_app/src/features/currency/domain/entities/date_currency_conversion_list_entity.dart';
 import 'package:fpdart/fpdart.dart';
 
-class CurrencyTypeRemoteDataSource {
+class CurrencyRemoteDataSource {
   final ApiClient apiClient;
 
-  CurrencyTypeRemoteDataSource({required this.apiClient});
+  CurrencyRemoteDataSource({required this.apiClient});
 
-  Future<Either<Failure, CurrencyTypeEntity>> get(String code) async {
-    final response =
-        await apiClient.getRequest('${APIContract.currencyType}/$code');
-    // Check if there is a request failure
-    return response.fold((failure) => left(failure),
-        (value) => right(CurrencyTypeEntity.fromJson(value.data)));
-  }
-
-  Future<Either<Failure, List<CurrencyTypeEntity>>> list() async {
+  Future<Either<Failure, List<CurrencyTypeEntity>>> getTypes() async {
     Map<String, dynamic> queryParameters = {"page": 1};
     final response = await apiClient.getRequest(APIContract.currencyType,
         queryParameters: queryParameters);
@@ -45,5 +39,25 @@ class CurrencyTypeRemoteDataSource {
       }
       return right(currencyTypes);
     });
+  }
+
+  Future<Either<Failure, CurrencyConversionListEntity>> getConversions(
+      String code) async {
+    final response =
+        await apiClient.getRequest('${APIContract.currencyConversion}/$code');
+    // Check if there is a request failure
+    return response.fold((failure) => left(failure),
+        (value) => right(CurrencyConversionListEntity.fromJson(value.data)));
+  }
+
+  Future<Either<Failure, DateCurrencyConversionListEntity>>
+      getLastDateConversions({required int days}) async {
+    final response = await apiClient
+        .getRequest('${APIContract.currencyConversion}/days=$days');
+    // Check if there is a request failure
+    return response.fold(
+        (failure) => left(failure),
+        (value) =>
+            right(DateCurrencyConversionListEntity.fromJson(value.data)));
   }
 }

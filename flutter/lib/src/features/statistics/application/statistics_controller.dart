@@ -7,7 +7,7 @@ import 'package:balance_home_app/src/features/balance/domain/repositories/balanc
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/date_currency_conversion_list_entity.dart';
 import 'package:balance_home_app/src/features/currency/domain/repositories/currency_conversion_repository_interface.dart';
-import 'package:balance_home_app/src/features/currency/domain/repositories/currency_type_repository_interface.dart';
+import 'package:balance_home_app/src/features/currency/domain/repositories/currency_repository_interface.dart';
 import 'package:balance_home_app/src/features/statistics/domain/repositories/annual_balance_repository_interface.dart';
 import 'package:balance_home_app/src/features/statistics/domain/repositories/monthly_balance_repository_interface.dart';
 import 'package:balance_home_app/src/features/statistics/presentation/models/statistics_data.dart';
@@ -19,7 +19,7 @@ class StatisticsController
   final BalanceRepositoryInterface balanceRepository;
   final AnnualBalanceRepositoryInterface annualBalanceRepository;
   final MonthlyBalanceRepositoryInterface monthlyBalanceRepository;
-  final CurrencyTypeRepositoryInterface currencyTypeRepository;
+  final CurrencyRepositoryInterface currencyTypeRepository;
   final CurrencyConversionRepositoryInterface currencyConversionRepository;
   final SelectedDate selectedBalanceDate;
   final SelectedDate selectedSavingsDate;

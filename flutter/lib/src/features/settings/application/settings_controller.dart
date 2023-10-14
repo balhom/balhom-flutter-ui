@@ -1,7 +1,7 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/unprocessable_value_failure.dart';
 import 'package:balance_home_app/src/features/account/domain/entities/account_entity.dart';
-import 'package:balance_home_app/src/features/auth/domain/repositories/auth_repository_interface.dart';
+import 'package:balance_home_app/src/features/account/domain/repositories/account_repository_interface.dart';
 import 'package:balance_home_app/src/features/settings/domain/repositories/settings_repository_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,25 +9,28 @@ import 'package:fpdart/fpdart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsController extends StateNotifier<AsyncValue<void>> {
-  final AuthRepositoryInterface _authRepository;
-  final SettingsRepositoryInterface _settingsRepository;
+  final AccountRepositoryInterface accountRepository;
+  final SettingsRepositoryInterface settingsRepository;
 
-  SettingsController(this._authRepository, this._settingsRepository)
+  SettingsController(
+      {required this.accountRepository, required this.settingsRepository})
       : super(const AsyncValue.data(null));
 
-  Future<Either<Failure, AccountEntity>> handleLanguage(AccountEntity oldUser,
-      Locale lang, AppLocalizations appLocalizations) async {
+  Future<Either<Failure, AccountEntity>> updateLanguage(
+      final AccountEntity oldAccount,
+      final Locale locale,
+      final AppLocalizations appLocalizations) async {
     state = const AsyncValue.loading();
-    final res = await _authRepository.updateUser(
+    final res = await accountRepository.update(
       AccountEntity(
-          username: oldUser.username,
-          email: oldUser.email,
-          receiveEmailBalance: oldUser.receiveEmailBalance,
-          balance: oldUser.balance,
-          expectedAnnualBalance: oldUser.expectedAnnualBalance,
-          expectedMonthlyBalance: oldUser.expectedMonthlyBalance,
-          language: lang.languageCode,
-          prefCoinType: oldUser.prefCoinType,
+          username: oldAccount.username,
+          email: oldAccount.email,
+          receiveEmailBalance: oldAccount.receiveEmailBalance,
+          balance: oldAccount.balance,
+          expectedAnnualBalance: oldAccount.expectedAnnualBalance,
+          expectedMonthlyBalance: oldAccount.expectedMonthlyBalance,
+          language: locale.languageCode,
+          prefCurrencyType: oldAccount.prefCurrencyType,
           lastLogin: null,
           image: null),
     );
@@ -41,21 +44,21 @@ class SettingsController extends StateNotifier<AsyncValue<void>> {
     });
   }
 
-  Future<Either<Failure, AccountEntity>> handleReceiveEmailBalance(
-      AccountEntity oldUser,
-      bool receiveEmailBalance,
-      AppLocalizations appLocalizations) async {
+  Future<Either<Failure, AccountEntity>> updateReceiveEmailBalance(
+      final AccountEntity oldAccount,
+      final bool receiveEmailBalance,
+      final AppLocalizations appLocalizations) async {
     state = const AsyncValue.loading();
-    final res = await _authRepository.updateUser(
+    final res = await accountRepository.update(
       AccountEntity(
-          username: oldUser.username,
-          email: oldUser.email,
+          username: oldAccount.username,
+          email: oldAccount.email,
           receiveEmailBalance: receiveEmailBalance,
-          balance: oldUser.balance,
-          expectedAnnualBalance: oldUser.expectedAnnualBalance,
-          expectedMonthlyBalance: oldUser.expectedMonthlyBalance,
-          language: oldUser.language,
-          prefCoinType: oldUser.prefCoinType,
+          balance: oldAccount.balance,
+          expectedAnnualBalance: oldAccount.expectedAnnualBalance,
+          expectedMonthlyBalance: oldAccount.expectedMonthlyBalance,
+          language: oldAccount.language,
+          prefCurrencyType: oldAccount.prefCurrencyType,
           lastLogin: null,
           image: null),
     );
@@ -69,10 +72,10 @@ class SettingsController extends StateNotifier<AsyncValue<void>> {
     });
   }
 
-  Future<Either<Failure, bool>> handleThemeMode(
+  Future<Either<Failure, bool>> updateThemeMode(
       ThemeData theme, AppLocalizations appLocalizations) async {
     state = const AsyncValue.loading();
-    final res = await _settingsRepository.saveTheme(theme);
+    final res = await settingsRepository.saveTheme(theme);
     return res.fold((_) {
       state = const AsyncValue.data(null);
       return left(

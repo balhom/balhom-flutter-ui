@@ -9,7 +9,6 @@ import 'package:balance_home_app/src/core/presentation/views/app_error_view.dart
 import 'package:balance_home_app/src/core/presentation/views/app_loading_view.dart';
 import 'package:balance_home_app/src/features/auth/presentation/views/logout_view.dart';
 import 'package:balance_home_app/src/features/auth/presentation/views/auth_view.dart';
-import 'package:balance_home_app/src/features/auth/presentation/views/reset_password_view.dart';
 import 'package:balance_home_app/src/features/settings/presentation/views/settings_view.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
@@ -171,20 +170,6 @@ final router = GoRouter(
             path: AppLoadingView.routePath,
             builder: (context, state) => const AppLoadingView(),
           ),
-          GoRoute(
-              name: 'passwordRoot',
-              path: 'password',
-              redirect: passwordGuard,
-              builder: (_, __) => AppLoadingView(func: (context) {
-                    context.go("/${AuthView.routePath}");
-                  }),
-              routes: [
-                GoRoute(
-                  name: ResetPasswordView.routeName,
-                  path: ResetPasswordView.routePath,
-                  builder: (context, state) => ResetPasswordView(),
-                ),
-              ]),
         ]),
   ],
 );

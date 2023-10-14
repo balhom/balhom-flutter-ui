@@ -1,7 +1,7 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/features/account/domain/entities/register_entity.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_name_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_username_value.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/register_password_value.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/register_repeat_password_value.dart';
 import 'package:fpdart/fpdart.dart';
@@ -15,7 +15,7 @@ class RegisterValuesDto with _$RegisterValuesDto {
   const RegisterValuesDto._();
 
   const factory RegisterValuesDto({
-    required RegisterNameValue usernameValue,
+    required RegisterUsernameValue usernameValue,
     required EmailValue emailValue,
     required String language,
     required String prefCurrencyType,

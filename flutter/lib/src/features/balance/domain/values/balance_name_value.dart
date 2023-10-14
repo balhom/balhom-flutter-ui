@@ -5,18 +5,18 @@ import 'package:fpdart/fpdart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Balance Name value
-class BalanceName extends ValueAbstract<String> {
+class BalanceNameValue extends ValueAbstract<String> {
   @override
   Either<Failure, String> get value => _value;
   final Either<Failure, String> _value;
 
-  factory BalanceName(AppLocalizations appLocalizations, String input) {
-    return BalanceName._(
+  factory BalanceNameValue(AppLocalizations appLocalizations, String input) {
+    return BalanceNameValue._(
       _validate(appLocalizations, input),
     );
   }
 
-  const BalanceName._(this._value);
+  const BalanceNameValue._(this._value);
 }
 
 /// * minLength: 1

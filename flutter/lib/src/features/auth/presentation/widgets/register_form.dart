@@ -3,12 +3,13 @@ import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.d
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_field.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/invitation_code_value.dart';
+import 'package:balance_home_app/src/features/account/domain/dtos/register_values_dto.dart';
+import 'package:balance_home_app/src/features/account/providers.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/email_value.dart';
-import 'package:balance_home_app/src/features/auth/domain/values/register_name_value.dart';
+import 'package:balance_home_app/src/features/auth/domain/values/register_username_value.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/register_password_value.dart';
 import 'package:balance_home_app/src/features/auth/domain/values/register_repeat_password_value.dart';
-import 'package:balance_home_app/src/core/utils/dialog_utils.dart';
+import 'package:balance_home_app/src/features/auth/presentation/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/currency_type_entity.dart';
 import 'package:balance_home_app/src/features/currency/presentation/widgets/dropdown_picker_field.dart';
@@ -16,30 +17,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RegisterForm extends ConsumerStatefulWidget {
-  @visibleForTesting
   final cache = ValueNotifier<Widget>(Container());
 
-  @visibleForTesting
   final TextEditingController usernameController;
-  @visibleForTesting
   final TextEditingController emailController;
-  @visibleForTesting
   final TextEditingController passwordController;
-  @visibleForTesting
-  final TextEditingController password2Controller;
-  @visibleForTesting
-  final TextEditingController invitationCodeController;
-  @visibleForTesting
+  final TextEditingController repeatPasswordController;
+
   final List<CurrencyTypeEntity> currencyTypes;
-  @visibleForTesting
+
   final formKey = GlobalKey<FormState>();
 
   RegisterForm(
       {required this.usernameController,
       required this.emailController,
       required this.passwordController,
-      required this.password2Controller,
-      required this.invitationCodeController,
+      required this.repeatPasswordController,
       required this.currencyTypes,
       Key? key})
       : super(key: key);
@@ -49,43 +42,43 @@ class RegisterForm extends ConsumerStatefulWidget {
 }
 
 class _RegisterFormState extends ConsumerState<RegisterForm> {
-  @visibleForTesting
-  RegisterNameValue? username;
-  @visibleForTesting
-  EmailValue? email;
-  @visibleForTesting
-  RegisterPasswordValue? password;
-  @visibleForTesting
-  RegisterRepeatPasswordValue? repeatPassword;
-  @visibleForTesting
-  InvitationCode? invitationCode;
-  @visibleForTesting
-  String? prefCoinType;
+  RegisterValuesDto? registerValuesDto;
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    username = RegisterNameValue(appLocalizations, widget.usernameController.text);
-    email = EmailValue(appLocalizations, widget.emailController.text);
-    password = RegisterPasswordValue(appLocalizations, widget.passwordController.text);
-    repeatPassword = RegisterRepeatPasswordValue(appLocalizations,
-        widget.passwordController.text, widget.password2Controller.text);
-    invitationCode =
-        InvitationCode(appLocalizations, widget.invitationCodeController.text);
-    final auth = ref.watch(authControllerProvider);
-    final authController = ref.read(authControllerProvider.notifier);
-    final emailCode = ref.watch(emailCodeControllerProvider);
-    final emailCodeController = ref.read(emailCodeControllerProvider.notifier);
-    final isLoading = auth.maybeWhen(
-          data: (_) => auth.isRefreshing,
+
+    registerValuesDto = RegisterValuesDto(
+        usernameValue: RegisterUsernameValue(
+            appLocalizations, widget.usernameController.text),
+        emailValue: EmailValue(appLocalizations, widget.emailController.text),
+        language: appLocalizations.localeName,
+        prefCurrencyType: widget.currencyTypes[0].code,
+        passwordValue: RegisterPasswordValue(
+            appLocalizations, widget.passwordController.text),
+        repeatPasswordValue: RegisterRepeatPasswordValue(
+            appLocalizations,
+            widget.passwordController.text,
+            widget.repeatPasswordController.text));
+
+    final accountState = ref.watch(accountControllerProvider);
+    final accountController = ref.read(accountControllerProvider.notifier);
+    final emailVerificationState =
+        ref.watch(emailVerificationControllerProvider);
+    final emailVerificationController =
+        ref.read(emailVerificationControllerProvider.notifier);
+
+    final isLoading = accountState.maybeWhen(
+          data: (_) => accountState.isRefreshing,
           loading: () => true,
           orElse: () => false,
         ) ||
-        emailCode.maybeWhen(
-          data: (_) => auth.isRefreshing,
+        emailVerificationState.maybeWhen(
+          data: (_) => emailVerificationState.isRefreshing,
           loading: () => true,
           orElse: () => false,
         );
+
     widget.cache.value = SingleChildScrollView(
       child: Form(
         key: widget.formKey,
@@ -94,66 +87,72 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
+              // Usename Text Field
               AppTextFormField(
                 maxCharacters: 15,
                 maxWidth: 400,
                 title: appLocalizations.username,
                 controller: widget.usernameController,
-                onChanged: (value) =>
-                    username = RegisterNameValue(appLocalizations, value),
-                validator: (value) => username?.validate,
+                onChanged: (value) => registerValuesDto = registerValuesDto!
+                    .copyWith(
+                        usernameValue:
+                            RegisterUsernameValue(appLocalizations, value)),
+                validator: (value) => registerValuesDto!.usernameValue.validate,
               ),
               verticalSpace(),
+              // Usename Text Field
               AppTextFormField(
                 title: appLocalizations.emailAddress,
                 maxWidth: 400,
                 maxCharacters: 300,
                 controller: widget.emailController,
-                onChanged: (value) =>
-                    email = EmailValue(appLocalizations, value),
-                validator: (value) => email?.validate,
+                onChanged: (value) => registerValuesDto = registerValuesDto!
+                    .copyWith(emailValue: EmailValue(appLocalizations, value)),
+                validator: (value) => registerValuesDto!.emailValue.validate,
               ),
               verticalSpace(),
+              // Password Text Field
               AppPasswordTextFormField(
                 title: appLocalizations.password,
                 maxWidth: 400,
                 maxCharacters: 400,
                 controller: widget.passwordController,
-                onChanged: (value) =>
-                    password = RegisterPasswordValue(appLocalizations, value),
-                validator: (value) => password?.validate,
+                onChanged: (value) => registerValuesDto = registerValuesDto!
+                    .copyWith(
+                        passwordValue:
+                            RegisterPasswordValue(appLocalizations, value)),
+                validator: (value) => registerValuesDto!.passwordValue.validate,
               ),
               verticalSpace(),
+              // Repeat Password Text Field
               AppPasswordTextFormField(
                 title: appLocalizations.repeatPassword,
                 maxWidth: 400,
                 maxCharacters: 400,
-                controller: widget.password2Controller,
-                onChanged: (value) => repeatPassword = RegisterRepeatPasswordValue(
-                    appLocalizations, widget.passwordController.text, value),
-                validator: (value) => repeatPassword?.validate,
+                controller: widget.repeatPasswordController,
+                onChanged: (value) => registerValuesDto = registerValuesDto!
+                    .copyWith(
+                        repeatPasswordValue: RegisterRepeatPasswordValue(
+                            appLocalizations,
+                            widget.passwordController.text,
+                            value)),
+                validator: (value) =>
+                    registerValuesDto!.repeatPasswordValue.validate,
               ),
               verticalSpace(),
-              AppTextFormField(
-                title: appLocalizations.invitationCode,
-                maxWidth: 400,
-                maxCharacters: 36,
-                controller: widget.invitationCodeController,
-                onChanged: (value) =>
-                    invitationCode = InvitationCode(appLocalizations, value),
-                validator: (value) => invitationCode?.validate,
-              ),
-              verticalSpace(),
+              // Currency Type Picker
               (widget.currencyTypes.isNotEmpty)
                   ? DropdownPickerField(
                       name: appLocalizations.currencyType,
                       initialValue: widget.currencyTypes[0].code,
                       items: widget.currencyTypes.map((e) => e.code).toList(),
                       onChanged: (value) {
-                        prefCoinType = value;
+                        registerValuesDto = registerValuesDto!
+                            .copyWith(prefCurrencyType: value!);
                       })
                   : Text(appLocalizations.genericError),
               verticalSpace(),
+              // Register Button
               SizedBox(
                   height: 50,
                   width: 240,
@@ -164,39 +163,17 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                             !widget.formKey.currentState!.validate()) {
                           return;
                         }
-                        if (username == null) return;
-                        if (email == null) return;
-                        if (password == null) return;
-                        if (invitationCode == null) return;
-                        if (repeatPassword == null) return;
-                        String lang = appLocalizations.localeName;
-                        prefCoinType =
-                            prefCoinType ?? widget.currencyTypes[0].code;
-                        (await authController.createUser(
-                                username!,
-                                email!,
-                                lang,
-                                invitationCode!,
-                                prefCoinType!,
-                                password!,
-                                repeatPassword!,
-                                appLocalizations))
+
+                        (await accountController.create(
+                                registerValuesDto!, appLocalizations))
                             .fold((failure) {
                           showErrorRegisterDialog(
                               appLocalizations, failure.detail);
                         }, (_) async {
-                          bool sendCode =
-                              await showCodeAdviceDialog(appLocalizations);
-                          if (sendCode) {
-                            (await emailCodeController.requestCode(
-                                    email!, appLocalizations))
-                                .fold((failure) {
-                              showErrorEmailSendCodeDialog(
-                                  appLocalizations, failure.detail);
-                            }, (_) {
-                              showCodeSendDialog(widget.emailController.text);
-                            });
-                          }
+                          await showEmailVerificationDialog(
+                              emailVerificationController,
+                              registerValuesDto!.emailValue,
+                              appLocalizations);
                         });
                       },
                       text: appLocalizations.register)),

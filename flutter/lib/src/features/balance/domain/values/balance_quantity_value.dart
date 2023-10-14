@@ -4,30 +4,31 @@ import 'package:balance_home_app/src/core/domain/values/value_abstract.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-/// Balance Date value
-class BalanceDate extends ValueAbstract<DateTime?> {
+/// Balance Quanity value
+class BalanceQuantityValue extends ValueAbstract<double?> {
   @override
-  Either<Failure, DateTime> get value => _value;
-  final Either<Failure, DateTime> _value;
+  Either<Failure, double> get value => _value;
+  final Either<Failure, double> _value;
 
-  factory BalanceDate(AppLocalizations appLocalizations, DateTime? input) {
-    return BalanceDate._(
+  factory BalanceQuantityValue(
+      AppLocalizations appLocalizations, double? input) {
+    return BalanceQuantityValue._(
       _validate(appLocalizations, input),
     );
   }
 
-  const BalanceDate._(this._value);
+  const BalanceQuantityValue._(this._value);
 }
 
 /// * minimum: 0
-Either<Failure, DateTime> _validate(
-    AppLocalizations appLocalizations, DateTime? input) {
-  if (input != null && !input.isAfter(DateTime.now())) {
+Either<Failure, double> _validate(
+    AppLocalizations appLocalizations, double? input) {
+  if (input != null && input >= 0) {
     return right(input);
   }
   String message = input == null
-      ? appLocalizations.balanceDateRequired
-      : appLocalizations.balanceDateFuture;
+      ? appLocalizations.balanceQuantityRequired
+      : appLocalizations.balanceQuantityMinValue;
   return left(
     UnprocessableValueFailure(
       detail: message,

@@ -58,13 +58,14 @@ class ApiClient {
       final Response response) {
     connectionStateListenable.value = true;
     switch (response.statusCode) {
-      case 200:
-      case 201:
-      case 204:
+      case HttpStatus.ok:
+      case HttpStatus.created:
+      case HttpStatus.accepted:
+      case HttpStatus.noContent:
         return right(response);
-      case 400:
+      case HttpStatus.badRequest:
         return left(BadRequestFailure.fromObject(response.data));
-      case 401:
+      case HttpStatus.unauthorized:
         return left(UnauthorizedRequestFailure.fromObject(response.data));
     }
     debugPrint("[HTTP CHECK] Unknown HttpFailure: ${response.data}");

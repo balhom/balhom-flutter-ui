@@ -1,7 +1,5 @@
 import 'package:balance_home_app/src/core/router.dart';
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/features/auth/providers.dart';
-import 'package:balance_home_app/src/features/settings/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -16,20 +14,6 @@ class BalanceHomeApp extends ConsumerStatefulWidget {
 class BalanceHomeAppState extends ConsumerState<BalanceHomeApp> {
   @override
   Widget build(BuildContext context) {
-    // Change aplication language at user sign in
-    ref.listen(authControllerProvider, (_, value) {
-      if (value.asData != null && value.asData!.value != null) {
-        ref
-            .read(appLocalizationsProvider.notifier)
-            .setLocale(Locale(value.asData!.value!.language));
-      }
-    });
-    // Change theme
-    ref.read(settingsRepositoryProvider).getTheme().then((value) {
-      value.fold((_) => null, (theme) {
-        ref.read(themeDataProvider.notifier).setThemeData(theme);
-      });
-    });
     return MaterialApp.router(
         debugShowCheckedModeBanner: false,
         theme: ref.watch(themeDataProvider),

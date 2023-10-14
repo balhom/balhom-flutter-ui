@@ -1,15 +1,14 @@
 import 'package:balance_home_app/config/app_colors.dart';
 import 'package:balance_home_app/src/core/router.dart';
-import 'package:balance_home_app/src/core/clients/api_client.dart';
 import 'package:balance_home_app/src/core/presentation/views/app_title.dart';
 import 'package:balance_home_app/src/features/account/presentation/views/account_delete_view.dart';
+import 'package:balance_home_app/src/features/account/providers.dart';
 import 'package:balance_home_app/src/features/auth/presentation/views/auth_background_view.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_loading_widget.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
 import 'package:balance_home_app/src/features/account/presentation/widgets/account_edit_form.dart';
-import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:balance_home_app/src/features/statistics/presentation/views/statistics_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,15 +37,18 @@ class _AccountEditViewState extends ConsumerState<AccountEditView> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authControllerProvider);
+    final accountState = ref.watch(accountControllerProvider);
+
     final appLocalizations = ref.watch(appLocalizationsProvider);
+
     final isConnected = connectionStateListenable.value;
-    return user.when(data: (data) {
-      String lastLogin = data == null
+
+    return accountState.when(data: (accountEntity) {
+      String lastLogin = accountEntity == null
           ? "-"
-          : data.lastLogin == null
+          : accountEntity.lastLogin == null
               ? "-"
-              : widget.dateFormatter.format(data.lastLogin!);
+              : widget.dateFormatter.format(accountEntity.lastLogin!);
       widget.cache.value = Scaffold(
           appBar: AppBar(
             title: const AppTitle(fontSize: 30),
@@ -75,12 +77,12 @@ class _AccountEditViewState extends ConsumerState<AccountEditView> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  (data == null)
+                  (accountEntity == null)
                       ? const AppLoadingWidget()
-                      : AccountEditForm(edit: editable, user: data),
+                      : AccountEditForm(edit: editable, account: accountEntity),
                   if (!editable && isConnected)
                     AppTextButton(
-                      text: appLocalizations.userDelete,
+                      text: appLocalizations.accountDelete,
                       height: 40,
                       onPressed: () async {
                         router.pushNamed(AccountDeleteView.routeName);

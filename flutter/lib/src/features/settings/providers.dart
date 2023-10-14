@@ -1,9 +1,9 @@
 import 'package:balance_home_app/src/core/providers.dart';
+import 'package:balance_home_app/src/features/account/providers.dart';
 import 'package:balance_home_app/src/features/settings/application/settings_controller.dart';
 import 'package:balance_home_app/src/features/settings/domain/repositories/settings_repository_interface.dart';
 import 'package:balance_home_app/src/features/settings/infrastructure/datasources/local/theme_local_data_source.dart';
 import 'package:balance_home_app/src/features/settings/infrastructure/repositories/settings_repository.dart';
-import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 ///
@@ -23,7 +23,9 @@ final settingsRepositoryProvider = Provider<SettingsRepositoryInterface>((ref) {
 
 final settingsControllerProvider =
     StateNotifierProvider<SettingsController, AsyncValue<void>>((ref) {
-  final authRepo = ref.read(authRepositoryProvider);
-  final settingsRepo = ref.read(settingsRepositoryProvider);
-  return SettingsController(authRepo, settingsRepo);
+  final accountRepository = ref.read(accountRepositoryProvider);
+  final settingsRepository = ref.read(settingsRepositoryProvider);
+  return SettingsController(
+      accountRepository: accountRepository,
+      settingsRepository: settingsRepository);
 });

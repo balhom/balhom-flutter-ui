@@ -4,7 +4,7 @@ import 'package:balance_home_app/src/features/currency/domain/entities/date_curr
 import 'package:balance_home_app/src/features/statistics/domain/entities/annual_balance_entity.dart';
 import 'package:balance_home_app/src/features/statistics/domain/entities/monthly_balance_entity.dart';
 
-class StatisticsData {
+class StatisticsDataDto {
   List<BalanceEntity> revenues;
   List<BalanceEntity> expenses;
   List<int> revenueYears;
@@ -14,7 +14,7 @@ class StatisticsData {
   DateCurrencyConversionListEntity dateCurrencyConversion;
   List<CurrencyTypeEntity> currencyTypes;
 
-  StatisticsData({
+  StatisticsDataDto({
     required this.revenues,
     required this.expenses,
     required this.revenueYears,

@@ -1,14 +1,13 @@
 import 'package:balance_home_app/config/app_colors.dart';
-import 'package:balance_home_app/src/core/clients/api_client.dart';
 import 'package:balance_home_app/src/core/utils/platform_utils.dart';
 import 'package:balance_home_app/src/core/router.dart';
 import 'package:balance_home_app/src/core/presentation/views/app_title.dart';
 import 'package:balance_home_app/src/features/account/presentation/views/account_edit_view.dart';
+import 'package:balance_home_app/src/features/account/providers.dart';
 import 'package:balance_home_app/src/features/auth/presentation/views/logout_view.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/features/account/domain/entities/account_entity.dart';
 import 'package:balance_home_app/src/features/settings/presentation/views/settings_view.dart';
-import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,8 +19,9 @@ class CustomAppBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authControllerProvider).asData?.value;
+    final account = ref.watch(accountControllerProvider).asData?.value;
     final appLocalizations = ref.watch(appLocalizationsProvider);
+
     return AppBar(
       automaticallyImplyLeading: false,
       systemOverlayStyle: const SystemUiOverlayStyle(
@@ -39,18 +39,18 @@ class CustomAppBar extends ConsumerWidget {
       title: (PlatformUtils.isLargeWindow(context) ||
               PlatformUtils.isMediumWindow(context))
           ? const AppTitle(fontSize: 30)
-          : _balanceBox(appLocalizations, user),
+          : _balanceBox(appLocalizations, account),
       leading: (PlatformUtils.isLargeWindow(context) ||
               PlatformUtils.isMediumWindow(context))
-          ? _balanceBox(appLocalizations, user)
+          ? _balanceBox(appLocalizations, account)
           : null,
       leadingWidth: (PlatformUtils.isLargeWindow(context) ||
               PlatformUtils.isMediumWindow(context))
           ? 250
           : 0,
       actions: [
-        _profileButton(appLocalizations, user),
-        if (user == null)
+        _profileButton(appLocalizations, account),
+        if (account == null)
           Container(
               margin: const EdgeInsets.all(5),
               child: const CircularProgressIndicator(strokeWidth: 5)),
@@ -60,15 +60,16 @@ class CustomAppBar extends ConsumerWidget {
 
   /// Returns a [Widget] that includes an account balance counter and
   /// the coint type setup in the account.
-  Widget _balanceBox(AppLocalizations appLocalizations, AccountEntity? user) {
+  Widget _balanceBox(
+      AppLocalizations appLocalizations, AccountEntity? account) {
     return Container(
         width: 400,
         height: 100,
         color: const Color.fromARGB(255, 12, 12, 12),
         child: Center(
           child: Text(
-            "${appLocalizations.balance}: ${user == null ? "-" : user.balance} "
-            "${user == null ? "" : user.prefCoinType}",
+            "${appLocalizations.balance}: ${account == null ? "-" : account.balance} "
+            "${account == null ? "" : account.prefCurrencyType}",
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.openSans(fontSize: 17, color: Colors.white),
           ),
@@ -76,8 +77,9 @@ class CustomAppBar extends ConsumerWidget {
   }
 
   /// Returns a [Widget] that includes a button with the image
-  /// profile and name of the user account.
-  Widget _profileButton(AppLocalizations appLocalizations, AccountEntity? user) {
+  /// profile and name of the account.
+  Widget _profileButton(
+      AppLocalizations appLocalizations, AccountEntity? account) {
     final isConnected = connectionStateListenable.value;
     return PopupMenuButton(
       onSelected: (value) {
@@ -111,25 +113,25 @@ class CustomAppBar extends ConsumerWidget {
       },
       child: Row(
         children: [
-          if (user != null)
+          if (account != null)
             Container(
               decoration: BoxDecoration(
                 border: Border.all(width: 1),
               ),
               margin: const EdgeInsets.all(4),
-              child: user.image == null
+              child: account.image == null
                   ? const Icon(
                       Icons.error_outline,
                       color: Colors.red,
                     )
-                  : Image.network(user.image!),
+                  : Image.network(account.image!),
             ),
-          if (user != null)
+          if (account != null)
             if (!PlatformUtils.isMobile)
               Container(
                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 child: Text(
-                  user.username,
+                  account.username,
                   style: GoogleFonts.openSans(
                       fontSize: 17,
                       color: const Color.fromARGB(255, 202, 202, 202)),

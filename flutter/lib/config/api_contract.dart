@@ -1,4 +1,4 @@
-/// Defines the relative URLs for the backend server endpoints.
+/// Defines the relative URLs for the API server endpoints.
 class APIContract {
   /*
    * ============ Version ============ *
@@ -30,36 +30,30 @@ class APIContract {
   /// `POST` Logout session
   static const String authLogout = "/api/v1/auth/logout";
 
-  /// [POST] User password reset send code
-  static const String authPasswordReset = "/api/v1/auth/password/reset";
+  /// [POST] Auth email verification
+  static const String authEmailVerify = "/api/v1/auth/send-verify-email";
 
-  /// [POST] User password change
-  static const String userPasswordChange = "/api/v1/user/password/change";
-
-  /*
-   * ============ Email code ============ *
-   */
-  /// [POST] Send email code
-  static const String emailCodeSend = "/api/v1/email_code/send";
-
-  /// [POST] Verify sent email code
-  static const String emailCodeVerify = "/api/v1/email_code/verify";
+  /// [POST] Auth password reset
+  static const String authPasswordReset = "/api/v1/auth/password-reset";
 
   /*
    * ============ Annual balance ============ *
    */
+
   /// [GET] Returns annual balance
   static const String annualBalance = "/api/v1/annual_balance";
 
   /*
    * ============ Monthly balance ============ *
    */
+
   /// [GET] Returns monthly balance
   static const String monthlyBalance = "/api/v1/monthly_balance";
 
   /*
    * ============ Currency ============ *
    */
+
   /// [GET] Returns currency conversion
   static const String currencyConversion = "/api/v1/coin/exchange";
 
@@ -69,6 +63,7 @@ class APIContract {
   /*
    * ============ Revenue ============ *
    */
+
   /// [GET], [PUT], [PATCH], [DEL] Revenue info
   static const String revenue = "/api/v1/revenue";
 
@@ -81,6 +76,7 @@ class APIContract {
   /*
    * ============ Expense ============ *
    */
+
   /// [GET], [PUT], [PATCH], [DEL] Expense info
   static const String expense = "/api/v1/expense";
 

@@ -4,39 +4,31 @@ import 'package:balance_home_app/src/core/domain/values/value_abstract.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-/// Register Name value
-class RegisterNameValue extends ValueAbstract<String> {
+/// Balance Description value
+class BalanceDescriptionValue extends ValueAbstract<String> {
   @override
   Either<Failure, String> get value => _value;
   final Either<Failure, String> _value;
 
-  factory RegisterNameValue(AppLocalizations appLocalizations, String input) {
-    return RegisterNameValue._(
+  factory BalanceDescriptionValue(
+      AppLocalizations appLocalizations, String input) {
+    return BalanceDescriptionValue._(
       _validate(appLocalizations, input),
     );
   }
 
-  const RegisterNameValue._(this._value);
+  const BalanceDescriptionValue._(this._value);
 }
 
-/// * minLength: 1
-/// * maxLength: 15
-/// * only alphanumeric characters
+/// * maxLength: 2000
 Either<Failure, String> _validate(
     AppLocalizations appLocalizations, String input) {
-  if (input.isNotEmpty &&
-      input.length <= 15 &&
-      RegExp(r"^[A-Za-z0-9]+$").hasMatch(input)) {
+  if (input.length <= 2000) {
     return right(input);
   }
-  String message = input.isEmpty
-      ? appLocalizations.needUsername
-      : input.length > 15
-          ? appLocalizations.usernameMaxSize
-          : appLocalizations.usernameNotValid;
   return left(
     UnprocessableValueFailure(
-      detail: message,
+      detail: appLocalizations.balanceDescriptionMaxLength,
     ),
   );
 }

@@ -1,9 +1,6 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http/api_bad_request_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http/unauthorized_request_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/unprocessable_value_failure.dart';
 import 'package:balance_home_app/src/features/auth/domain/dtos/login_values_dto.dart';
-import 'package:balance_home_app/src/features/account/domain/entities/account_entity.dart';
+import 'package:balance_home_app/src/features/auth/domain/failures/login_failure.dart';
 import 'package:balance_home_app/src/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,7 +9,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// State controller for authentication
-class AuthController extends StateNotifier<AsyncValue<AccountEntity?>> {
+class AuthController extends StateNotifier<AsyncValue<void>> {
   final AuthRepositoryInterface authRepository;
 
   AuthController({required this.authRepository})
@@ -25,70 +22,41 @@ class AuthController extends StateNotifier<AsyncValue<AccountEntity?>> {
       state = const AsyncValue.data(null);
       return left(failure);
     }, (_) async {
-      final res = await authRepository.getUser();
-      return res.fold((failure) {
-        state = const AsyncValue.data(null);
-        return left(failure);
-      }, (value) {
-        state = AsyncValue.data(value);
-        updateAuthState();
-        return right(null);
-      });
+      state = const AsyncValue.data(null);
+      updateAuthState(true);
+      return right(null);
     });
   }
 
   Future<Either<Failure, void>> login(final LoginValuesDto loginValuesDto,
-      final AppLocalizations appLocalizations,
-      {bool rememberMe = false}) async {
+      final AppLocalizations appLocalizations) async {
     state = const AsyncValue.loading();
     return loginValuesDto.toEntity().fold((failure) {
       state = const AsyncValue.data(null);
       return left(failure);
     }, (credentialsEntity) async {
-      final res = await authRepository.login(credentialsEntity, store: rememberMe);
+      final res = await authRepository.login(credentialsEntity);
       return res.fold((failure) {
         state = const AsyncValue.data(null);
-        if (failure is ApiBadRequestFailure) {
-          if (failure.errorCode == unverifiedEmailFailure) {
-            return left(UnprocessableValueFailure(
-                detail: appLocalizations.emailNotVerified));
-          }
-          return left(UnprocessableValueFailure(detail: failure.detail));
-        } else if (failure is InputBadRequestFailure) {
-          if (failure.containsFieldName("email")) {
-            return left(UnprocessableValueFailure(
-                detail: appLocalizations.emailNotValid));
-          }
-        } else if (failure is UnauthorizedRequestFailure) {
-          return left(UnprocessableValueFailure(
-              detail: appLocalizations.wrongCredentials));
-        }
-        return left(
-            UnprocessableValueFailure(detail: appLocalizations.genericError));
+        return left(LoginFailure.fromFailure(failure, appLocalizations));
       }, (_) async {
-        final res = await authRepository.getUser();
-        return res.fold(
-            (failure) => left(UnprocessableValueFailure(
-                detail: appLocalizations.genericError)), (value) {
-          state = AsyncValue.data(value);
-          updateAuthState();
-          return right(null);
-        });
+        state = const AsyncValue.data(null);
+        updateAuthState(true);
+        return right(null);
       });
     });
   }
 
-  /// Signs out user
   Future<Either<Failure, void>> logout() async {
     final res = await authRepository.logout();
     if (res.isLeft()) return res;
     state = const AsyncValue.data(null);
-    updateAuthState();
+    updateAuthState(false);
     return right(null);
   }
 
   @visibleForTesting
-  void updateAuthState() {
-    authStateListenable.value = state.hasValue && state.asData!.value != null;
+  void updateAuthState(final bool state) {
+    authStateListenable.value = state;
   }
 }

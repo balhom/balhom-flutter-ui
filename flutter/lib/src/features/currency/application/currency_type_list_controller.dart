@@ -3,23 +3,23 @@ import 'package:balance_home_app/src/core/domain/failures/http/api_bad_request_f
 import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/currency_type_entity.dart';
-import 'package:balance_home_app/src/features/currency/domain/repositories/currency_type_repository_interface.dart';
+import 'package:balance_home_app/src/features/currency/domain/repositories/currency_repository_interface.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 
 class CurrencyTypeListController extends StateNotifier<
     AsyncValue<Either<Failure, List<CurrencyTypeEntity>>>> {
-  final CurrencyTypeRepositoryInterface currencyTypeRepository;
+  final CurrencyRepositoryInterface currencyRepository;
 
-  CurrencyTypeListController({required this.currencyTypeRepository})
+  CurrencyTypeListController({required this.currencyRepository})
       : super(const AsyncValue.loading()) {
     handle();
   }
 
   @visibleForTesting
   Future<void> handle() async {
-    final res = await currencyTypeRepository.getCurrencyTypes();
+    final res = await currencyRepository.getCurrencyTypes();
     state = res.fold((failure) {
       if (failure is HttpConnectionFailure ||
           failure is NoLocalEntryFailure ||

@@ -6,9 +6,11 @@ import 'package:balance_home_app/src/core/clients/local_preferences_client.dart'
 import 'package:balance_home_app/src/core/presentation/states/app_localizations_state.dart';
 import 'package:balance_home_app/src/core/presentation/states/theme_data_state.dart';
 import 'package:balance_home_app/src/features/account/infrastructure/datasources/local/account_local_data_source.dart';
+import 'package:balance_home_app/src/features/account/providers.dart';
 import 'package:balance_home_app/src/features/balance/infrastructure/datasources/local/balance_local_data_source.dart';
 import 'package:balance_home_app/src/features/balance/infrastructure/datasources/local/balance_type_local_data_source.dart';
-import 'package:balance_home_app/src/features/currency/infrastructure/datasources/local/currency_type_local_data_source.dart';
+import 'package:balance_home_app/src/features/currency/infrastructure/datasources/local/currency_local_data_source.dart';
+import 'package:balance_home_app/src/features/settings/providers.dart';
 import 'package:balance_home_app/src/features/statistics/infrastructure/datasources/local/annual_balance_local_data_source.dart';
 import 'package:balance_home_app/src/features/statistics/infrastructure/datasources/local/monthly_balance_local_data_source.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,22 @@ Future<void> initializeProviders(ProviderContainer container) async {
   container.read(localDbClientProvider);
   container.read(balhomApiClientProvider);
   container.read(currencyConversionClientProvider);
+
+  // Change aplication language at account fetch
+  container.listen(accountControllerProvider, (_, accountEntityState) {
+    if (accountEntityState.asData != null &&
+        accountEntityState.asData!.value != null) {
+      container
+          .read(appLocalizationsProvider.notifier)
+          .setLocale(Locale(accountEntityState.asData!.value!.language));
+    }
+  });
+  // Change theme
+  container.read(settingsRepositoryProvider).getTheme().then((value) {
+    value.fold((_) => null, (theme) {
+      container.read(themeDataProvider.notifier).setThemeData(theme);
+    });
+  });
 }
 
 ///
@@ -43,7 +61,7 @@ final localDbClientProvider =
           UserLocalDataSource.tableName,
           BalanceTypeLocalDataSource.tableName,
           BalanceLocalDataSource.tableName,
-          CurrencyTypeLocalDataSource.tableName,
+          CurrencyLocalDataSource.tableName,
           AnnualBalanceLocalDataSource.tableName,
           MonthlyBalanceLocalDataSource.tableName,
         }));
