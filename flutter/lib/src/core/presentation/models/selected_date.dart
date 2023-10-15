@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 /// Selected date class.
-class SelectedDate extends Equatable {
+class SelectedDateDto extends Equatable {
   final int day;
   final int month;
   final int year;
@@ -27,7 +27,7 @@ class SelectedDate extends Equatable {
     return DateTime(year, month, day);
   }
 
-  const SelectedDate({
+  const SelectedDateDto({
     required this.day,
     required this.month,
     required this.year,
@@ -37,13 +37,13 @@ class SelectedDate extends Equatable {
   @override
   List<Object?> get props => [day, month, year];
 
-  SelectedDate copyWith({
+  SelectedDateDto copyWith({
     int? day,
     int? month,
     int? year,
     SelectedDateMode? selectedDateMode,
   }) {
-    return SelectedDate(
+    return SelectedDateDto(
         day: day ?? this.day,
         month: month ?? this.month,
         year: year ?? this.year,

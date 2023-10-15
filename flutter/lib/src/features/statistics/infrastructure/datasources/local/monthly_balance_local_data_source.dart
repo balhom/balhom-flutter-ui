@@ -3,12 +3,11 @@ import 'package:balance_home_app/src/core/domain/failures/empty_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/features/statistics/domain/entities/monthly_balance_entity.dart';
-import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 
 class MonthlyBalanceLocalDataSource {
-  @visibleForTesting
   final LocalDbClient localDbClient;
+
   static const tableName = "monthlyBalance";
 
   MonthlyBalanceLocalDataSource({required this.localDbClient});

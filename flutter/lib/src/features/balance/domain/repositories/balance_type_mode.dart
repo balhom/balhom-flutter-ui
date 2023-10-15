@@ -1,1 +1,0 @@
-enum BalanceTypeMode { revenue, expense }

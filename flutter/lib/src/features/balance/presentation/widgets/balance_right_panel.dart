@@ -1,7 +1,7 @@
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_limit_type_dialog.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_list.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_ordering_type_dialog.dart';
@@ -10,16 +10,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BalanaceRightPanel extends ConsumerWidget {
   final List<BalanceEntity> balances;
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
-  const BalanaceRightPanel({required this.balances, required this.balanceTypeMode, super.key});
+  const BalanaceRightPanel({required this.balances, required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      color: balanceTypeMode == BalanceTypeMode.expense
+      color: balanceTypeEnum.isExpense()
           ? const Color.fromARGB(254, 236, 182, 163)
           : const Color.fromARGB(254, 174, 221, 148),
       child: Column(
@@ -68,7 +68,7 @@ class BalanaceRightPanel extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Expanded(child: BalanceList(balances: balances, balanceTypeMode: balanceTypeMode)),
+          Expanded(child: BalanceList(balances: balances, balanceTypeEnum: balanceTypeEnum)),
         ],
       ),
     );
@@ -78,13 +78,13 @@ class BalanaceRightPanel extends ConsumerWidget {
   showOrderingDialog(BuildContext context) => showDialog(
       context: context,
       builder: (context) {
-        return BalanceOrderingTypeDialog(balanceTypeMode: balanceTypeMode);
+        return BalanceOrderingTypeDialog(balanceTypeEnum: balanceTypeEnum);
       });
 
   @visibleForTesting
   showLimitDialog(BuildContext context) => showDialog(
       context: context,
       builder: (context) {
-        return BalanceLimitTypeDialog(balanceTypeMode: balanceTypeMode);
+        return BalanceLimitTypeDialog(balanceTypeEnum: balanceTypeEnum);
       });
 }

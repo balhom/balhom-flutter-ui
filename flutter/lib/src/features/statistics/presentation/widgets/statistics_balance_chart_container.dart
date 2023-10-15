@@ -1,4 +1,3 @@
-import 'package:balance_home_app/src/core/clients/api_client.dart';
 import 'package:balance_home_app/src/core/utils/platform_utils.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date_mode.dart';
@@ -108,7 +107,7 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
   Widget dateButton(
       String selectedMonth,
       List<int> years,
-      SelectedDate selectedDate,
+      SelectedDateDto selectedDate,
       SelectedDateState selectedDateState,
       AppLocalizations appLocalizations) {
     final List<int> dropdownValues = (dateMode == SelectedDateMode.month)

@@ -3,12 +3,11 @@ import 'package:balance_home_app/src/core/domain/failures/empty_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/features/statistics/domain/entities/annual_balance_entity.dart';
-import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 
 class AnnualBalanceLocalDataSource {
-  @visibleForTesting
   final LocalDbClient localDbClient;
+
   static const tableName = "annualBalance";
 
   AnnualBalanceLocalDataSource({required this.localDbClient});
@@ -23,8 +22,7 @@ class AnnualBalanceLocalDataSource {
       }
       return right(AnnualBalanceEntity.fromJson(jsonObj));
     } on Exception {
-      return left(
-          const NoLocalEntryFailure(entityName: tableName, detail: ""));
+      return left(const NoLocalEntryFailure(entityName: tableName, detail: ""));
     }
   }
 
@@ -51,8 +49,7 @@ class AnnualBalanceLocalDataSource {
       return right(
           jsonObjList.map((e) => AnnualBalanceEntity.fromJson(e)).toList());
     } on Exception {
-      return left(
-          const NoLocalEntryFailure(entityName: tableName, detail: ""));
+      return left(const NoLocalEntryFailure(entityName: tableName, detail: ""));
     }
   }
 

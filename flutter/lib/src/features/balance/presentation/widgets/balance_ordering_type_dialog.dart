@@ -1,25 +1,23 @@
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/presentation/models/balance_ordering_type.dart';
 import 'package:balance_home_app/src/features/balance/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BalanceOrderingTypeDialog extends ConsumerWidget {
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
-  const BalanceOrderingTypeDialog({required this.balanceTypeMode, super.key});
+  const BalanceOrderingTypeDialog({required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final balanceOrderingTypeNotifier =
-        balanceTypeMode == BalanceTypeMode.expense
-            ? ref.read(expenseOrderingTypeProvider.notifier)
-            : ref.read(revenueOrderingTypeProvider.notifier);
-    BalanceOrderingType orderingType =
-        balanceTypeMode == BalanceTypeMode.expense
-            ? ref.watch(expenseOrderingTypeProvider)
-            : ref.watch(revenueOrderingTypeProvider);
+    final balanceOrderingTypeNotifier = balanceTypeEnum.isExpense()
+        ? ref.read(expenseOrderingTypeProvider.notifier)
+        : ref.read(revenueOrderingTypeProvider.notifier);
+    final BalanceOrderingType orderingType = balanceTypeEnum.isExpense()
+        ? ref.watch(expenseOrderingTypeProvider)
+        : ref.watch(revenueOrderingTypeProvider);
     final appLocalizations = ref.read(appLocalizationsProvider);
     return AlertDialog(
         title: Text(appLocalizations.orderBy),

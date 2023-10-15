@@ -1,18 +1,20 @@
+import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
+import 'package:balance_home_app/src/core/presentation/widgets/app_date_time_form_picker.dart';
 import 'package:balance_home_app/src/core/router.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/double_form_field.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_field.dart';
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/core/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
-import 'package:balance_home_app/src/features/auth/providers.dart';
+import 'package:balance_home_app/src/features/account/providers.dart';
+import 'package:balance_home_app/src/features/balance/domain/dtos/balance_values_dto.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_date_value.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_description_value.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_name_value.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_quantity_value.dart';
+import 'package:balance_home_app/src/features/balance/presentation/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_type_dropdown_picker.dart';
 import 'package:balance_home_app/src/features/balance/providers.dart';
@@ -23,7 +25,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class BalanceCreateForm extends ConsumerStatefulWidget {
-  @visibleForTesting
   final formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
@@ -31,84 +32,56 @@ class BalanceCreateForm extends ConsumerStatefulWidget {
   final quantityController = TextEditingController();
   final dateController = TextEditingController();
 
-  final dateFormatter = DateFormat("dd/MM/yyyy");
+  final dateTimeFormatter = DateFormat("dd/MM/yyyy HH:mm");
 
-  @visibleForTesting
   final cache = ValueNotifier<Widget>(Container());
 
-  @visibleForTesting
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
   BalanceCreateForm({
-    required this.balanceTypeMode,
+    required this.balanceTypeEnum,
     super.key,
-  });
+  }) {
+    dateController.text = dateTimeFormatter.format(DateTime.now());
+  }
 
   @override
   ConsumerState<BalanceCreateForm> createState() => _BalanceCreateFormState();
 }
 
 class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
-  @visibleForTesting
-  BalanceNameValue? name;
-  @visibleForTesting
-  BalanceDescriptionValue? description;
-  @visibleForTesting
-  BalanceQuantityValue? quantity;
-  @visibleForTesting
-  BalanceDateValue? date;
-  @visibleForTesting
-  String? currencyType;
-  @visibleForTesting
-  BalanceTypeEntity? balanceTypeEntity;
+  BalanceValuesDto? balanceValuesDto;
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    final authController = ref.read(authControllerProvider.notifier);
-    name = BalanceNameValue(appLocalizations, widget.nameController.text);
-    description =
-        BalanceDescriptionValue(appLocalizations, widget.descriptionController.text);
-    quantity = BalanceQuantityValue(appLocalizations,
-        double.tryParse(widget.quantityController.text.replaceAll(",", ".")));
-    date = BalanceDateValue(
-        appLocalizations,
-        widget.dateController.text.isNotEmpty
-            ? DateTime(
-                int.parse(widget.dateController.text.split("/")[2]),
-                int.parse(widget.dateController.text.split("/")[1]),
-                int.parse(widget.dateController.text.split("/")[0]))
-            : DateTime.now());
-    if (widget.dateController.text.isEmpty) {
-      widget.dateController.text = widget.dateFormatter.format(DateTime.now());
-    }
-    final balanceCreateControllerProvider =
-        widget.balanceTypeMode == BalanceTypeMode.expense
-            ? expenseCreateControllerProvider
-            : revenueCreateControllerProvider;
-    final balanceListController =
-        widget.balanceTypeMode == BalanceTypeMode.expense
-            ? ref.read(expenseListControllerProvider.notifier)
-            : ref.read(revenueListControllerProvider.notifier);
-    final balanceTypeListControllerProvider =
-        widget.balanceTypeMode == BalanceTypeMode.expense
-            ? expenseTypeListControllerProvider
-            : revenueTypeListControllerProvider;
+
+    final balanceListController = widget.balanceTypeEnum.isExpense()
+        ? ref.read(expenseListControllerProvider.notifier)
+        : ref.read(revenueListControllerProvider.notifier);
 
     final balanceCreateController =
         ref.read(balanceCreateControllerProvider.notifier);
-
-    final user = ref.watch(authControllerProvider);
     final balanceCreate = ref.watch(balanceCreateControllerProvider);
-    final currencyTypes = ref.watch(currencyTypeListsControllerProvider);
+
     final balanceTypes = ref.watch(balanceTypeListControllerProvider);
-    return user.when(data: (user) {
-      currencyType ??= user!.prefCoinType;
+
+    final accountController = ref.read(accountControllerProvider.notifier);
+    final accountState = ref.watch(accountControllerProvider);
+
+    final currencyTypesState = ref.watch(currencyTypeListsControllerProvider);
+
+    return accountState.when(data: (accountEntity) {
       // This is used to refresh page in case handle controller
       return balanceCreate.when(data: (_) {
         return balanceTypes.when(data: (balanceTypes) {
-          balanceTypeEntity ??= balanceTypes[0];
-          return currencyTypes.when(data: (data) {
+          // Initialize balance values dto
+          balanceValuesDto ??= defaultBalanceValuesDto(
+              accountEntity!.prefCurrencyType,
+              balanceTypes[0],
+              appLocalizations);
+
+          return currencyTypesState.when(data: (data) {
             return data.fold((failure) {
               if (failure is HttpConnectionFailure) {
                 return showError(
@@ -127,21 +100,29 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
                     child: Column(
                       children: [
                         verticalSpace(),
+                        // Name Text Field
                         AppTextFormField(
-                          onChanged: (value) =>
-                              name = BalanceNameValue(appLocalizations, value),
+                          onChanged: (value) => balanceValuesDto =
+                              balanceValuesDto!.copyWith(
+                                  nameValue: BalanceNameValue(
+                                      appLocalizations, value)),
                           title: appLocalizations.balanceName,
-                          validator: (value) => name?.validate,
+                          validator: (value) =>
+                              balanceValuesDto!.nameValue.validate,
                           maxCharacters: 40,
                           maxWidth: 500,
                           controller: widget.nameController,
                         ),
                         verticalSpace(),
+                        // Description Text Field
                         AppTextFormField(
-                          onChanged: (value) => description =
-                              BalanceDescriptionValue(appLocalizations, value),
+                          onChanged: (value) => balanceValuesDto =
+                              balanceValuesDto!.copyWith(
+                                  descriptionValue: BalanceDescriptionValue(
+                                      appLocalizations, value)),
                           title: appLocalizations.balanceDescription,
-                          validator: (value) => description?.validate,
+                          validator: (value) =>
+                              balanceValuesDto!.descriptionValue.validate,
                           maxCharacters: 2000,
                           maxWidth: 500,
                           maxHeight: 400,
@@ -154,24 +135,31 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            // Quantity Double Field
                             DoubleFormField(
-                              onChanged: (value) => quantity =
-                                  BalanceQuantityValue(appLocalizations, value),
+                              onChanged: (value) => balanceValuesDto =
+                                  balanceValuesDto!.copyWith(
+                                      quantityValue: BalanceQuantityValue(
+                                          appLocalizations, value)),
                               title: appLocalizations.balanceQuantity,
-                              validator: (value) => quantity?.validate,
+                              validator: (value) =>
+                                  balanceValuesDto!.quantityValue.validate,
                               maxWidth: 200,
                               controller: widget.quantityController,
                               align: TextAlign.end,
                             ),
+                            // Currency Type Picker
                             (currencyTypes.isNotEmpty)
                                 ? DropdownPickerField(
-                                    initialValue: currencyType!,
+                                    initialValue:
+                                        balanceValuesDto!.currencyType,
                                     items: currencyTypes
                                         .map((e) => e.code)
                                         .toList(),
                                     width: 100,
                                     onChanged: (value) {
-                                      currencyType = value;
+                                      balanceValuesDto = balanceValuesDto!
+                                          .copyWith(currencyType: value!);
                                     })
                                 : const Icon(
                                     Icons.error_outline,
@@ -180,40 +168,36 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
                           ],
                         ),
                         verticalSpace(),
-                        AppTextFormField(
-                            onTap: () async {
-                              // Below line stops keyboard from appearing
-                              FocusScope.of(context).requestFocus(FocusNode());
-                              // Show Date Picker Here
-                              DateTime? newDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime.now());
-                              if (newDate != null) {
-                                date = BalanceDateValue(appLocalizations, newDate);
-                                widget.dateController.text =
-                                    widget.dateFormatter.format(newDate);
-                              }
+                        // DateTime Text Field
+                        AppDateTimeFormPicker(
+                            onTap: (dateTime) {
+                              balanceValuesDto = balanceValuesDto!.copyWith(
+                                  dateValue: BalanceDateTimeValue(
+                                      appLocalizations, dateTime));
+                              widget.dateController.text =
+                                  widget.dateTimeFormatter.format(dateTime);
                             },
-                            textAlign: TextAlign.center,
                             controller: widget.dateController,
                             title: appLocalizations.balanceDate,
-                            validator: (value) => date?.validate,
+                            validator: (value) =>
+                                balanceValuesDto!.dateValue.validate,
                             maxWidth: 200),
                         verticalSpace(),
+                        // Balance Type Picker
                         (balanceTypes.isNotEmpty)
                             ? BalanceTypeDropdownPicker(
                                 name: appLocalizations.balanceType,
-                                initialValue: balanceTypeEntity!,
+                                initialValue: balanceValuesDto!.balanceType,
                                 items: balanceTypes,
                                 onChanged: (value) {
-                                  balanceTypeEntity = value!;
+                                  balanceValuesDto = balanceValuesDto!
+                                      .copyWith(balanceType: value!);
                                 },
                                 appLocalizations: appLocalizations,
                               )
                             : Text(appLocalizations.genericError),
                         verticalSpace(),
+                        // Create Button
                         AppTextButton(
                           width: 140,
                           height: 50,
@@ -222,28 +206,18 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
                                 !widget.formKey.currentState!.validate()) {
                               return;
                             }
-                            if (name == null) return;
-                            if (description == null) return;
-                            if (quantity == null) return;
-                            if (date == null) return;
-                            (await balanceCreateController.handle(
-                                    name!,
-                                    description!,
-                                    quantity!,
-                                    date!,
-                                    currencyType!,
-                                    balanceTypeEntity!,
-                                    appLocalizations))
+                            (await balanceCreateController.create(
+                                    balanceValuesDto!, appLocalizations))
                                 .fold((failure) {
                               showErrorBalanceCreationDialog(appLocalizations,
-                                  failure.detail, widget.balanceTypeMode);
+                                  failure.detail, widget.balanceTypeEnum);
                             }, (entity) {
-                              router.goNamed(widget.balanceTypeMode ==
-                                      BalanceTypeMode.expense
+                              router.goNamed(widget.balanceTypeEnum.isExpense()
                                   ? BalanceView.routeExpenseName
                                   : BalanceView.routeRevenueName);
                               balanceListController.addBalance(entity);
-                              authController.refreshUserData();
+                              // Refresh UI account data
+                              accountController.get();
                             });
                           },
                           text: appLocalizations.create,
@@ -275,5 +249,26 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
     }, loading: () {
       return showLoading(background: widget.cache.value);
     });
+  }
+
+  BalanceValuesDto defaultBalanceValuesDto(final String currencyType,
+      final BalanceTypeEntity balanceTypeEntity, final appLocalizations) {
+    return BalanceValuesDto(
+        id: null,
+        nameValue:
+            BalanceNameValue(appLocalizations, widget.nameController.text),
+        descriptionValue: BalanceDescriptionValue(
+            appLocalizations, widget.descriptionController.text),
+        quantityValue: BalanceQuantityValue(
+            appLocalizations,
+            double.tryParse(
+                widget.quantityController.text.replaceAll(",", "."))),
+        dateValue: BalanceDateTimeValue(
+            appLocalizations,
+            widget.dateController.text.isNotEmpty
+                ? widget.dateTimeFormatter.parse(widget.dateController.text)
+                : DateTime.now()),
+        currencyType: currencyType,
+        balanceType: balanceTypeEntity);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/type_util.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +9,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BalanceBarChart extends ConsumerWidget {
   final List<BalanceEntity> balances;
-  final BalanceTypeMode balanceType;
+  final BalanceTypeEnum balanceTypeEnum;
 
   const BalanceBarChart(
-      {required this.balances, required this.balanceType, super.key});
+      {required this.balances, required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,7 +24,7 @@ class BalanceBarChart extends ConsumerWidget {
         child: SfCartesianChart(
             backgroundColor: Theme.of(context).brightness == Brightness.light
                 ? null
-                : balanceType == BalanceTypeMode.expense
+                : balanceTypeEnum == BalanceTypeEnum.expense
                     ? const Color.fromARGB(108, 136, 47, 39)
                     : const Color.fromARGB(108, 0, 109, 44),
             primaryXAxis: CategoryAxis(),
@@ -37,7 +37,7 @@ class BalanceBarChart extends ConsumerWidget {
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y,
                   width: (data.length < 2) ? 0.2 : null,
-                  color: balanceType == BalanceTypeMode.expense
+                  color: balanceTypeEnum == BalanceTypeEnum.expense
                       ? const Color.fromARGB(255, 232, 80, 65)
                       : const Color.fromARGB(255, 0, 179, 71))
             ]));

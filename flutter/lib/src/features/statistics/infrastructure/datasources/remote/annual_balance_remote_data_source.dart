@@ -1,8 +1,8 @@
-import 'package:balance_home_app/config/api_contract.dart';
-import 'package:balance_home_app/src/core/clients/api_client.dart';
+import 'package:balance_home_app/config/balhom_api_contract.dart';
+import 'package:balance_home_app/src/core/clients/api_client/api_client.dart';
 import 'package:balance_home_app/src/core/domain/entities/pagination_entity.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_request_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/http/http_request_failure.dart';
 import 'package:balance_home_app/src/features/statistics/domain/entities/annual_balance_entity.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -13,7 +13,7 @@ class AnnualBalanceRemoteDataSource {
 
   Future<Either<Failure, AnnualBalanceEntity>> get(int id) async {
     final response = await apiClient
-        .getRequest('${APIContract.annualBalance}/${id.toString()}');
+        .getRequest('${BalhomAPIContract.annualBalance}/${id.toString()}');
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
         (value) => right(AnnualBalanceEntity.fromJson(value.data)));
@@ -21,7 +21,7 @@ class AnnualBalanceRemoteDataSource {
 
   Future<Either<Failure, List<AnnualBalanceEntity>>> list() async {
     Map<String, dynamic> queryParameters = {"page": 1};
-    final response = await apiClient.getRequest(APIContract.annualBalance,
+    final response = await apiClient.getRequest(BalhomAPIContract.annualBalance,
         queryParameters: queryParameters);
     // Check if there is a request failure
     return await response.fold((failure) => left(failure), (value) async {
@@ -31,7 +31,8 @@ class AnnualBalanceRemoteDataSource {
       // No more than 10 annual balances data would be needed
       while (page.next != null && annualBalances.length < 10) {
         queryParameters["page"]++;
-        final response = await apiClient.getRequest(APIContract.annualBalance,
+        final response = await apiClient.getRequest(
+            BalhomAPIContract.annualBalance,
             queryParameters: queryParameters);
         // Check if there is a request failure
         response.fold((_) => null, (value) {

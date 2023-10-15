@@ -1,20 +1,21 @@
+import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
+import 'package:balance_home_app/src/core/presentation/widgets/app_date_time_form_picker.dart';
 import 'package:balance_home_app/src/core/router.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/double_form_field.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_field.dart';
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/core/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
-import 'package:balance_home_app/src/features/auth/providers.dart';
+import 'package:balance_home_app/src/features/account/providers.dart';
+import 'package:balance_home_app/src/features/balance/domain/dtos/balance_values_dto.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_date_value.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_description_value.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_name_value.dart';
 import 'package:balance_home_app/src/features/balance/domain/values/balance_quantity_value.dart';
+import 'package:balance_home_app/src/features/balance/presentation/utils/dialog_utils.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_type_dropdown_picker.dart';
 import 'package:balance_home_app/src/features/balance/providers.dart';
@@ -25,7 +26,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class BalanceEditForm extends ConsumerStatefulWidget {
-  @visibleForTesting
   final formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
@@ -33,92 +33,60 @@ class BalanceEditForm extends ConsumerStatefulWidget {
   final quantityController = TextEditingController();
   final dateController = TextEditingController();
 
-  final dateFormatter = DateFormat("dd/MM/yyyy");
+  final dateTimeFormatter = DateFormat("dd/MM/yyyy HH:mm");
 
-  @visibleForTesting
   final bool edit;
-  @visibleForTesting
+
   final BalanceEntity balance;
 
-  @visibleForTesting
   final cache = ValueNotifier<Widget>(Container());
 
-  @visibleForTesting
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
   BalanceEditForm({
     required this.edit,
     required this.balance,
-    required this.balanceTypeMode,
+    required this.balanceTypeEnum,
     super.key,
-  });
+  }) {
+    nameController.text = balance.name;
+    descriptionController.text = balance.description;
+    quantityController.text =
+        balance.realQuantity.toString().replaceAll(".", ",");
+    dateController.text = dateTimeFormatter.format(balance.date);
+  }
 
   @override
   ConsumerState<BalanceEditForm> createState() => _BalanceEditFormState();
 }
 
 class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
-  @visibleForTesting
-  BalanceNameValue? name;
-  @visibleForTesting
-  BalanceDescriptionValue? description;
-  @visibleForTesting
-  BalanceQuantityValue? quantity;
-  @visibleForTesting
-  BalanceDateValue? date;
-  @visibleForTesting
-  String? coinType;
-  @visibleForTesting
-  BalanceTypeEntity? balanceTypeEntity;
+  BalanceValuesDto? balanceValuesDto;
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    final authController = ref.read(authControllerProvider.notifier);
-    widget.nameController.text = widget.balance.name;
-    widget.descriptionController.text = widget.balance.description;
-    widget.quantityController.text =
-        widget.balance.realQuantity.toString().replaceAll(".", ",");
-    if (widget.dateController.text.isEmpty) {
-      widget.dateController.text =
-          widget.dateFormatter.format(widget.balance.date);
-    }
-    name = BalanceNameValue(appLocalizations, widget.nameController.text);
-    description =
-        BalanceDescriptionValue(appLocalizations, widget.descriptionController.text);
-    quantity = BalanceQuantityValue(appLocalizations,
-        double.tryParse(widget.quantityController.text.replaceAll(",", ".")));
-    date = BalanceDateValue(
-        appLocalizations,
-        DateTime(
-            int.parse(widget.dateController.text.split("/")[2]),
-            int.parse(widget.dateController.text.split("/")[1]),
-            int.parse(widget.dateController.text.split("/")[0])));
-    coinType ??= widget.balance.coinType;
-    final balanceEditControllerProvider =
-        widget.balanceTypeMode == BalanceTypeMode.expense
-            ? expenseEditControllerProvider
-            : revenueEditControllerProvider;
-    final balanceListController =
-        widget.balanceTypeMode == BalanceTypeMode.expense
-            ? ref.read(expenseListControllerProvider.notifier)
-            : ref.read(revenueListControllerProvider.notifier);
-    final balanceTypeListControllerProvider =
-        widget.balanceTypeMode == BalanceTypeMode.expense
-            ? expenseTypeListControllerProvider
-            : revenueTypeListControllerProvider;
 
+    final balanceListController = widget.balanceTypeEnum.isExpense()
+        ? ref.read(expenseListControllerProvider.notifier)
+        : ref.read(revenueListControllerProvider.notifier);
+
+    // Initialize balance values dto
+    balanceValuesDto ??= defaultBalanceValuesDto(appLocalizations);
+
+    final balanceEditState = ref.watch(balanceEditControllerProvider);
     final balanceEditController =
         ref.read(balanceEditControllerProvider.notifier);
 
-    final currencyTypes = ref.watch(currencyTypeListsControllerProvider);
-    final balanceTypes = ref.watch(balanceTypeListControllerProvider);
-    final balanceEdit = ref.watch(balanceEditControllerProvider);
+    final balanceTypesState = ref.watch(balanceTypeListControllerProvider);
+
+    final accountController = ref.read(accountControllerProvider.notifier);
+
+    final currencyTypesState = ref.watch(currencyTypeListsControllerProvider);
     // This is used to refresh page in case handle controller
-    return balanceEdit.when(data: (_) {
-      return balanceTypes.when(data: (balanceTypes) {
-        balanceTypeEntity ??= widget.balance.balanceType;
-        return currencyTypes.when(data: (data) {
+    return balanceEditState.when(data: (_) {
+      return balanceTypesState.when(data: (balanceTypes) {
+        return currencyTypesState.when(data: (data) {
           return data.fold((failure) {
             if (failure is HttpConnectionFailure ||
                 failure is NoLocalEntryFailure) {
@@ -138,23 +106,31 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                   child: Column(
                     children: [
                       verticalSpace(),
+                      // Name Text Field
                       AppTextFormField(
                         readOnly: !widget.edit,
-                        onChanged: (value) =>
-                            name = BalanceNameValue(appLocalizations, value),
+                        onChanged: (value) => balanceValuesDto =
+                            balanceValuesDto!.copyWith(
+                                nameValue:
+                                    BalanceNameValue(appLocalizations, value)),
                         title: appLocalizations.balanceName,
-                        validator: (value) => name?.validate,
+                        validator: (value) =>
+                            balanceValuesDto!.nameValue.validate,
                         maxCharacters: 40,
                         maxWidth: 500,
                         controller: widget.nameController,
                       ),
                       verticalSpace(),
+                      // Description Text Field
                       AppTextFormField(
                         readOnly: !widget.edit,
-                        onChanged: (value) => description =
-                            BalanceDescriptionValue(appLocalizations, value),
+                        onChanged: (value) => balanceValuesDto =
+                            balanceValuesDto!.copyWith(
+                                descriptionValue: BalanceDescriptionValue(
+                                    appLocalizations, value)),
                         title: appLocalizations.balanceDescription,
-                        validator: (value) => description?.validate,
+                        validator: (value) =>
+                            balanceValuesDto!.descriptionValue.validate,
                         maxCharacters: 2000,
                         maxWidth: 500,
                         maxHeight: 400,
@@ -167,25 +143,32 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          // Quantity Double Field
                           DoubleFormField(
                             readOnly: !widget.edit,
-                            onChanged: (value) => quantity =
-                                BalanceQuantityValue(appLocalizations, value),
+                            onChanged: (value) => balanceValuesDto =
+                                balanceValuesDto!.copyWith(
+                                    quantityValue: BalanceQuantityValue(
+                                        appLocalizations, value)),
                             title: appLocalizations.balanceQuantity,
-                            validator: (value) => quantity?.validate,
+                            validator: (value) =>
+                                balanceValuesDto!.quantityValue.validate,
                             maxWidth: 200,
                             controller: widget.quantityController,
                             align: TextAlign.end,
                           ),
+                          // Currency Type Picker
                           (currencyTypes.isNotEmpty)
                               ? DropdownPickerField(
                                   readOnly: !widget.edit,
-                                  initialValue: coinType!,
+                                  initialValue: balanceValuesDto!.currencyType,
                                   items:
                                       currencyTypes.map((e) => e.code).toList(),
                                   width: 100,
                                   onChanged: (value) {
-                                    coinType = value;
+                                    balanceValuesDto = balanceValuesDto!
+                                        .copyWith(currencyType: value!);
+                                    // TODO show warning gialog about current conversion value
                                   })
                               : const Icon(
                                   Icons.error_outline,
@@ -194,42 +177,38 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                         ],
                       ),
                       verticalSpace(),
-                      AppTextFormField(
+                      // DateTime Text Field
+                      AppDateTimeFormPicker(
                           readOnly: !widget.edit,
-                          onTap: () async {
-                            // Below line stops keyboard from appearing
-                            FocusScope.of(context).requestFocus(FocusNode());
-                            // Show Date Picker Here
-                            DateTime? newDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime.now());
-                            if (newDate != null) {
-                              date = BalanceDateValue(appLocalizations, newDate);
-                              widget.dateController.text =
-                                  widget.dateFormatter.format(newDate);
-                            }
+                          onTap: (dateTime) {
+                            balanceValuesDto = balanceValuesDto!.copyWith(
+                                dateValue: BalanceDateTimeValue(
+                                    appLocalizations, dateTime));
+                            widget.dateController.text =
+                                widget.dateTimeFormatter.format(dateTime);
                           },
-                          textAlign: TextAlign.center,
                           controller: widget.dateController,
                           title: appLocalizations.balanceDate,
-                          validator: (value) => date?.validate,
+                          validator: (value) =>
+                              balanceValuesDto!.dateValue.validate,
                           maxWidth: 200),
                       verticalSpace(),
+                      // Balance Type Picker
                       (balanceTypes.isNotEmpty)
                           ? BalanceTypeDropdownPicker(
                               readOnly: !widget.edit,
                               name: appLocalizations.balanceType,
-                              initialValue: balanceTypeEntity!,
+                              initialValue: balanceValuesDto!.balanceType,
                               items: balanceTypes,
                               onChanged: (value) {
-                                balanceTypeEntity = value!;
+                                balanceValuesDto = balanceValuesDto!
+                                    .copyWith(balanceType: value!);
                               },
                               appLocalizations: appLocalizations,
                             )
                           : Text(appLocalizations.genericError),
                       verticalSpace(),
+                      // Update Button
                       if (widget.edit)
                         AppTextButton(
                           text: appLocalizations.confirmation,
@@ -240,29 +219,18 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                                 !widget.formKey.currentState!.validate()) {
                               return;
                             }
-                            if (name == null) return;
-                            if (description == null) return;
-                            if (quantity == null) return;
-                            if (date == null) return;
-                            (await balanceEditController.handle(
-                                    widget.balance.id!,
-                                    name!,
-                                    description!,
-                                    quantity!,
-                                    date!,
-                                    coinType!,
-                                    balanceTypeEntity!,
-                                    appLocalizations))
+                            (await balanceEditController.update(
+                                    balanceValuesDto!, appLocalizations))
                                 .fold((failure) {
                               showErrorBalanceEditDialog(appLocalizations,
-                                  failure.detail, widget.balanceTypeMode);
+                                  failure.detail, widget.balanceTypeEnum);
                             }, (entity) {
-                              router.goNamed(widget.balanceTypeMode ==
-                                      BalanceTypeMode.expense
+                              router.goNamed(widget.balanceTypeEnum.isExpense()
                                   ? BalanceView.routeExpensePath
                                   : BalanceView.routeRevenuePath);
                               balanceListController.updateBalance(entity);
-                              authController.refreshUserData();
+                              // Refresh UI account data
+                              accountController.get();
                             });
                           },
                         ),
@@ -288,5 +256,18 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
     }, loading: () {
       return showLoading(background: widget.cache.value);
     });
+  }
+
+  BalanceValuesDto defaultBalanceValuesDto(final appLocalizations) {
+    return BalanceValuesDto(
+        id: widget.balance.id,
+        nameValue: BalanceNameValue(appLocalizations, widget.balance.name),
+        descriptionValue: BalanceDescriptionValue(
+            appLocalizations, widget.balance.description),
+        quantityValue:
+            BalanceQuantityValue(appLocalizations, widget.balance.realQuantity),
+        dateValue: BalanceDateTimeValue(appLocalizations, widget.balance.date),
+        currencyType: widget.balance.currencyType,
+        balanceType: widget.balance.balanceType);
   }
 }

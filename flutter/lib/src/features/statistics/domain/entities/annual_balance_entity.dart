@@ -10,7 +10,7 @@ class AnnualBalanceEntity with _$AnnualBalanceEntity {
   /// Factory constructor
   /// [grossQuantity] - [double] gross quantity
   /// [expectedQuantity] - [double] expected quantity
-  /// [coinType] - [String] coin type code
+  /// [currencyType] - [String] coin type code
   /// [year] - [int] year
   /// [created] - [DateTime] created
   // ignore: invalid_annotation_target
@@ -18,7 +18,7 @@ class AnnualBalanceEntity with _$AnnualBalanceEntity {
   const factory AnnualBalanceEntity({
     required double grossQuantity,
     required double expectedQuantity,
-    required String coinType,
+    required String currencyType,
     required int year,
     required DateTime created,
   }) = _AnnualBalanceEntity;

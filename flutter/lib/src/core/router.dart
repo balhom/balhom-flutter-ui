@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:balance_home_app/src/core/providers.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/version/presentation/views/version_loading_view.dart';
 import 'package:balance_home_app/src/core/presentation/views/fade_transition_view.dart';
 import 'package:balance_home_app/src/features/account/presentation/views/account_delete_view.dart';
@@ -11,7 +12,6 @@ import 'package:balance_home_app/src/features/auth/presentation/views/logout_vie
 import 'package:balance_home_app/src/features/auth/presentation/views/auth_view.dart';
 import 'package:balance_home_app/src/features/settings/presentation/views/settings_view.dart';
 import 'package:balance_home_app/src/features/auth/providers.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_create_view.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_edit_view.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
@@ -109,7 +109,7 @@ final router = GoRouter(
                   child: HomeView(
                       selectedSection: HomeTab.revenues,
                       child: BalanceView(
-                        balanceTypeMode: BalanceTypeMode.revenue,
+                        balanceTypeEnum: balanceTypeEnum.revenue,
                       ))),
               routes: [
                 GoRoute(
@@ -117,7 +117,7 @@ final router = GoRouter(
                         BalanceCreateView.routeName,
                     path: BalanceCreateView.routePath,
                     builder: (context, state) => const BalanceCreateView(
-                          balanceTypeMode: BalanceTypeMode.revenue,
+                          balanceTypeEnum: BalanceTypeEnum.revenue,
                         )),
                 GoRoute(
                     name: BalanceView.routeRevenueName +
@@ -127,7 +127,7 @@ final router = GoRouter(
                           id: int.parse(GoRouterState.of(context)
                               .uri
                               .queryParameters['id']!),
-                          balanceTypeMode: BalanceTypeMode.revenue,
+                          balanceTypeEnum: BalanceTypeEnum.revenue,
                         )),
               ]),
           GoRoute(
@@ -139,7 +139,7 @@ final router = GoRouter(
                   child: HomeView(
                       selectedSection: HomeTab.expenses,
                       child: BalanceView(
-                        balanceTypeMode: BalanceTypeMode.expense,
+                        balanceTypeEnum: BalanceTypeEnum.expense,
                       ))),
               routes: [
                 GoRoute(
@@ -147,7 +147,7 @@ final router = GoRouter(
                         BalanceCreateView.routeName,
                     path: BalanceCreateView.routePath,
                     builder: (context, state) => const BalanceCreateView(
-                          balanceTypeMode: BalanceTypeMode.expense,
+                          balanceTypeEnum: BalanceTypeEnum.expense,
                         )),
                 GoRoute(
                     name: BalanceView.routeExpenseName +
@@ -157,7 +157,7 @@ final router = GoRouter(
                           id: int.parse(GoRouterState.of(context)
                               .uri
                               .queryParameters['id']!),
-                          balanceTypeMode: BalanceTypeMode.expense,
+                          balanceTypeEnum: BalanceTypeEnum.expense,
                         )),
               ]),
           GoRoute(

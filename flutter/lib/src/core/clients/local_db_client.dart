@@ -3,11 +3,10 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 class LocalDbClient {
-  @visibleForTesting
   final String dbName;
-  @visibleForTesting
+
   final Set<String> tableNames;
-  @visibleForTesting
+
   late final Future<BoxCollection> futureCollection;
 
   LocalDbClient(

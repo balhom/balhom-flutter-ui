@@ -1,4 +1,4 @@
-import 'package:balance_home_app/config/api_contract.dart';
+import 'package:balance_home_app/config/balhom_api_contract.dart';
 import 'package:balance_home_app/src/core/clients/api_client/api_client.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/features/auth/domain/entities/credentials_entity.dart';
@@ -13,7 +13,7 @@ class JwtRemoteDataSource {
 
   Future<Either<Failure, JwtEntity>> get(
       final CredentialsEntity credentials) async {
-    final response = await apiClient.postRequest(APIContract.authAccess,
+    final response = await apiClient.postRequest(BalhomAPIContract.authAccess,
         data: credentials.toJson());
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
@@ -21,7 +21,7 @@ class JwtRemoteDataSource {
   }
 
   Future<Either<Failure, JwtEntity>> refresh() async {
-    final response = await apiClient.postRequest(APIContract.authRefresh);
+    final response = await apiClient.postRequest(BalhomAPIContract.authRefresh);
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
         (value) => right(JwtEntity.fromJson(value.data)));

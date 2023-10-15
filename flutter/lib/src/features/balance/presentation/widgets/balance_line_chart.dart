@@ -5,7 +5,7 @@ import 'package:balance_home_app/src/core/presentation/models/selected_date_mode
 import 'package:balance_home_app/src/core/presentation/widgets/chart_indicator.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,9 +120,9 @@ class BalanceLineChart extends ConsumerWidget {
                 borderData: borderData,
                 lineBarsData: [
                   if (revenues != null)
-                    balancesChartBarData(revenues!, BalanceTypeMode.revenue),
+                    balancesChartBarData(revenues!, BalanceTypeEnum.revenue),
                   if (expenses != null)
-                    balancesChartBarData(expenses!, BalanceTypeMode.expense),
+                    balancesChartBarData(expenses!, BalanceTypeEnum.expense),
                 ],
                 minX: 1,
                 maxX: selectedDateMode == SelectedDateMode.year
@@ -163,7 +163,7 @@ class BalanceLineChart extends ConsumerWidget {
 
   @visibleForTesting
   LineChartBarData balancesChartBarData(
-      List<BalanceEntity> balances, BalanceTypeMode balanceType) {
+      List<BalanceEntity> balances, BalanceTypeEnum balanceTypeEnum) {
     // Dictionary with balances quantities per month or day
     Map<int, double> spotsMap = {};
     for (BalanceEntity balance in balances) {
@@ -198,7 +198,7 @@ class BalanceLineChart extends ConsumerWidget {
     return LineChartBarData(
         isCurved: true,
         preventCurveOverShooting: true,
-        color: (balanceType == BalanceTypeMode.expense)
+        color: balanceTypeEnum.isExpense()
             ? const Color.fromARGB(188, 255, 17, 0)
             : const Color.fromARGB(184, 0, 175, 15),
         barWidth: 2,
@@ -206,7 +206,7 @@ class BalanceLineChart extends ConsumerWidget {
         dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(
           show: true,
-          color: (balanceType == BalanceTypeMode.expense)
+          color: balanceTypeEnum.isExpense()
               ? const Color.fromARGB(55, 212, 117, 117)
               : const Color.fromARGB(55, 0, 175, 15),
         ),

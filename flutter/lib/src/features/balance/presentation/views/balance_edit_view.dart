@@ -1,13 +1,12 @@
 import 'package:balance_home_app/config/app_colors.dart';
-import 'package:balance_home_app/src/core/clients/api_client.dart';
+import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/router.dart';
 import 'package:balance_home_app/config/app_theme.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/views/app_title.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_edit_form.dart';
 import 'package:balance_home_app/src/features/balance/providers.dart';
@@ -22,10 +21,10 @@ class BalanceEditView extends ConsumerStatefulWidget {
   static const routePath = 'edit';
 
   final int id;
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
   const BalanceEditView(
-      {required this.id, required this.balanceTypeMode, super.key});
+      {required this.id, required this.balanceTypeEnum, super.key});
 
   @override
   ConsumerState<BalanceEditView> createState() => _BalanceEditViewState();
@@ -37,12 +36,15 @@ class _BalanceEditViewState extends ConsumerState<BalanceEditView> {
   @override
   Widget build(BuildContext context) {
     final isConnected = connectionStateListenable.value;
+
     final appLocalizations = ref.read(appLocalizationsProvider);
     final theme = ref.watch(themeDataProvider);
-    final balanceList = widget.balanceTypeMode == BalanceTypeMode.expense
+
+    final balanceListState = widget.balanceTypeEnum.isExpense()
         ? ref.watch(expenseListControllerProvider)
         : ref.watch(revenueListControllerProvider);
-    return balanceList.when(data: (data) {
+
+    return balanceListState.when(data: (data) {
       return data.fold((failure) {
         if (failure is HttpConnectionFailure ||
             failure is NoLocalEntryFailure) {
@@ -53,7 +55,7 @@ class _BalanceEditViewState extends ConsumerState<BalanceEditView> {
         return showError(text: failure.detail);
       }, (entities) {
         return Scaffold(
-          backgroundColor: widget.balanceTypeMode == BalanceTypeMode.expense
+          backgroundColor: widget.balanceTypeEnum.isExpense()
               ? theme == AppTheme.darkTheme
                   ? AppColors.expenseBackgroundDarkColor
                   : AppColors.expenseBackgroundLightColor
@@ -65,10 +67,9 @@ class _BalanceEditViewState extends ConsumerState<BalanceEditView> {
             backgroundColor: AppColors.appBarBackgroundColor,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => router.goNamed(
-                  widget.balanceTypeMode == BalanceTypeMode.expense
-                      ? BalanceView.routeExpenseName
-                      : BalanceView.routeRevenueName),
+              onPressed: () => router.goNamed(widget.balanceTypeEnum.isExpense()
+                  ? BalanceView.routeExpenseName
+                  : BalanceView.routeRevenueName),
             ),
             actions: [
               if (isConnected)
@@ -89,7 +90,7 @@ class _BalanceEditViewState extends ConsumerState<BalanceEditView> {
               edit: edit,
               balance:
                   entities.firstWhere((element) => element.id == widget.id),
-              balanceTypeMode: widget.balanceTypeMode),
+              balanceTypeEnum: widget.balanceTypeEnum),
         );
       });
     }, error: (error, _) {

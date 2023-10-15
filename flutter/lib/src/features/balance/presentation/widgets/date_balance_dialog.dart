@@ -11,9 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DateBalanceDialog extends ConsumerStatefulWidget {
-  final SelectedDate selectedDate;
+  final SelectedDateDto selectedDate;
   final List<int> years;
-  final void Function(SelectedDate newDate) onPressed;
+  final void Function(SelectedDateDto newDate) onPressed;
 
   const DateBalanceDialog(
       {required this.selectedDate,
@@ -65,7 +65,7 @@ class _DateBalanceDialogState extends ConsumerState<DateBalanceDialog> {
                         : isMonth!
                             ? SelectedDateMode.month
                             : SelectedDateMode.year;
-                    SelectedDate newDate = SelectedDate(
+                    SelectedDateDto newDate = SelectedDateDto(
                         day: day!,
                         month: month!,
                         year: year!,

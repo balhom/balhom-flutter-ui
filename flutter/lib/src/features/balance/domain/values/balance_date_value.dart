@@ -5,18 +5,19 @@ import 'package:fpdart/fpdart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Balance Date value
-class BalanceDateValue extends ValueAbstract<DateTime?> {
+class BalanceDateTimeValue extends ValueAbstract<DateTime?> {
   @override
   Either<Failure, DateTime> get value => _value;
   final Either<Failure, DateTime> _value;
 
-  factory BalanceDateValue(AppLocalizations appLocalizations, DateTime? input) {
-    return BalanceDateValue._(
+  factory BalanceDateTimeValue(
+      AppLocalizations appLocalizations, DateTime? input) {
+    return BalanceDateTimeValue._(
       _validate(appLocalizations, input),
     );
   }
 
-  const BalanceDateValue._(this._value);
+  const BalanceDateTimeValue._(this._value);
 }
 
 /// * minimum: 0
@@ -25,7 +26,7 @@ Either<Failure, DateTime> _validate(
   if (input != null && !input.isAfter(DateTime.now())) {
     return right(input);
   }
-  String message = input == null
+  final String message = input == null
       ? appLocalizations.balanceDateRequired
       : appLocalizations.balanceDateFuture;
   return left(

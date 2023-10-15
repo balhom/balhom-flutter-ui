@@ -1,6 +1,6 @@
-import 'package:balance_home_app/src/core/clients/api_client.dart';
+import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/presentation/models/balance_limit_type.dart';
 import 'package:balance_home_app/src/features/balance/presentation/models/balance_ordering_type.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_create_view.dart';
@@ -12,29 +12,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class BalanceList extends ConsumerWidget {
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
   final List<BalanceEntity> balances;
 
   const BalanceList(
-      {required this.balances, required this.balanceTypeMode, super.key});
+      {required this.balances, required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isConnected = connectionStateListenable.value;
-    final orderingType = balanceTypeMode == BalanceTypeMode.expense
+
+    final orderingType = balanceTypeEnum.isExpense()
         ? ref.watch(expenseOrderingTypeProvider)
         : ref.watch(revenueOrderingTypeProvider);
-    final limitType = balanceTypeMode == BalanceTypeMode.expense
+
+    final limitType = balanceTypeEnum.isExpense()
         ? ref.watch(expenseLimitTypeProvider)
         : ref.watch(revenueLimitTypeProvider);
-    List<BalanceEntity> balanceList = orderBalances(orderingType, limitType);
+
+    final List<BalanceEntity> balanceList =
+        orderBalances(orderingType, limitType);
+
     return Stack(children: <Widget>[
       ListView.separated(
         padding: const EdgeInsets.all(8),
         itemCount: balanceList.length,
         itemBuilder: (BuildContext context, int index) {
           return BalanceCard(
-              balance: balanceList[index], balanceTypeMode: balanceTypeMode);
+              balance: balanceList[index], balanceTypeEnum: balanceTypeEnum);
         },
         separatorBuilder: (BuildContext context, int index) => const Divider(),
       ),
@@ -44,7 +49,7 @@ class BalanceList extends ConsumerWidget {
         child: isConnected
             ? FloatingActionButton(
                 onPressed: () async {
-                  if (balanceTypeMode == BalanceTypeMode.expense) {
+                  if (balanceTypeEnum.isExpense()) {
                     context.push(
                         "/${BalanceView.routeExpensePath}/${BalanceCreateView.routePath}");
                   } else {
@@ -52,9 +57,8 @@ class BalanceList extends ConsumerWidget {
                         "/${BalanceView.routeRevenuePath}/${BalanceCreateView.routePath}");
                   }
                 },
-                backgroundColor: balanceTypeMode == BalanceTypeMode.expense
-                    ? Colors.orange
-                    : Colors.green,
+                backgroundColor:
+                    balanceTypeEnum.isExpense() ? Colors.orange : Colors.green,
                 child: const Icon(Icons.add),
               )
             : null,
@@ -74,8 +78,7 @@ class BalanceList extends ConsumerWidget {
             balance.date.isAfter(aux.elementAt(i).date)) break;
         // Case Quantity ordering
         if (orderingType == BalanceOrderingType.quantity &&
-            balance.convertedQuantity! >
-                aux.elementAt(i).convertedQuantity!) {
+            balance.convertedQuantity! > aux.elementAt(i).convertedQuantity!) {
           break;
         }
         // Case Name ordering

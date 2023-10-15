@@ -1,4 +1,4 @@
-import 'package:balance_home_app/config/api_contract.dart';
+import 'package:balance_home_app/config/balhom_api_contract.dart';
 import 'package:balance_home_app/src/core/clients/api_client/api_client.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/features/account/domain/entities/account_entity.dart';
@@ -13,7 +13,7 @@ class AccountRemoteDataSource {
   AccountRemoteDataSource({required this.apiClient});
 
   Future<Either<Failure, AccountEntity>> get() async {
-    final response = await apiClient.getRequest(APIContract.accountProfile);
+    final response = await apiClient.getRequest(BalhomAPIContract.accountProfile);
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
         (value) => right(AccountEntity.fromJson(value.data)));
@@ -21,14 +21,14 @@ class AccountRemoteDataSource {
 
   Future<Either<Failure, void>> create(
       final RegisterEntity registration) async {
-    final response = await apiClient.postRequest(APIContract.accountCreation,
+    final response = await apiClient.postRequest(BalhomAPIContract.accountCreation,
         data: registration.toJson());
     // Check if there is a request failure
     return response.fold((failure) => left(failure), (_) => right(null));
   }
 
   Future<Either<Failure, AccountEntity>> update(AccountEntity user) async {
-    final response = await apiClient.patchRequest(APIContract.accountProfile,
+    final response = await apiClient.patchRequest(BalhomAPIContract.accountProfile,
         data: user.toJson());
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
@@ -38,13 +38,13 @@ class AccountRemoteDataSource {
   Future<Either<Failure, void>> updateImage(
       Uint8List bytes, String type) async {
     final response = await apiClient.putImageRequest(
-        APIContract.accountProfile, bytes, type);
+        BalhomAPIContract.accountImage, "image", bytes, type);
     // Check if there is a request failure
     return response.fold((failure) => left(failure), (_) => right(null));
   }
 
   Future<Either<Failure, void>> delete() async {
-    final response = await apiClient.delRequest(APIContract.accountProfile);
+    final response = await apiClient.delRequest(BalhomAPIContract.accountProfile);
     // Check if there is a request failure
     return response.fold((failure) => left(failure), (_) => right(null));
   }

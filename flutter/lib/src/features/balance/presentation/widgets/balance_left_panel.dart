@@ -5,7 +5,7 @@ import 'package:balance_home_app/src/core/presentation/models/selected_date_mode
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/date_util.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_bar_chart.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_line_chart.dart';
 import 'package:balance_home_app/src/features/balance/providers.dart';
@@ -14,28 +14,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BalanaceLeftPanel extends ConsumerWidget {
   final List<BalanceEntity> balances;
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
   const BalanaceLeftPanel(
-      {required this.balances, required this.balanceTypeMode, super.key});
+      {required this.balances, required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
     final theme = ref.watch(themeDataProvider);
-    final selectedDate = balanceTypeMode == BalanceTypeMode.expense
+
+    final selectedDate = balanceTypeEnum.isExpense()
         ? ref.watch(expenseSelectedDateProvider)
         : ref.watch(revenueSelectedDateProvider);
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    double chartLineHeight = (screenHeight * 0.45 <= 300)
+
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double chartLineHeight = (screenHeight * 0.45 <= 300)
         ? 300
         : (screenHeight * 0.45 <= 400)
             ? screenHeight * 0.45
             : 400;
+
     return Container(
       constraints: const BoxConstraints.expand(),
-      color: balanceTypeMode == BalanceTypeMode.expense
+      color: balanceTypeEnum.isExpense()
           ? theme == AppTheme.darkTheme
               ? AppColors.expenseBackgroundDarkColor
               : AppColors.expenseBackgroundLightColor
@@ -51,7 +54,7 @@ class BalanaceLeftPanel extends ConsumerWidget {
                   ? screenWidth * 0.95
                   : screenWidth * 0.45,
               child: BalanceBarChart(
-                  balances: balances, balanceType: balanceTypeMode),
+                  balances: balances, balanceTypeEnum: balanceTypeEnum),
             ),
             if (selectedDate.selectedDateMode != SelectedDateMode.day)
               SizedBox(
@@ -60,12 +63,8 @@ class BalanaceLeftPanel extends ConsumerWidget {
                     ? screenWidth * 0.95
                     : screenWidth * 0.45,
                 child: BalanceLineChart(
-                  revenues: (balanceTypeMode == BalanceTypeMode.revenue)
-                      ? balances
-                      : null,
-                  expenses: balanceTypeMode == BalanceTypeMode.expense
-                      ? balances
-                      : null,
+                  revenues: !balanceTypeEnum.isExpense() ? balances : null,
+                  expenses: balanceTypeEnum.isExpense() ? balances : null,
                   selectedDateMode: selectedDate.selectedDateMode,
                   selectedMonth: selectedDate.month,
                   selectedYear: selectedDate.year,

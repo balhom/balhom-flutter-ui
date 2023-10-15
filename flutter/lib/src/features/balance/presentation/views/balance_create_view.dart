@@ -3,7 +3,7 @@ import 'package:balance_home_app/src/core/router.dart';
 import 'package:balance_home_app/config/app_theme.dart';
 import 'package:balance_home_app/src/core/presentation/views/app_title.dart';
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_create_form.dart';
 import 'package:flutter/material.dart';
@@ -16,15 +16,15 @@ class BalanceCreateView extends ConsumerWidget {
   /// Route path
   static const routePath = 'create';
 
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
-  const BalanceCreateView({required this.balanceTypeMode, super.key});
+  const BalanceCreateView({required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeDataProvider);
     return Scaffold(
-      backgroundColor: balanceTypeMode == BalanceTypeMode.expense
+      backgroundColor: balanceTypeEnum.isExpense()
           ? theme == AppTheme.darkTheme
               ? AppColors.expenseBackgroundDarkColor
               : AppColors.expenseBackgroundLightColor
@@ -36,13 +36,12 @@ class BalanceCreateView extends ConsumerWidget {
         backgroundColor: AppColors.appBarBackgroundColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => router.goNamed(
-              balanceTypeMode == BalanceTypeMode.expense
-                  ? BalanceView.routeExpenseName
-                  : BalanceView.routeRevenueName),
+          onPressed: () => router.goNamed(balanceTypeEnum.isExpense()
+              ? BalanceView.routeExpenseName
+              : BalanceView.routeRevenueName),
         ),
       ),
-      body: BalanceCreateForm(balanceTypeMode: balanceTypeMode),
+      body: BalanceCreateForm(balanceTypeEnum: balanceTypeEnum),
     );
   }
 }

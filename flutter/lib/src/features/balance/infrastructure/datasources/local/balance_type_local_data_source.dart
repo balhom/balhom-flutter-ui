@@ -3,7 +3,7 @@ import 'package:balance_home_app/src/core/domain/failures/empty_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -15,9 +15,9 @@ class BalanceTypeLocalDataSource {
   BalanceTypeLocalDataSource({required this.localDbClient});
 
   Future<Either<Failure, BalanceTypeEntity>> get(
-      final String name, final BalanceTypeMode typeMode) async {
+      final String name, final BalanceTypeEnum balanceTypeEnum) async {
     try {
-      final id = "${typeMode.name}_$name";
+      final id = "${balanceTypeEnum.name}_$name";
       final jsonObj = await localDbClient.getById(tableName: tableName, id: id);
       if (jsonObj == null) {
         return left(
@@ -25,15 +25,14 @@ class BalanceTypeLocalDataSource {
       }
       return right(BalanceTypeEntity.fromJson(jsonObj));
     } on Exception {
-      return left(
-          const NoLocalEntryFailure(entityName: tableName, detail: ""));
+      return left(const NoLocalEntryFailure(entityName: tableName, detail: ""));
     }
   }
 
-  Future<Either<Failure, void>> put(
-      BalanceTypeEntity balanceType, final BalanceTypeMode typeMode) async {
+  Future<Either<Failure, void>> put(BalanceTypeEntity balanceType,
+      final BalanceTypeEnum balanceTypeEnum) async {
     try {
-      final id = "${typeMode.name}_${balanceType.name}";
+      final id = "${balanceTypeEnum.name}_${balanceType.name}";
       await localDbClient.putById(
           tableName: tableName, id: id, content: balanceType.toJson());
       return right(null);
@@ -43,12 +42,12 @@ class BalanceTypeLocalDataSource {
   }
 
   Future<Either<Failure, List<BalanceTypeEntity>>> list(
-      final BalanceTypeMode typeMode) async {
+      final BalanceTypeEnum balanceTypeEnum) async {
     try {
       final res = <BalanceTypeEntity>[];
       final jsonObj = await localDbClient.getAllWithIds(tableName: tableName);
       for (String id in jsonObj.keys) {
-        if (id.startsWith(typeMode.name)) {
+        if (id.startsWith(balanceTypeEnum.name)) {
           final balanceTypeJson = Map<String, dynamic>.from(jsonObj[id]);
           res.add(BalanceTypeEntity.fromJson(balanceTypeJson));
         }
@@ -59,16 +58,16 @@ class BalanceTypeLocalDataSource {
       }
       return right(res);
     } on Exception {
-      return left(
-          const NoLocalEntryFailure(entityName: tableName, detail: ""));
+      return left(const NoLocalEntryFailure(entityName: tableName, detail: ""));
     }
   }
 
-  Future<Either<Failure, void>> deleteAll(BalanceTypeMode typeMode) async {
+  Future<Either<Failure, void>> deleteAll(
+      final BalanceTypeEnum balanceTypeEnum) async {
     try {
       final jsonObj = await localDbClient.getAllWithIds(tableName: tableName);
       for (String jsonId in jsonObj.keys) {
-        if (jsonId.startsWith(typeMode.name)) {
+        if (jsonId.startsWith(balanceTypeEnum.name)) {
           await localDbClient.deleteById(tableName: tableName, id: jsonId);
         }
       }

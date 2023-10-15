@@ -1,5 +1,5 @@
+import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/router.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date_mode.dart';
@@ -10,7 +10,7 @@ import 'package:balance_home_app/src/core/presentation/widgets/responsive_layout
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/widget_utils.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_left_panel.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_right_panel.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/date_balance_dialog.dart';
@@ -37,31 +37,31 @@ class BalanceView extends ConsumerWidget {
   @visibleForTesting
   final cache = ValueNotifier<Widget>(Container());
 
-  @visibleForTesting
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
-  BalanceView({required this.balanceTypeMode, super.key});
+  BalanceView({required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final balanceList = balanceTypeMode == BalanceTypeMode.expense
+    final balanceListState = balanceTypeEnum.isExpense()
         ? ref.watch(expenseListControllerProvider)
         : ref.watch(revenueListControllerProvider);
-    final balanceListController = balanceTypeMode == BalanceTypeMode.expense
-        ? ref.watch(expenseListControllerProvider.notifier)
-        : ref.watch(revenueListControllerProvider.notifier);
-    final selectedDate = balanceTypeMode == BalanceTypeMode.expense
-        ? ref.watch(expenseSelectedDateProvider)
-        : ref.watch(revenueSelectedDateProvider);
+    final balanceListController = balanceTypeEnum.isExpense()
+        ? ref.read(expenseListControllerProvider.notifier)
+        : ref.read(revenueListControllerProvider.notifier);
 
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
-    final selectedDateState = balanceTypeMode == BalanceTypeMode.expense
-        ? ref.watch(expenseSelectedDateProvider.notifier)
-        : ref.watch(revenueSelectedDateProvider.notifier);
+    final selectedDate = balanceTypeEnum == BalanceTypeEnum.expense
+        ? ref.watch(expenseSelectedDateProvider)
+        : ref.watch(revenueSelectedDateProvider);
+    final selectedDateState = balanceTypeEnum == BalanceTypeEnum.expense
+        ? ref.read(expenseSelectedDateProvider.notifier)
+        : ref.read(revenueSelectedDateProvider.notifier);
 
-    return balanceList.when<Widget>(data: (data) {
-      final balanceYears = balanceListController.getAllBalanceYears();
+    return balanceListState.when<Widget>(data: (data) {
+      final balanceYears =
+          balanceListController.getAllBalanceYears(balanceTypeEnum);
       return data.fold((failure) {
         if (failure is HttpConnectionFailure ||
             failure is NoLocalEntryFailure) {
@@ -119,7 +119,7 @@ class BalanceView extends ConsumerWidget {
       BuildContext context,
       AppLocalizations appLocalizations,
       SelectedDateState selectedDateState,
-      SelectedDate selectedDate,
+      SelectedDateDto selectedDate,
       Future<List<int>> balanceYears) {
     // All posible date formatters
     final dayFormatter = DateFormat("dd MMM yyyy", appLocalizations.localeName);
@@ -134,7 +134,7 @@ class BalanceView extends ConsumerWidget {
 
     final screenWidth = MediaQuery.of(context).size.width;
     final topContainer = Container(
-      color: balanceTypeMode == BalanceTypeMode.expense
+      color: balanceTypeEnum.isExpense()
           ? const Color.fromARGB(255, 212, 112, 78)
           : const Color.fromARGB(255, 76, 122, 52),
       constraints: BoxConstraints.tightFor(
@@ -154,7 +154,7 @@ class BalanceView extends ConsumerWidget {
 
     final dateBtn = AppTextButton(
       text: appLocalizations.date,
-      backgroundColor: balanceTypeMode == BalanceTypeMode.expense
+      backgroundColor: balanceTypeEnum.isExpense()
           ? const Color.fromARGB(255, 160, 71, 41)
           : const Color.fromARGB(255, 54, 90, 35),
       onPressed: () async {
@@ -174,7 +174,7 @@ class BalanceView extends ConsumerWidget {
   Future<void> showDateBalanceDialog(
       AppLocalizations appLocalizations,
       SelectedDateState selectedDateState,
-      SelectedDate selectedDate,
+      SelectedDateDto selectedDate,
       Future<List<int>> balanceYears) async {
     final years = await balanceYears;
     if (years.isEmpty) {
@@ -190,7 +190,7 @@ class BalanceView extends ConsumerWidget {
           context: navigatorKey.currentContext!,
           builder: (context) => DateBalanceDialog(
                 selectedDate: selectedDate,
-                onPressed: (SelectedDate newDate) {
+                onPressed: (SelectedDateDto newDate) {
                   // Pop current dialog
                   Navigator.pop(context);
                   selectedDateState.setSelectedDate(newDate);
@@ -204,7 +204,7 @@ class BalanceView extends ConsumerWidget {
       BuildContext context,
       AppLocalizations appLocalizations,
       SelectedDateState selectedDateState,
-      SelectedDate selectedDate,
+      SelectedDateDto selectedDate,
       List<BalanceEntity> balances,
       Future<List<int>> balanceYears) {
     return Column(
@@ -213,7 +213,7 @@ class BalanceView extends ConsumerWidget {
             balanceYears),
         Expanded(
           child: BalanaceRightPanel(
-              balances: balances, balanceTypeMode: balanceTypeMode),
+              balances: balances, balanceTypeEnum: balanceTypeEnum),
         ),
       ],
     );
@@ -224,7 +224,7 @@ class BalanceView extends ConsumerWidget {
       BuildContext context,
       AppLocalizations appLocalizations,
       SelectedDateState selectedDateState,
-      SelectedDate selectedDate,
+      SelectedDateDto selectedDate,
       List<BalanceEntity> balances,
       Future<List<int>> balanceYears) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -238,12 +238,12 @@ class BalanceView extends ConsumerWidget {
             children: [
               Expanded(
                 child: BalanaceLeftPanel(
-                    balances: balances, balanceTypeMode: balanceTypeMode),
+                    balances: balances, balanceTypeEnum: balanceTypeEnum),
               ),
               SizedBox(
                 width: (screenWidth * 0.3 > 440) ? 440 : screenWidth * 0.3,
                 child: BalanaceRightPanel(
-                    balances: balances, balanceTypeMode: balanceTypeMode),
+                    balances: balances, balanceTypeEnum: balanceTypeEnum),
               )
             ],
           ),

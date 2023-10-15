@@ -1,31 +1,33 @@
-import 'package:balance_home_app/src/core/domain/failures/api_bad_request_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http_connection_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/http/api_bad_request_failure.dart';
+import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_sorting_enum.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_repository_interface.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 
 class BalanceListController
     extends StateNotifier<AsyncValue<Either<Failure, List<BalanceEntity>>>> {
-  final BalanceRepositoryInterface repository;
-  final BalanceTypeMode balanceTypeMode;
-  final SelectedDate selectedDate;
+  final BalanceRepositoryInterface balanceRepository;
+  final SelectedDateDto selectedDateDto;
 
   BalanceListController(
-      {required this.repository,
-      required this.balanceTypeMode,
-      required this.selectedDate})
-      : super(const AsyncValue.loading()) {
-    getBalances();
-  }
+      {required this.balanceRepository, required this.selectedDateDto})
+      : super(AsyncValue.data(right([])));
 
-  Future<void> getBalances() async {
-    final res = await repository.getBalances(balanceTypeMode,
-        dateFrom: selectedDate.dateFrom, dateTo: selectedDate.dateTo);
+  Future<void> getBalances(final BalanceTypeEnum balanceTypeEnum,
+      final BalanceSortingEnum balanceSortingEnum, final int page) async {
+    state = const AsyncValue.loading();
+    final res = await balanceRepository.getBalances(
+        dateFrom: selectedDateDto.dateFrom,
+        dateTo: selectedDateDto.dateTo,
+        balanceTypeEnum: balanceTypeEnum,
+        balanceSortingEnum: balanceSortingEnum,
+        page: page);
     state = res.fold((failure) {
       if (failure is HttpConnectionFailure ||
           failure is NoLocalEntryFailure ||
@@ -39,7 +41,7 @@ class BalanceListController
   }
 
   /// Add an entity to list
-  void addBalance(BalanceEntity entity) {
+  void addBalance(final BalanceEntity entity) {
     // No need to use repository,
     // it will be used by Create Controller
     if (state.value != null) {
@@ -53,7 +55,7 @@ class BalanceListController
   }
 
   /// Update an entity of the list
-  void updateBalance(BalanceEntity entity) {
+  void updateBalance(final BalanceEntity entity) {
     // No need to use repository,
     // it will be used by Edit Controller
     if (state.value != null) {
@@ -72,19 +74,20 @@ class BalanceListController
   }
 
   /// Delete an entity of the list
-  void deleteBalance(BalanceEntity entity) {
+  void deleteBalance(final BalanceEntity entity) {
     if (state.value != null) {
       state.value!.fold((_) {}, (entities) {
         entities.remove(entity);
-        repository.deleteBalance(entity, balanceTypeMode);
+        balanceRepository.deleteBalance(entity);
         state = AsyncValue.data(right(entities));
       });
     }
   }
 
   /// Get a list of years of stored balances
-  Future<List<int>> getAllBalanceYears() async {
-    final res = await repository.getBalanceYears(balanceTypeMode);
+  Future<List<int>> getAllBalanceYears(
+      final BalanceTypeEnum balanceTypeEnum) async {
+    final res = await balanceRepository.getBalanceYears(balanceTypeEnum);
     return res.fold((_) => [], (value) => value);
   }
 }

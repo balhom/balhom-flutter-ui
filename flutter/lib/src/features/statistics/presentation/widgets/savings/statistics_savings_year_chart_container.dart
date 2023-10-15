@@ -25,7 +25,7 @@ class StatisticsSavingsYearChartContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isConnected = connectionStateListenable.value;
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    SelectedDate selectedDate =
+    SelectedDateDto selectedDate =
         ref.watch(statisticsSavingsSelectedDateProvider);
     final selectedDateState =
         ref.read(statisticsSavingsSelectedDateProvider.notifier);

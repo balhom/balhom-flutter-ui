@@ -145,9 +145,9 @@ class ApiClient {
   ///
   /// Returns either a HTTP failure or a HTTP response.
   Future<Either<HttpRequestFailure, Response>> putImageRequest(
-      String path, Uint8List bytes, String type) async {
+      String path, String fieldName, Uint8List bytes, String type) async {
     final FormData data = FormData.fromMap({
-      "image": MultipartFile.fromBytes(bytes,
+      fieldName: MultipartFile.fromBytes(bytes,
           filename: 'upload_image.${type.split("/").last}',
           contentType: MediaType("image", type)),
     });

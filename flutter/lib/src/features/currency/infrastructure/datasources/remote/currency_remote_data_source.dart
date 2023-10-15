@@ -1,4 +1,4 @@
-import 'package:balance_home_app/config/api_contract.dart';
+import 'package:balance_home_app/config/balhom_api_contract.dart';
 import 'package:balance_home_app/src/core/clients/api_client/api_client.dart';
 import 'package:balance_home_app/src/core/domain/entities/pagination_entity.dart';
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
@@ -15,7 +15,7 @@ class CurrencyRemoteDataSource {
 
   Future<Either<Failure, List<CurrencyTypeEntity>>> getTypes() async {
     Map<String, dynamic> queryParameters = {"page": 1};
-    final response = await apiClient.getRequest(APIContract.currencyType,
+    final response = await apiClient.getRequest(BalhomAPIContract.currencyType,
         queryParameters: queryParameters);
     // Check if there is a request failure
     return await response.fold((failure) => left(failure), (value) async {
@@ -24,7 +24,7 @@ class CurrencyRemoteDataSource {
           page.results.map((e) => CurrencyTypeEntity.fromJson(e)).toList();
       while (page.next != null) {
         queryParameters["page"]++;
-        final response = await apiClient.getRequest(APIContract.currencyType,
+        final response = await apiClient.getRequest(BalhomAPIContract.currencyType,
             queryParameters: queryParameters);
         // Check if there is a request failure
         response.fold((_) => null, (value) {
@@ -44,7 +44,7 @@ class CurrencyRemoteDataSource {
   Future<Either<Failure, CurrencyConversionListEntity>> getConversions(
       String code) async {
     final response =
-        await apiClient.getRequest('${APIContract.currencyConversion}/$code');
+        await apiClient.getRequest('${BalhomAPIContract.currencyConversion}/$code');
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
         (value) => right(CurrencyConversionListEntity.fromJson(value.data)));
@@ -53,7 +53,7 @@ class CurrencyRemoteDataSource {
   Future<Either<Failure, DateCurrencyConversionListEntity>>
       getLastDateConversions({required int days}) async {
     final response = await apiClient
-        .getRequest('${APIContract.currencyConversion}/days=$days');
+        .getRequest('${BalhomAPIContract.currencyConversion}/days=$days');
     // Check if there is a request failure
     return response.fold(
         (failure) => left(failure),

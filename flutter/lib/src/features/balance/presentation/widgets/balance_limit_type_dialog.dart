@@ -1,26 +1,27 @@
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/presentation/models/balance_limit_type.dart';
 import 'package:balance_home_app/src/features/balance/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BalanceLimitTypeDialog extends ConsumerWidget {
-  final BalanceTypeMode balanceTypeMode;
+  final BalanceTypeEnum balanceTypeEnum;
 
-  const BalanceLimitTypeDialog({required this.balanceTypeMode, super.key});
+  const BalanceLimitTypeDialog({required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final balanceLimitTypeNotifier = balanceTypeMode == BalanceTypeMode.expense
+    final balanceLimitTypeNotifier = balanceTypeEnum.isExpense()
         ? ref.read(expenseLimitTypeProvider.notifier)
         : ref.read(revenueLimitTypeProvider.notifier);
-    BalanceLimitType limitType = balanceTypeMode == BalanceTypeMode.expense
+
+    final BalanceLimitType limitType = balanceTypeEnum.isExpense()
         ? ref.watch(expenseLimitTypeProvider)
         : ref.watch(revenueLimitTypeProvider);
     final appLocalizations = ref.read(appLocalizationsProvider);
     return AlertDialog(
-        title: balanceTypeMode == BalanceTypeMode.expense
+        title: balanceTypeEnum.isExpense()
             ? Text(appLocalizations.maxExpenseDialoTitle)
             : Text(appLocalizations.maxRevenueDialoTitle),
         content: SingleChildScrollView(

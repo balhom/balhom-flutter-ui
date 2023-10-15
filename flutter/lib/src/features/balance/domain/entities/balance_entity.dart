@@ -1,6 +1,5 @@
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:intl/intl.dart';
 
 part 'balance_entity.freezed.dart';
 part 'balance_entity.g.dart';
@@ -17,7 +16,7 @@ class BalanceEntity with _$BalanceEntity {
   /// [realQuantity] - [double] quantity
   /// [convertedQuantity] - [double] quantity
   /// [date] - [DateTime] date
-  /// [coinType] - [String] coin type code
+  /// [currencyType] - [String] currency type code
   /// [balanceType] - [BalanceTypeEntity] balance type
   // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
@@ -30,41 +29,11 @@ class BalanceEntity with _$BalanceEntity {
     // ignore: invalid_annotation_target
     @JsonKey(includeIfNull: false) required double? convertedQuantity,
     required DateTime date,
-    required String coinType,
+    required String currencyType,
     required BalanceTypeEntity balanceType,
   }) = _BalanceEntity;
 
   // Serialization
   factory BalanceEntity.fromJson(Map<String, dynamic> json) =>
       _$BalanceEntityFromJson(json);
-
-  factory BalanceEntity.fromRevenueJson(Map<String, dynamic> json,
-      {BalanceTypeEntity? type}) {
-    json["balance_type"] =
-        type != null ? type.toJson() : json.remove("rev_type");
-    return _$BalanceEntityFromJson(json);
-  }
-
-  factory BalanceEntity.fromExpenseJson(Map<String, dynamic> json,
-      {BalanceTypeEntity? type}) {
-    json["balance_type"] =
-        type != null ? type.toJson() : json.remove("exp_type");
-    return _$BalanceEntityFromJson(json);
-  }
-
-  Map<String, dynamic> toRevenueJson() {
-    Map<String, dynamic> map = toJson();
-    map["date"] = _dateToJson(date);
-    map["rev_type"] = (map.remove("balance_type") as BalanceTypeEntity).name;
-    return map;
-  }
-
-  Map<String, dynamic> toExpenseJson() {
-    Map<String, dynamic> map = toJson();
-    map["date"] = _dateToJson(date);
-    map["exp_type"] = (map.remove("balance_type") as BalanceTypeEntity).name;
-    return map;
-  }
-
-  String _dateToJson(DateTime date) => DateFormat("yyyy-MM-dd").format(date);
 }

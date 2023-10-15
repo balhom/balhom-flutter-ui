@@ -9,9 +9,7 @@ import 'package:balance_home_app/src/features/balance/application/balance_type_l
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_repository_interface.dart';
-import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_mode.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_respository_interface.dart';
-import 'package:balance_home_app/src/features/balance/infrastructure/datasources/local/balance_local_data_source.dart';
 import 'package:balance_home_app/src/features/balance/infrastructure/datasources/local/balance_type_local_data_source.dart';
 import 'package:balance_home_app/src/features/balance/infrastructure/datasources/remote/balance_remote_data_source.dart';
 import 'package:balance_home_app/src/features/balance/infrastructure/datasources/remote/balance_type_remote_data_source.dart';
@@ -22,6 +20,14 @@ import 'package:balance_home_app/src/features/balance/presentation/models/balanc
 import 'package:balance_home_app/src/features/balance/presentation/states/balance_limit_type_state.dart';
 import 'package:balance_home_app/src/features/balance/presentation/states/balance_ordering_type_state.dart';
 import 'package:balance_home_app/src/core/presentation/states/selected_date_state.dart';
+import 'package:balance_home_app/src/features/statistics/domain/repositories/annual_balance_repository_interface.dart';
+import 'package:balance_home_app/src/features/statistics/domain/repositories/monthly_balance_repository_interface.dart';
+import 'package:balance_home_app/src/features/statistics/infrastructure/datasources/local/annual_balance_local_data_source.dart';
+import 'package:balance_home_app/src/features/statistics/infrastructure/datasources/local/monthly_balance_local_data_source.dart';
+import 'package:balance_home_app/src/features/statistics/infrastructure/datasources/remote/annual_balance_remote_data_source.dart';
+import 'package:balance_home_app/src/features/statistics/infrastructure/datasources/remote/monthly_balance_remote_data_source.dart';
+import 'package:balance_home_app/src/features/statistics/infrastructure/repositories/annual_balance_repository.dart';
+import 'package:balance_home_app/src/features/statistics/infrastructure/repositories/monthly_balance_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -32,86 +38,76 @@ import 'package:fpdart/fpdart.dart';
 /// Balance type repository
 final balanceTypeRepositoryProvider = Provider<BalanceTypeRepositoryInterface>(
     (ref) => BalanceTypeRepository(
-        balanceTypeRemoteDataSource:
-            BalanceTypeRemoteDataSource(apiClient: ref.read(balhomApiClientProvider)),
+        balanceTypeRemoteDataSource: BalanceTypeRemoteDataSource(
+            apiClient: ref.read(balhomApiClientProvider)),
         balanceTypeLocalDataSource: BalanceTypeLocalDataSource(
             localDbClient: ref.read(localDbClientProvider))));
 
 /// Balance repository
-final balanceRepositoryProvider = Provider<BalanceRepositoryInterface>((ref) =>
-    BalanceRepository(
-        balanceRemoteDataSource:
-            BalanceRemoteDataSource(apiClient: ref.read(balhomApiClientProvider)),
-        balanceLocalDataSource: BalanceLocalDataSource(
+final balanceRepositoryProvider =
+    Provider<BalanceRepositoryInterface>((ref) => BalanceRepository(
+          balanceRemoteDataSource: BalanceRemoteDataSource(
+              apiClient: ref.read(balhomApiClientProvider)),
+        ));
+
+/// Annual balance repository
+final annualBalanceRepositoryProvider =
+    Provider<AnnualBalanceRepositoryInterface>((ref) => AnnualBalanceRepository(
+        annualBalanceRemoteDataSource: AnnualBalanceRemoteDataSource(
+            apiClient: ref.read(balhomApiClientProvider)),
+        annualBalanceLocalDataSource: AnnualBalanceLocalDataSource(
             localDbClient: ref.read(localDbClientProvider))));
+
+/// Monthly balance repository
+final monthlyBalanceRepositoryProvider =
+    Provider<MonthlyBalanceRepositoryInterface>((ref) =>
+        MonthlyBalanceRepository(
+            monthlyBalanceRemoteDataSource: MonthlyBalanceRemoteDataSource(
+                apiClient: ref.read(balhomApiClientProvider)),
+            monthlyBalanceLocalDataSource: MonthlyBalanceLocalDataSource(
+                localDbClient: ref.read(localDbClientProvider))));
 
 ///
 /// Application dependencies
 ///
+
 final revenueListControllerProvider = StateNotifierProvider<
     BalanceListController,
     AsyncValue<Either<Failure, List<BalanceEntity>>>>((ref) {
-  final repo = ref.watch(balanceRepositoryProvider);
-  const balanceTypeMode = BalanceTypeMode.revenue;
+  final balanceRepository = ref.watch(balanceRepositoryProvider);
   final selectedDate = ref.watch(revenueSelectedDateProvider);
   return BalanceListController(
-      repository: repo,
-      balanceTypeMode: balanceTypeMode,
-      selectedDate: selectedDate);
+      balanceRepository: balanceRepository, selectedDateDto: selectedDate);
 });
 
 final expenseListControllerProvider = StateNotifierProvider<
     BalanceListController,
     AsyncValue<Either<Failure, List<BalanceEntity>>>>((ref) {
-  final repo = ref.watch(balanceRepositoryProvider);
-  const balanceTypeMode = BalanceTypeMode.expense;
-  final selectedDate = ref.watch(expenseSelectedDateProvider);
+  final balanceRepository = ref.watch(balanceRepositoryProvider);
+  final selectedDate = ref.watch(revenueSelectedDateProvider);
   return BalanceListController(
-      repository: repo,
-      balanceTypeMode: balanceTypeMode,
-      selectedDate: selectedDate);
+      balanceRepository: balanceRepository, selectedDateDto: selectedDate);
 });
 
-final revenueCreateControllerProvider =
+final balanceCreateControllerProvider =
     StateNotifierProvider<BalanceCreateController, AsyncValue<BalanceEntity?>>(
         (ref) {
-  final repo = ref.watch(balanceRepositoryProvider);
-  return BalanceCreateController(repo, BalanceTypeMode.revenue);
+  final balanceRepository = ref.watch(balanceRepositoryProvider);
+  return BalanceCreateController(balanceRepository: balanceRepository);
 });
 
-final expenseCreateControllerProvider =
-    StateNotifierProvider<BalanceCreateController, AsyncValue<BalanceEntity?>>(
-        (ref) {
-  final repo = ref.watch(balanceRepositoryProvider);
-  return BalanceCreateController(repo, BalanceTypeMode.expense);
-});
-
-final revenueEditControllerProvider =
+final balanceEditControllerProvider =
     StateNotifierProvider<BalanceEditController, AsyncValue<BalanceEntity?>>(
         (ref) {
-  final repo = ref.watch(balanceRepositoryProvider);
-  return BalanceEditController(repo, BalanceTypeMode.revenue);
+  final balanceRepository = ref.watch(balanceRepositoryProvider);
+  return BalanceEditController(balanceRepository: balanceRepository);
 });
 
-final expenseEditControllerProvider =
-    StateNotifierProvider<BalanceEditController, AsyncValue<BalanceEntity?>>(
-        (ref) {
-  final repo = ref.watch(balanceRepositoryProvider);
-  return BalanceEditController(repo, BalanceTypeMode.expense);
-});
-
-final revenueTypeListControllerProvider = StateNotifierProvider<
+final balanceTypeListControllerProvider = StateNotifierProvider<
     BalanceTypeListController, AsyncValue<List<BalanceTypeEntity>>>((ref) {
-  final repo = ref.watch(balanceTypeRepositoryProvider);
-  const balanceTypeMode = BalanceTypeMode.revenue;
-  return BalanceTypeListController(repo, balanceTypeMode);
-});
-
-final expenseTypeListControllerProvider = StateNotifierProvider<
-    BalanceTypeListController, AsyncValue<List<BalanceTypeEntity>>>((ref) {
-  final repo = ref.watch(balanceTypeRepositoryProvider);
-  const balanceTypeMode = BalanceTypeMode.expense;
-  return BalanceTypeListController(repo, balanceTypeMode);
+  final balanceTypeRepository = ref.watch(balanceTypeRepositoryProvider);
+  return BalanceTypeListController(
+      balanceTypeRepository: balanceTypeRepository);
 });
 
 ///
@@ -144,12 +140,12 @@ final expenseOrderingTypeProvider =
 
 /// Selected date for revenues
 final revenueSelectedDateProvider =
-    StateNotifierProvider<SelectedDateState, SelectedDate>((ref) {
+    StateNotifierProvider<SelectedDateState, SelectedDateDto>((ref) {
   return SelectedDateState(SelectedDateMode.month);
 });
 
-/// Selected date for expenses
+/// Selected date for balances
 final expenseSelectedDateProvider =
-    StateNotifierProvider<SelectedDateState, SelectedDate>((ref) {
+    StateNotifierProvider<SelectedDateState, SelectedDateDto>((ref) {
   return SelectedDateState(SelectedDateMode.month);
 });
