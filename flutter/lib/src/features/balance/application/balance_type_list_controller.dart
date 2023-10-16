@@ -2,7 +2,6 @@ import 'package:balance_home_app/src/core/domain/failures/http/api_bad_request_f
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_respository_interface.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BalanceTypeListController
@@ -12,7 +11,6 @@ class BalanceTypeListController
   BalanceTypeListController({required this.balanceTypeRepository})
       : super(const AsyncValue.data([]));
 
-  @visibleForTesting
   Future<void> get(final BalanceTypeEnum balanceTypeEnum) async {
     state = const AsyncValue.loading();
     final res = await balanceTypeRepository.getBalanceTypes(balanceTypeEnum);

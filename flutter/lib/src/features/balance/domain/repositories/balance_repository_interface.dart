@@ -1,5 +1,6 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
+import 'package:balance_home_app/src/features/balance/domain/entities/balance_summary_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_sorting_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:fpdart/fpdart.dart';
@@ -14,12 +15,18 @@ abstract class BalanceRepositoryInterface {
       {required BalanceTypeEnum balanceTypeEnum,
       required BalanceSortingEnum balanceSortingEnum,
       required int page,
-      DateTime? dateFrom,
-      DateTime? dateTo});
+      required DateTime dateFrom,
+      required DateTime dateTo});
 
   /// Get a list of years related to existing [BalanceEntity] years.
   Future<Either<Failure, List<int>>> getBalanceYears(
       final BalanceTypeEnum balanceTypeEnum);
+
+  Future<Either<Failure, List<BalanceSummaryEntity>>> getMonthSummary(
+      final int month, final int year);
+
+  Future<Either<Failure, List<BalanceSummaryEntity>>> getYearSummary(
+      final int year);
 
   /// Store a [BalanceEntity].
   Future<Either<Failure, BalanceEntity>> createBalance(BalanceEntity balance);

@@ -58,6 +58,9 @@ class BalhomAPIContract {
   /// `GET` Returns Balance type
   static const String balanceType = "/api/v2/balance/type";
 
+  /// `GET` Returns Balance Summary
+  static const String balanceSummary = "/api/v2/balance/summary";
+
   /*
    * ============ Statistics ============ *
    */

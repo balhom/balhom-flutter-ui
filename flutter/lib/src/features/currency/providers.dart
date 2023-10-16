@@ -4,7 +4,6 @@ import 'package:balance_home_app/src/features/currency/application/currency_conv
 import 'package:balance_home_app/src/features/currency/application/currency_type_list_controller.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/currency_type_entity.dart';
 import 'package:balance_home_app/src/features/currency/domain/repositories/currency_repository_interface.dart';
-import 'package:balance_home_app/src/features/currency/infrastructure/datasources/local/currency_local_data_source.dart';
 import 'package:balance_home_app/src/features/currency/infrastructure/datasources/remote/currency_remote_data_source.dart';
 import 'package:balance_home_app/src/features/currency/infrastructure/repositories/currency_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,6 +34,4 @@ final currencyConversionControllerProvider =
 final currencyRepositoryProvider = Provider<CurrencyRepositoryInterface>(
     (ref) => CurrencyRepository(
         currencyRemoteDataSource: CurrencyRemoteDataSource(
-            apiClient: ref.read(balhomApiClientProvider)),
-        currencyLocalDataSource: CurrencyLocalDataSource(
-            localDbClient: ref.read(localDbClientProvider))));
+            apiClient: ref.read(balhomApiClientProvider))));

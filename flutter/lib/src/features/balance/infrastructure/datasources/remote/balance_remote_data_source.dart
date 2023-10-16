@@ -3,6 +3,7 @@ import 'package:balance_home_app/src/core/domain/entities/pagination_entity.dart
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/config/balhom_api_contract.dart';
+import 'package:balance_home_app/src/features/balance/domain/entities/balance_summary_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_years_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_sorting_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
@@ -26,19 +27,15 @@ class BalanceRemoteDataSource {
       {required BalanceTypeEnum balanceTypeEnum,
       required BalanceSortingEnum balanceSortingEnum,
       required int page,
-      DateTime? dateFrom,
-      DateTime? dateTo}) async {
+      required DateTime dateFrom,
+      required DateTime dateTo}) async {
     final Map<String, dynamic> queryParameters = {
       "page": page,
       "sorting": balanceSortingEnum.value,
-      "balance_type": balanceTypeEnum.name.toUpperCase()
+      "balance_type": balanceTypeEnum.name.toUpperCase(),
+      "date_from": DateFormat('yyyy-MM-dd').format(dateFrom),
+      "date_to": DateFormat('yyyy-MM-dd').format(dateTo)
     };
-    if (dateFrom != null) {
-      queryParameters["date_from"] = DateFormat('yyyy-MM-dd').format(dateFrom);
-    }
-    if (dateTo != null) {
-      queryParameters["date_to"] = DateFormat('yyyy-MM-dd').format(dateTo);
-    }
     final response = await apiClient.getRequest(BalhomAPIContract.balance,
         queryParameters: queryParameters);
     // Check if there is a request failure
@@ -54,11 +51,39 @@ class BalanceRemoteDataSource {
       final BalanceTypeEnum balanceTypeEnum) async {
     final String balanceUrl =
         "${BalhomAPIContract.balanceYears}/${balanceTypeEnum.name.toUpperCase()}";
-
     final response = await apiClient.getRequest(balanceUrl);
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
         (value) => right(BalanceYearsEntity.fromJson(value.data).years));
+  }
+
+  Future<Either<Failure, List<BalanceSummaryEntity>>> getMonthSummary(
+      final int month, final int year) async {
+    final String balanceUrl =
+        "${BalhomAPIContract.balanceSummary}/$year/$month";
+    final response = await apiClient.getRequest(balanceUrl);
+    // Check if there is a request failure
+    return response.fold((failure) => left(failure), (value) {
+      final List<dynamic> responseList = value.data as List;
+      final List<BalanceSummaryEntity> summaryList = responseList
+          .map((data) => BalanceSummaryEntity.fromJson(data))
+          .toList();
+      return right(summaryList);
+    });
+  }
+
+  Future<Either<Failure, List<BalanceSummaryEntity>>> getYearSummary(
+      final int year) async {
+    final String balanceUrl = "${BalhomAPIContract.balanceSummary}/$year";
+    final response = await apiClient.getRequest(balanceUrl);
+    // Check if there is a request failure
+    return response.fold((failure) => left(failure), (value) {
+      final List<dynamic> responseList = value.data as List;
+      final List<BalanceSummaryEntity> summaryList = responseList
+          .map((data) => BalanceSummaryEntity.fromJson(data))
+          .toList();
+      return right(summaryList);
+    });
   }
 
   Future<Either<Failure, BalanceEntity>> create(

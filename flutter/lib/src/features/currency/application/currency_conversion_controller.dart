@@ -15,15 +15,16 @@ class CurrencyConversionController {
       final String currencyFrom,
       final String currencyTo,
       final AppLocalizations appLocalizations) async {
-    return (await currencyRepository
-            .getCurrencyConversion(currencyFrom))
-        .fold(
-            (failure) => left(UnprocessableValueFailure(
-                detail: appLocalizations.genericError)), (value) {
-      for (CurrencyConversionEntity conversion in value.exchanges) {
-        if (conversion.code == currencyTo) {
-          return right(
-              ((quantity * conversion.value) * 100).roundToDouble() / 100.0);
+    return (await currencyRepository.getCurrencyConversion(currencyFrom)).fold(
+        (failure) => left(
+            UnprocessableValueFailure(detail: appLocalizations.genericError)),
+        (currencyConversionListEntity) {
+      for (final CurrencyConversionEntity currencyConversionEntity
+          in currencyConversionListEntity.conversions) {
+        if (currencyConversionEntity.code == currencyTo) {
+          return right(((quantity * currencyConversionEntity.value) * 100)
+                  .roundToDouble() /
+              100.0);
         }
       }
       return left(

@@ -109,7 +109,7 @@ final router = GoRouter(
                   child: HomeView(
                       selectedSection: HomeTab.revenues,
                       child: BalanceView(
-                        balanceTypeEnum: balanceTypeEnum.revenue,
+                        balanceTypeEnum: BalanceTypeEnum.revenue,
                       ))),
               routes: [
                 GoRoute(

@@ -9,12 +9,12 @@ part 'currency_conversion_list_entity.g.dart';
 class CurrencyConversionListEntity with _$CurrencyConversionListEntity {
   /// Factory constructor
   /// [code] - [String] code
-  /// [exchanges] - [List] exchanges
+  /// [conversions] - [List] conversions
   // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory CurrencyConversionListEntity(
       {required String code,
-      required List<CurrencyConversionEntity> exchanges}) = _CurrencyConversionListEntity;
+      required List<CurrencyConversionEntity> conversions}) = _CurrencyConversionListEntity;
 
   // Serialization
   factory CurrencyConversionListEntity.fromJson(Map<String, dynamic> json) =>

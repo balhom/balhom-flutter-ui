@@ -15,5 +15,5 @@ abstract class CurrencyRepositoryInterface {
 
   /// Get [DateCurrencyConversionListEntity] by `days`.
   Future<Either<Failure, DateCurrencyConversionListEntity>>
-      getLastDateCurrencyConversions({required int days});
+      getDaysCurrencyConversions({required int days});
 }

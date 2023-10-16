@@ -1,6 +1,7 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
+import 'package:balance_home_app/src/features/balance/domain/entities/balance_summary_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_sorting_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/infrastructure/datasources/remote/balance_remote_data_source.dart';
@@ -30,8 +31,8 @@ class BalanceRepository implements BalanceRepositoryInterface {
       {required BalanceTypeEnum balanceTypeEnum,
       required BalanceSortingEnum balanceSortingEnum,
       required int page,
-      DateTime? dateFrom,
-      DateTime? dateTo}) async {
+      required DateTime dateFrom,
+      required DateTime dateTo}) async {
     final response = await balanceRemoteDataSource.list(
         page: page,
         balanceSortingEnum: balanceSortingEnum,
@@ -54,6 +55,24 @@ class BalanceRepository implements BalanceRepositoryInterface {
       if (failure is HttpConnectionFailure) {
         return right([DateTime.now().year]);
       }
+      return left(failure);
+    }, (value) => right(value));
+  }
+
+  @override
+  Future<Either<Failure, List<BalanceSummaryEntity>>> getMonthSummary(
+      final int month, final int year) async {
+    final res = await balanceRemoteDataSource.getMonthSummary(month, year);
+    return res.fold((failure) {
+      return left(failure);
+    }, (value) => right(value));
+  }
+
+  @override
+  Future<Either<Failure, List<BalanceSummaryEntity>>> getYearSummary(
+      final int year) async {
+    final res = await balanceRemoteDataSource.getYearSummary(year);
+    return res.fold((failure) {
       return left(failure);
     }, (value) => right(value));
   }

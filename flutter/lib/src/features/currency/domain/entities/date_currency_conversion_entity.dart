@@ -8,12 +8,12 @@ part 'date_currency_conversion_entity.g.dart';
 @freezed
 class DateCurrencyConversionEntity with _$DateCurrencyConversionEntity {
   /// Factory constructor
-  /// [exchanges] - [List] exchanges
+  /// [conversions] - [List] conversions
   /// [date] - [DateTime] date
   // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory DateCurrencyConversionEntity(
-      {required List<CurrencyConversionListEntity> exchanges,
+      {required List<CurrencyConversionListEntity> conversions,
       required DateTime date}) = _DateCurrencyConversionEntity;
 
   // Serialization

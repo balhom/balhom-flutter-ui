@@ -8,7 +8,6 @@ import 'package:balance_home_app/src/core/presentation/states/theme_data_state.d
 import 'package:balance_home_app/src/features/account/infrastructure/datasources/local/account_local_data_source.dart';
 import 'package:balance_home_app/src/features/account/providers.dart';
 import 'package:balance_home_app/src/features/balance/infrastructure/datasources/local/balance_type_local_data_source.dart';
-import 'package:balance_home_app/src/features/currency/infrastructure/datasources/local/currency_local_data_source.dart';
 import 'package:balance_home_app/src/features/settings/providers.dart';
 import 'package:balance_home_app/src/features/statistics/infrastructure/datasources/local/annual_balance_local_data_source.dart';
 import 'package:balance_home_app/src/features/statistics/infrastructure/datasources/local/monthly_balance_local_data_source.dart';
@@ -59,7 +58,6 @@ final localDbClientProvider =
     Provider((ref) => LocalDbClient(dbName: "balhomDb_v2", tableNames: {
           UserLocalDataSource.tableName,
           BalanceTypeLocalDataSource.tableName,
-          CurrencyLocalDataSource.tableName,
           AnnualBalanceLocalDataSource.tableName,
           MonthlyBalanceLocalDataSource.tableName,
         }));
