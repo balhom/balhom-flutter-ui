@@ -29,11 +29,7 @@ final router = GoRouter(
       return const AppErrorView(
           location: "/${AppErrorView.noConnectionErrorPath}");
     }
-    if (state.error.toString().contains("/${AppErrorView.notFoundPath}")) {
-      return const AppErrorView(location: "/${AppErrorView.notFoundPath}");
-    }
-    debugPrint(state.error.toString());
-    return const AppErrorView(location: '/${AppErrorView.routePath}');
+    return const AppErrorView(location: "/${AppErrorView.notFoundPath}");
   },
   navigatorKey: navigatorKey,
   debugLogDiagnostics: true,
@@ -44,8 +40,7 @@ final router = GoRouter(
     GoRoute(
         name: 'root',
         path: '/',
-        builder: (_, __) => const AppLoadingView(),
-        redirect: rootGuard,
+        builder: (_, __) => const VersionLoadingView(),
         routes: [
           GoRoute(
             name: AuthLoadingView.routeName,
@@ -161,11 +156,6 @@ final router = GoRouter(
                         )),
               ]),
           GoRoute(
-            name: VersionLoadingView.routeName,
-            path: VersionLoadingView.routePath,
-            builder: (context, state) => const VersionLoadingView(),
-          ),
-          GoRoute(
             name: AppLoadingView.routeName,
             path: AppLoadingView.routePath,
             builder: (context, state) => const AppLoadingView(),
@@ -182,17 +172,7 @@ const ValueKey<String> _homeScaffoldKey = ValueKey<String>('balhom_home');
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
 
-@visibleForTesting
 String? appGuard(BuildContext context, GoRouterState state) {
-  return null;
-}
-
-@visibleForTesting
-String? rootGuard(BuildContext context, GoRouterState state) {
-  final goingToRoot = state.matchedLocation == '/';
-  if (goingToRoot) {
-    return "/${VersionLoadingView.routePath}";
-  }
   return null;
 }
 

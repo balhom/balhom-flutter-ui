@@ -6,6 +6,7 @@ import 'package:balance_home_app/src/features/balance/application/balance_create
 import 'package:balance_home_app/src/features/balance/application/balance_edit_controller.dart';
 import 'package:balance_home_app/src/features/balance/application/balance_list_controller.dart';
 import 'package:balance_home_app/src/features/balance/application/balance_type_list_controller.dart';
+import 'package:balance_home_app/src/features/balance/application/balance_year_controller.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_repository_interface.dart';
@@ -110,6 +111,12 @@ final balanceTypeListControllerProvider = StateNotifierProvider<
       balanceTypeRepository: balanceTypeRepository);
 });
 
+final balanceYearsControllerProvider =
+    StateNotifierProvider<BalanceYearController, AsyncValue<List<int>>>((ref) {
+  final balanceRepository = ref.watch(balanceRepositoryProvider);
+  return BalanceYearController(balanceRepository: balanceRepository);
+});
+
 ///
 /// Presentation dependencies
 ///
@@ -141,11 +148,11 @@ final expenseOrderingTypeProvider =
 /// Selected date for revenues
 final revenueSelectedDateProvider =
     StateNotifierProvider<SelectedDateState, SelectedDateDto>((ref) {
-  return SelectedDateState(SelectedDateMode.month);
+  return SelectedDateState(SelectedDateEnum.month);
 });
 
-/// Selected date for balances
+/// Selected date for expenses
 final expenseSelectedDateProvider =
     StateNotifierProvider<SelectedDateState, SelectedDateDto>((ref) {
-  return SelectedDateState(SelectedDateMode.month);
+  return SelectedDateState(SelectedDateEnum.month);
 });

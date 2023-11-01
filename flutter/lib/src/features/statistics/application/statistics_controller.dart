@@ -1,13 +1,11 @@
-import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date.dart';
 import 'package:balance_home_app/src/features/statistics/domain/dtos/statistics_data_dto.dart';
 import 'package:balance_home_app/src/features/statistics/domain/repositories/daily_statistics_repository_interface.dart';
 import 'package:balance_home_app/src/features/statistics/domain/repositories/monthly_statistics_repository_interface.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fpdart/fpdart.dart';
 
 class StatisticsController
-    extends StateNotifier<AsyncValue<Either<Failure, StatisticsDataDto>>> {
+    extends StateNotifier<AsyncValue<StatisticsDataDto>> {
   final DailyStatisticsRepositoryInterface dailyStatisticsRepository;
   final MonthlyStatisticsRepositoryInterface monthlyStatisticsRepository;
 
@@ -27,9 +25,9 @@ class StatisticsController
       return await monthlyStatistics.fold((failure) {
         return AsyncValue.error(failure.detail, StackTrace.empty);
       }, (monthlyStatistics) async {
-        return AsyncValue.data(right(StatisticsDataDto(
+        return AsyncValue.data(StatisticsDataDto(
             dailyStatistics: dailyStatistics,
-            monthlyStatistics: monthlyStatistics)));
+            monthlyStatistics: monthlyStatistics));
       });
     });
   }

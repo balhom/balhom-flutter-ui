@@ -44,7 +44,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
         onDestinationSelected: (int index) {
           switch (HomeTab.values[index]) {
             case HomeTab.statistics:
-              ref.read(statisticsControllerProvider.notifier).handle();
+              final selectedDate =
+                  ref.read(statisticsBalanceSelectedDateProvider);
+              ref.read(statisticsControllerProvider.notifier).get(selectedDate);
               context.go("/${StatisticsView.routePath}");
               break;
             case HomeTab.revenues:

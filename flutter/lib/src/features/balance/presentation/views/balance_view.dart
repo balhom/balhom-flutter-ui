@@ -46,9 +46,7 @@ class BalanceView extends ConsumerWidget {
     final balanceListState = balanceTypeEnum.isExpense()
         ? ref.watch(expenseListControllerProvider)
         : ref.watch(revenueListControllerProvider);
-    final balanceListController = balanceTypeEnum.isExpense()
-        ? ref.read(expenseListControllerProvider.notifier)
-        : ref.read(revenueListControllerProvider.notifier);
+    final balanceYearState = ref.watch(balanceYearsControllerProvider);
 
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
@@ -59,54 +57,58 @@ class BalanceView extends ConsumerWidget {
         ? ref.read(expenseSelectedDateProvider.notifier)
         : ref.read(revenueSelectedDateProvider.notifier);
 
-    return balanceListState.when<Widget>(data: (data) {
-      final balanceYears =
-          balanceListController.getAllBalanceYears(balanceTypeEnum);
-      return data.fold((failure) {
-        if (failure is HttpConnectionFailure ||
-            failure is NoLocalEntryFailure) {
-          return showError(
-              icon: Icons.network_wifi_1_bar,
-              text: appLocalizations.noConnection,
-              background: cache.value);
-        }
-        return showError(text: failure.detail, background: cache.value);
-      }, (entities) {
-        List<BalanceEntity> filteredBalances = [];
-        for (BalanceEntity e in entities) {
-          if (selectedDate.year != e.date.year) continue;
-          if (selectedDate.selectedDateMode == SelectedDateMode.month ||
-              selectedDate.selectedDateMode == SelectedDateMode.day) {
-            if (selectedDate.month != e.date.month) continue;
-            if (selectedDate.selectedDateMode == SelectedDateMode.day) {
-              if (selectedDate.day != e.date.day) continue;
-            }
+    return balanceYearState.when<Widget>(data: (balanceYears) {
+      return balanceListState.when<Widget>(data: (balanceListOptional) {
+        return balanceListOptional.fold((failure) {
+          if (failure is HttpConnectionFailure ||
+              failure is NoLocalEntryFailure) {
+            return showError(
+                icon: Icons.network_wifi_1_bar,
+                text: appLocalizations.noConnection,
+                background: cache.value);
           }
-          filteredBalances.add(e);
-        }
-        cache.value = ResponsiveLayout(
-            mobileChild: shortPanel(
-                context,
-                appLocalizations,
-                selectedDateState,
-                selectedDate,
-                filteredBalances,
-                balanceYears),
-            tabletChild: shortPanel(
-                context,
-                appLocalizations,
-                selectedDateState,
-                selectedDate,
-                filteredBalances,
-                balanceYears),
-            desktopChild: widePanel(
-                context,
-                appLocalizations,
-                selectedDateState,
-                selectedDate,
-                filteredBalances,
-                balanceYears));
-        return cache.value;
+          return showError(text: failure.detail, background: cache.value);
+        }, (entities) {
+          List<BalanceEntity> filteredBalances = [];
+          for (BalanceEntity e in entities) {
+            if (selectedDate.year != e.date.year) continue;
+            if (selectedDate.selectedDateMode == SelectedDateEnum.month ||
+                selectedDate.selectedDateMode == SelectedDateEnum.day) {
+              if (selectedDate.month != e.date.month) continue;
+              if (selectedDate.selectedDateMode == SelectedDateEnum.day) {
+                if (selectedDate.day != e.date.day) continue;
+              }
+            }
+            filteredBalances.add(e);
+          }
+          cache.value = ResponsiveLayout(
+              mobileChild: shortPanel(
+                  context,
+                  appLocalizations,
+                  selectedDateState,
+                  selectedDate,
+                  filteredBalances,
+                  balanceYears),
+              tabletChild: shortPanel(
+                  context,
+                  appLocalizations,
+                  selectedDateState,
+                  selectedDate,
+                  filteredBalances,
+                  balanceYears),
+              desktopChild: widePanel(
+                  context,
+                  appLocalizations,
+                  selectedDateState,
+                  selectedDate,
+                  filteredBalances,
+                  balanceYears));
+          return cache.value;
+        });
+      }, error: (error, _) {
+        return showError(error: error, background: cache.value);
+      }, loading: () {
+        return showLoading(background: cache.value);
       });
     }, error: (error, _) {
       return showError(error: error, background: cache.value);
@@ -120,15 +122,15 @@ class BalanceView extends ConsumerWidget {
       AppLocalizations appLocalizations,
       SelectedDateState selectedDateState,
       SelectedDateDto selectedDate,
-      Future<List<int>> balanceYears) {
+      List<int> balanceYears) {
     // All posible date formatters
     final dayFormatter = DateFormat("dd MMM yyyy", appLocalizations.localeName);
     final monthFormatter = DateFormat("MMM yyyy", appLocalizations.localeName);
     final yearFormatter = DateFormat("yyyy");
 
-    final dateText = (selectedDate.selectedDateMode == SelectedDateMode.year)
+    final dateText = (selectedDate.selectedDateMode == SelectedDateEnum.year)
         ? yearFormatter.format(selectedDate.dateFrom)
-        : (selectedDate.selectedDateMode == SelectedDateMode.month)
+        : (selectedDate.selectedDateMode == SelectedDateEnum.month)
             ? monthFormatter.format(selectedDate.dateFrom)
             : dayFormatter.format(selectedDate.dateFrom);
 
@@ -175,9 +177,8 @@ class BalanceView extends ConsumerWidget {
       AppLocalizations appLocalizations,
       SelectedDateState selectedDateState,
       SelectedDateDto selectedDate,
-      Future<List<int>> balanceYears) async {
-    final years = await balanceYears;
-    if (years.isEmpty) {
+      List<int> balanceYears) async {
+    if (balanceYears.isEmpty) {
       await showDialog(
           context: navigatorKey.currentContext!,
           builder: (context) => AppErrorDialog(
@@ -195,7 +196,7 @@ class BalanceView extends ConsumerWidget {
                   Navigator.pop(context);
                   selectedDateState.setSelectedDate(newDate);
                 },
-                years: years,
+                years: balanceYears,
               ));
     }
   }
@@ -206,7 +207,7 @@ class BalanceView extends ConsumerWidget {
       SelectedDateState selectedDateState,
       SelectedDateDto selectedDate,
       List<BalanceEntity> balances,
-      Future<List<int>> balanceYears) {
+      List<int> balanceYears) {
     return Column(
       children: [
         topContainer(context, appLocalizations, selectedDateState, selectedDate,
@@ -226,7 +227,7 @@ class BalanceView extends ConsumerWidget {
       SelectedDateState selectedDateState,
       SelectedDateDto selectedDate,
       List<BalanceEntity> balances,
-      Future<List<int>> balanceYears) {
+      List<int> balanceYears) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Column(
       children: [

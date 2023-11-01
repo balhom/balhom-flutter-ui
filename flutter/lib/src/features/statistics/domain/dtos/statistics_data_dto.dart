@@ -2,8 +2,8 @@ import 'package:balance_home_app/src/features/statistics/domain/entities/daily_s
 import 'package:balance_home_app/src/features/statistics/domain/entities/monthly_statistics_entity.dart';
 
 class StatisticsDataDto {
-  List<DailyStatisticsEntity> dailyStatistics;
-  List<MonthlyStatisticsEntity> monthlyStatistics;
+  final List<DailyStatisticsEntity> dailyStatistics;
+  final List<MonthlyStatisticsEntity> monthlyStatistics;
 
   StatisticsDataDto({
     required this.dailyStatistics,

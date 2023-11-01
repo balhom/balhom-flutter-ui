@@ -7,21 +7,21 @@ class SelectedDateDto extends Equatable {
   final int day;
   final int month;
   final int year;
-  final SelectedDateMode selectedDateMode;
+  final SelectedDateEnum selectedDateMode;
 
   DateTime get dateFrom {
-    if (selectedDateMode == SelectedDateMode.month) {
+    if (selectedDateMode == SelectedDateEnum.month) {
       return DateTime(year, month, 1);
-    } else if (selectedDateMode == SelectedDateMode.year) {
+    } else if (selectedDateMode == SelectedDateEnum.year) {
       return DateTime(year, 1, 1);
     }
     return DateTime(year, month, day);
   }
 
   DateTime get dateTo {
-    if (selectedDateMode == SelectedDateMode.month) {
+    if (selectedDateMode == SelectedDateEnum.month) {
       return DateTime(year, month, DateUtils.getDaysInMonth(year, month));
-    } else if (selectedDateMode == SelectedDateMode.year) {
+    } else if (selectedDateMode == SelectedDateEnum.year) {
       return DateTime(year, 12, DateUtils.getDaysInMonth(year, month));
     }
     return DateTime(year, month, day);
@@ -41,7 +41,7 @@ class SelectedDateDto extends Equatable {
     int? day,
     int? month,
     int? year,
-    SelectedDateMode? selectedDateMode,
+    SelectedDateEnum? selectedDateMode,
   }) {
     return SelectedDateDto(
         day: day ?? this.day,

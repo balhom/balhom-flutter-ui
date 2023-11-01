@@ -19,8 +19,7 @@ abstract class BalanceRepositoryInterface {
       required DateTime dateTo});
 
   /// Get a list of years related to existing [BalanceEntity] years.
-  Future<Either<Failure, List<int>>> getBalanceYears(
-      final BalanceTypeEnum balanceTypeEnum);
+  Future<List<int>> getBalanceYears(final BalanceTypeEnum balanceTypeEnum);
 
   Future<Either<Failure, List<BalanceSummaryEntity>>> getMonthSummary(
       final int month, final int year);

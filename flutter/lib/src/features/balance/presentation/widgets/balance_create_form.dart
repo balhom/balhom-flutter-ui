@@ -1,4 +1,3 @@
-import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_date_time_form_picker.dart';
 import 'package:balance_home_app/src/core/router.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/double_form_field.dart';
@@ -81,154 +80,142 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
               balanceTypes[0],
               appLocalizations);
 
-          return currencyTypesState.when(data: (data) {
-            return data.fold((failure) {
-              if (failure is HttpConnectionFailure) {
-                return showError(
-                    icon: Icons.network_wifi_1_bar,
-                    text: appLocalizations.noConnection);
-              }
-              return showError(
-                  background: widget.cache.value, text: failure.detail);
-            }, (currencyTypes) {
-              widget.cache.value = SingleChildScrollView(
-                child: Form(
-                  key: widget.formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        verticalSpace(),
-                        // Name Text Field
-                        AppTextFormField(
-                          onChanged: (value) => balanceValuesDto =
-                              balanceValuesDto!.copyWith(
-                                  nameValue: BalanceNameValue(
-                                      appLocalizations, value)),
-                          title: appLocalizations.balanceName,
-                          validator: (value) =>
-                              balanceValuesDto!.nameValue.validate,
-                          maxCharacters: 40,
-                          maxWidth: 500,
-                          controller: widget.nameController,
-                        ),
-                        verticalSpace(),
-                        // Description Text Field
-                        AppTextFormField(
-                          onChanged: (value) => balanceValuesDto =
-                              balanceValuesDto!.copyWith(
-                                  descriptionValue: BalanceDescriptionValue(
-                                      appLocalizations, value)),
-                          title: appLocalizations.balanceDescription,
-                          validator: (value) =>
-                              balanceValuesDto!.descriptionValue.validate,
-                          maxCharacters: 2000,
-                          maxWidth: 500,
-                          maxHeight: 400,
-                          maxLines: 7,
-                          multiLine: true,
-                          showCounterText: true,
-                          controller: widget.descriptionController,
-                        ),
-                        verticalSpace(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Quantity Double Field
-                            DoubleFormField(
-                              onChanged: (value) => balanceValuesDto =
-                                  balanceValuesDto!.copyWith(
-                                      quantityValue: BalanceQuantityValue(
-                                          appLocalizations, value)),
-                              title: appLocalizations.balanceQuantity,
-                              validator: (value) =>
-                                  balanceValuesDto!.quantityValue.validate,
-                              maxWidth: 200,
-                              controller: widget.quantityController,
-                              align: TextAlign.end,
-                            ),
-                            // Currency Type Picker
-                            (currencyTypes.isNotEmpty)
-                                ? DropdownPickerField(
-                                    initialValue:
-                                        balanceValuesDto!.currencyType,
-                                    items: currencyTypes
-                                        .map((e) => e.code)
-                                        .toList(),
-                                    width: 100,
-                                    onChanged: (value) {
-                                      balanceValuesDto = balanceValuesDto!
-                                          .copyWith(currencyType: value!);
-                                    })
-                                : const Icon(
-                                    Icons.error_outline,
-                                    color: Colors.red,
-                                  ),
-                          ],
-                        ),
-                        verticalSpace(),
-                        // DateTime Text Field
-                        AppDateTimeFormPicker(
-                            onTap: (dateTime) {
-                              balanceValuesDto = balanceValuesDto!.copyWith(
-                                  dateValue: BalanceDateTimeValue(
-                                      appLocalizations, dateTime));
-                              widget.dateController.text =
-                                  widget.dateTimeFormatter.format(dateTime);
-                            },
-                            controller: widget.dateController,
-                            title: appLocalizations.balanceDate,
+          return currencyTypesState.when(data: (currencyTypes) {
+            widget.cache.value = SingleChildScrollView(
+              child: Form(
+                key: widget.formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      verticalSpace(),
+                      // Name Text Field
+                      AppTextFormField(
+                        onChanged: (value) => balanceValuesDto =
+                            balanceValuesDto!.copyWith(
+                                nameValue:
+                                    BalanceNameValue(appLocalizations, value)),
+                        title: appLocalizations.balanceName,
+                        validator: (value) =>
+                            balanceValuesDto!.nameValue.validate,
+                        maxCharacters: 40,
+                        maxWidth: 500,
+                        controller: widget.nameController,
+                      ),
+                      verticalSpace(),
+                      // Description Text Field
+                      AppTextFormField(
+                        onChanged: (value) => balanceValuesDto =
+                            balanceValuesDto!.copyWith(
+                                descriptionValue: BalanceDescriptionValue(
+                                    appLocalizations, value)),
+                        title: appLocalizations.balanceDescription,
+                        validator: (value) =>
+                            balanceValuesDto!.descriptionValue.validate,
+                        maxCharacters: 2000,
+                        maxWidth: 500,
+                        maxHeight: 400,
+                        maxLines: 7,
+                        multiLine: true,
+                        showCounterText: true,
+                        controller: widget.descriptionController,
+                      ),
+                      verticalSpace(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Quantity Double Field
+                          DoubleFormField(
+                            onChanged: (value) => balanceValuesDto =
+                                balanceValuesDto!.copyWith(
+                                    quantityValue: BalanceQuantityValue(
+                                        appLocalizations, value)),
+                            title: appLocalizations.balanceQuantity,
                             validator: (value) =>
-                                balanceValuesDto!.dateValue.validate,
-                            maxWidth: 200),
-                        verticalSpace(),
-                        // Balance Type Picker
-                        (balanceTypes.isNotEmpty)
-                            ? BalanceTypeDropdownPicker(
-                                name: appLocalizations.balanceType,
-                                initialValue: balanceValuesDto!.balanceType,
-                                items: balanceTypes,
-                                onChanged: (value) {
-                                  balanceValuesDto = balanceValuesDto!
-                                      .copyWith(balanceType: value!);
-                                },
-                                appLocalizations: appLocalizations,
-                              )
-                            : Text(appLocalizations.genericError),
-                        verticalSpace(),
-                        // Create Button
-                        AppTextButton(
-                          width: 140,
-                          height: 50,
-                          onPressed: () async {
-                            if (widget.formKey.currentState == null ||
-                                !widget.formKey.currentState!.validate()) {
-                              return;
-                            }
-                            (await balanceCreateController.create(
-                                    balanceValuesDto!, appLocalizations))
-                                .fold((failure) {
-                              showErrorBalanceCreationDialog(appLocalizations,
-                                  failure.detail, widget.balanceTypeEnum);
-                            }, (entity) {
-                              router.goNamed(widget.balanceTypeEnum.isExpense()
-                                  ? BalanceView.routeExpenseName
-                                  : BalanceView.routeRevenueName);
-                              balanceListController.addBalance(entity);
-                              // Refresh UI account data
-                              accountController.get();
-                            });
+                                balanceValuesDto!.quantityValue.validate,
+                            maxWidth: 200,
+                            controller: widget.quantityController,
+                            align: TextAlign.end,
+                          ),
+                          // Currency Type Picker
+                          (currencyTypes.isNotEmpty)
+                              ? DropdownPickerField(
+                                  initialValue: balanceValuesDto!.currencyType,
+                                  items:
+                                      currencyTypes.map((e) => e.code).toList(),
+                                  width: 100,
+                                  onChanged: (value) {
+                                    balanceValuesDto = balanceValuesDto!
+                                        .copyWith(currencyType: value!);
+                                  })
+                              : const Icon(
+                                  Icons.error_outline,
+                                  color: Colors.red,
+                                ),
+                        ],
+                      ),
+                      verticalSpace(),
+                      // DateTime Text Field
+                      AppDateTimeFormPicker(
+                          onTap: (dateTime) {
+                            balanceValuesDto = balanceValuesDto!.copyWith(
+                                dateValue: BalanceDateTimeValue(
+                                    appLocalizations, dateTime));
+                            widget.dateController.text =
+                                widget.dateTimeFormatter.format(dateTime);
                           },
-                          text: appLocalizations.create,
-                        ),
-                      ],
-                    ),
+                          controller: widget.dateController,
+                          title: appLocalizations.balanceDate,
+                          validator: (value) =>
+                              balanceValuesDto!.dateValue.validate,
+                          maxWidth: 200),
+                      verticalSpace(),
+                      // Balance Type Picker
+                      (balanceTypes.isNotEmpty)
+                          ? BalanceTypeDropdownPicker(
+                              name: appLocalizations.balanceType,
+                              initialValue: balanceValuesDto!.balanceType,
+                              items: balanceTypes,
+                              onChanged: (value) {
+                                balanceValuesDto = balanceValuesDto!
+                                    .copyWith(balanceType: value!);
+                              },
+                              appLocalizations: appLocalizations,
+                            )
+                          : Text(appLocalizations.genericError),
+                      verticalSpace(),
+                      // Create Button
+                      AppTextButton(
+                        width: 140,
+                        height: 50,
+                        onPressed: () async {
+                          if (widget.formKey.currentState == null ||
+                              !widget.formKey.currentState!.validate()) {
+                            return;
+                          }
+                          (await balanceCreateController.create(
+                                  balanceValuesDto!, appLocalizations))
+                              .fold((failure) {
+                            showErrorBalanceCreationDialog(appLocalizations,
+                                failure.detail, widget.balanceTypeEnum);
+                          }, (entity) {
+                            router.goNamed(widget.balanceTypeEnum.isExpense()
+                                ? BalanceView.routeExpenseName
+                                : BalanceView.routeRevenueName);
+                            balanceListController.addBalance(entity);
+                            // Refresh UI account data
+                            accountController.get();
+                          });
+                        },
+                        text: appLocalizations.create,
+                      ),
+                    ],
                   ),
                 ),
-              );
-              return widget.cache.value;
-            });
+              ),
+            );
+            return widget.cache.value;
           }, error: (error, _) {
             return showError(error: error, background: widget.cache.value);
           }, loading: () {

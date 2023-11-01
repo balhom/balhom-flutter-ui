@@ -1,5 +1,4 @@
 import 'package:balance_home_app/src/core/domain/failures/failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_summary_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_sorting_enum.dart';
@@ -48,15 +47,12 @@ class BalanceRepository implements BalanceRepositoryInterface {
 
   /// Get a list of years related to existing [BalanceEntity] years.
   @override
-  Future<Either<Failure, List<int>>> getBalanceYears(
+  Future<List<int>> getBalanceYears(
       final BalanceTypeEnum balanceTypeEnum) async {
     final res = await balanceRemoteDataSource.getYears(balanceTypeEnum);
     return res.fold((failure) {
-      if (failure is HttpConnectionFailure) {
-        return right([DateTime.now().year]);
-      }
-      return left(failure);
-    }, (value) => right(value));
+      return [DateTime.now().year];
+    }, (value) => value);
   }
 
   @override

@@ -23,7 +23,6 @@ class AccountEditView extends ConsumerStatefulWidget {
 
   final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
 
-  @visibleForTesting
   final cache = ValueNotifier<Widget>(Container());
 
   AccountEditView({super.key});

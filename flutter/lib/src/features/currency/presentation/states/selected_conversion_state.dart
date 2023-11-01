@@ -1,4 +1,4 @@
-import 'package:balance_home_app/src/features/statistics/domain/dtos/selected_conversion_dto.dart';
+import 'package:balance_home_app/src/features/currency/domain/dtos/selected_conversion_dto.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SelectedConversionState extends StateNotifier<SelectedConversionDto> {

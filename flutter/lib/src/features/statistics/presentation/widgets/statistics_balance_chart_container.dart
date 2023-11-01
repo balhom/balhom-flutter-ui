@@ -5,7 +5,8 @@ import 'package:balance_home_app/src/core/presentation/states/selected_date_stat
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/features/balance/presentation/widgets/balance_line_chart.dart';
 import 'package:balance_home_app/src/core/utils/date_util.dart';
-import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
+import 'package:balance_home_app/src/features/statistics/domain/entities/daily_statistics_entity.dart';
+import 'package:balance_home_app/src/features/statistics/domain/entities/monthly_statistics_entity.dart';
 import 'package:balance_home_app/src/features/statistics/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,18 +14,16 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StatisticsBalanceChartContainer extends ConsumerWidget {
-  final SelectedDateMode dateMode;
-  final List<BalanceEntity> revenues;
-  final List<BalanceEntity> expenses;
-  final List<int> revenueYears;
-  final List<int> expenseYears;
+  final SelectedDateEnum dateMode;
+  final List<DailyStatisticsEntity> dailyStatistics;
+  final List<MonthlyStatisticsEntity> monthlyStatistics;
+  final List<int> balanceYears;
 
   const StatisticsBalanceChartContainer(
       {required this.dateMode,
-      required this.revenues,
-      required this.expenses,
-      required this.revenueYears,
-      required this.expenseYears,
+      required this.dailyStatistics,
+      required this.monthlyStatistics,
+      required this.balanceYears,
       super.key});
 
   @override
@@ -35,16 +34,18 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
     final selectedDateState =
         ref.read(statisticsBalanceSelectedDateProvider.notifier);
 
-    final years = <int>{...revenueYears, ...expenseYears}.toList();
-
     final selectedMonthAsStr =
         DateUtil.monthNumToString(selectedDate.month, appLocalizations);
 
     // Adding selected year to years list
-    if (!years.contains(selectedDate.year)) years.add(selectedDate.year);
+    if (!balanceYears.contains(selectedDate.year)) {
+      balanceYears.add(selectedDate.year);
+    }
     // Adding current year to years list
-    if (!years.contains(DateTime.now().year)) years.add(DateTime.now().year);
-    years.sort();
+    if (!balanceYears.contains(DateTime.now().year)) {
+      balanceYears.add(DateTime.now().year);
+    }
+    balanceYears.sort();
     // Screen sizes:
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -67,7 +68,7 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
                   : screenWidth * 0.35,
               child: Center(
                   child: Text(
-                      dateMode == SelectedDateMode.month
+                      dateMode == SelectedDateEnum.month
                           ? "${appLocalizations.balanceChartTitle} $selectedMonthAsStr"
                           : "${appLocalizations.balanceChartTitle} $selectedDate.year",
                       style: GoogleFonts.openSans(
@@ -75,7 +76,7 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
                           fontSize: 18,
                           fontWeight: FontWeight.bold))),
             ),
-            dateButton(selectedMonthAsStr, years, selectedDate,
+            dateButton(selectedMonthAsStr, balanceYears, selectedDate,
                 selectedDateState, appLocalizations)
           ],
         ),
@@ -89,12 +90,8 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
                       year: selectedDate.year)
                   .values
                   .toList(),
-              revenues: dateMode == SelectedDateMode.month
-                  ? getRevenues(selectedDate.month)
-                  : revenues,
-              expenses: dateMode == SelectedDateMode.month
-                  ? getExpenses(selectedDate.month)
-                  : expenses,
+              dailyStatisticsList: dailyStatistics,
+              monthlyStatisticsList: monthlyStatistics,
               selectedDateMode: dateMode,
               selectedMonth: selectedDate.month,
               selectedYear: selectedDate.year,
@@ -110,7 +107,7 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
       SelectedDateDto selectedDate,
       SelectedDateState selectedDateState,
       AppLocalizations appLocalizations) {
-    final List<int> dropdownValues = (dateMode == SelectedDateMode.month)
+    final List<int> dropdownValues = (dateMode == SelectedDateEnum.month)
         ? DateUtil.getMonthDict(appLocalizations, year: selectedDate.year)
             .keys
             .toList()
@@ -122,11 +119,11 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
       padding: const EdgeInsets.only(left: 10, right: 10),
       height: 45,
       child: DropdownButton<int>(
-          value: (dateMode == SelectedDateMode.month)
+          value: (dateMode == SelectedDateEnum.month)
               ? selectedDate.month
               : selectedDate.year,
           items: dropdownValues.map((value) {
-            final strValue = (dateMode == SelectedDateMode.month)
+            final strValue = (dateMode == SelectedDateEnum.month)
                 ? DateUtil.monthNumToString(value, appLocalizations)
                 : value.toString();
             return DropdownMenuItem<int>(
@@ -136,33 +133,15 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
           }).toList(),
           onChanged: (isConnected)
               ? (value) {
-                  if (dateMode == SelectedDateMode.month) {
+                  if (dateMode == SelectedDateEnum.month) {
                     if (value == selectedDate.month) return;
                     selectedDateState.setMonth(value!);
-                  } else if (dateMode == SelectedDateMode.year) {
+                  } else if (dateMode == SelectedDateEnum.year) {
                     if (value == selectedDate.year) return;
                     selectedDateState.setYear(value!);
                   }
                 }
               : null),
     );
-  }
-
-  @visibleForTesting
-  List<BalanceEntity> getExpenses(int month) {
-    List<BalanceEntity> aux = [];
-    for (BalanceEntity expense in expenses) {
-      if (expense.date.month == month) aux.add(expense);
-    }
-    return aux;
-  }
-
-  @visibleForTesting
-  List<BalanceEntity> getRevenues(int month) {
-    List<BalanceEntity> aux = [];
-    for (BalanceEntity revenue in revenues) {
-      if (revenue.date.month == month) aux.add(revenue);
-    }
-    return aux;
   }
 }

@@ -4,8 +4,9 @@ import 'package:balance_home_app/src/core/router.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date_mode.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/chart_indicator.dart';
 import 'package:balance_home_app/src/core/providers.dart';
-import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
+import 'package:balance_home_app/src/features/statistics/domain/entities/daily_statistics_entity.dart';
+import 'package:balance_home_app/src/features/statistics/domain/entities/monthly_statistics_entity.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,14 +28,14 @@ class BalanceLineChart extends ConsumerWidget {
         showTitles: true,
         reservedSize: 22,
         interval: PlatformUtils.isSmallWindow(navigatorKey.currentContext!) &&
-                selectedDateMode == SelectedDateMode.month
+                selectedDateMode == SelectedDateEnum.month
             ? 2
             : 1,
         getTitlesWidget: (double value, TitleMeta meta) {
           final style = GoogleFonts.openSans(
             fontSize: 12,
           );
-          String tittle = (selectedDateMode == SelectedDateMode.year)
+          final tittle = (selectedDateMode == SelectedDateEnum.year)
               ? monthList[value.toInt() - 1]
               : "${value.toInt()}";
           return SideTitleWidget(
@@ -80,15 +81,19 @@ class BalanceLineChart extends ConsumerWidget {
   /// List containing every month's translation
   final List<String> monthList;
 
-  /// List of revenues. If empty then all revenues are
-  /// set to 0, if `null` then revenue line are not shown
-  final List<BalanceEntity>? revenues;
+  /// List of [DailyStatisticsEntity]. If empty then all dailyStatistics are
+  /// set to 0
+  final List<DailyStatisticsEntity> dailyStatisticsList;
 
-  /// List of expenses. If empty then all expenses are
-  /// set to 0, if `null` then expense line are not shown
-  final List<BalanceEntity>? expenses;
+  final bool showRevenues;
 
-  final SelectedDateMode selectedDateMode;
+  /// List of [MonthlyStatisticsEntity]. If empty then all monthlyStatistics are
+  /// set to 0
+  final List<MonthlyStatisticsEntity> monthlyStatisticsList;
+
+  final bool showExpenses;
+
+  final SelectedDateEnum selectedDateMode;
 
   /// Required for `SelectedDate.month` as [dateType]
   final int? selectedMonth;
@@ -98,8 +103,10 @@ class BalanceLineChart extends ConsumerWidget {
 
   const BalanceLineChart(
       {required this.monthList,
-      required this.revenues,
-      required this.expenses,
+      required this.dailyStatisticsList,
+      required this.monthlyStatisticsList,
+      this.showRevenues = true,
+      this.showExpenses = true,
       required this.selectedDateMode,
       required this.selectedMonth,
       required this.selectedYear,
@@ -119,13 +126,13 @@ class BalanceLineChart extends ConsumerWidget {
                 titlesData: titlesData,
                 borderData: borderData,
                 lineBarsData: [
-                  if (revenues != null)
-                    balancesChartBarData(revenues!, BalanceTypeEnum.revenue),
-                  if (expenses != null)
-                    balancesChartBarData(expenses!, BalanceTypeEnum.expense),
+                  if (showRevenues)
+                    _balancesChartBarData(BalanceTypeEnum.revenue),
+                  if (showExpenses)
+                    _balancesChartBarData(BalanceTypeEnum.expense),
                 ],
                 minX: 1,
-                maxX: selectedDateMode == SelectedDateMode.year
+                maxX: selectedDateMode == SelectedDateEnum.year
                     ? 12
                     : DateUtils.getDaysInMonth(
                             selectedYear ?? DateTime.now().year,
@@ -140,15 +147,14 @@ class BalanceLineChart extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (revenues != null)
+              if (showRevenues)
                 ChartIndicator(
                   color: const Color.fromARGB(184, 0, 175, 15),
                   text: appLocalizations.revenues,
                   isSquare: true,
                 ),
-              if (revenues != null && expenses != null)
-                const SizedBox(width: 10),
-              if (expenses != null)
+              if (showRevenues && showExpenses) const SizedBox(width: 10),
+              if (showExpenses)
                 ChartIndicator(
                   color: const Color.fromARGB(188, 255, 17, 0),
                   text: appLocalizations.expenses,
@@ -161,39 +167,22 @@ class BalanceLineChart extends ConsumerWidget {
     );
   }
 
-  @visibleForTesting
-  LineChartBarData balancesChartBarData(
-      List<BalanceEntity> balances, BalanceTypeEnum balanceTypeEnum) {
-    // Dictionary with balances quantities per month or day
-    Map<int, double> spotsMap = {};
-    for (BalanceEntity balance in balances) {
-      int key = selectedDateMode == SelectedDateMode.year
-          ? balance.date.month
-          : balance.date.day;
-      if (spotsMap.containsKey(key)) {
-        spotsMap[key] = spotsMap[key]! + balance.convertedQuantity!;
-      } else {
-        spotsMap[key] = balance.convertedQuantity!;
-      }
-      spotsMap[key] = (spotsMap[key]! * 100).roundToDouble() / 100;
-    }
-    if (selectedDateMode == SelectedDateMode.year) {
-      // Check unexistant months
-      for (int month = 1; month <= 12; month++) {
-        if (!spotsMap.containsKey(month)) spotsMap[month] = 0.0;
-      }
-    } else if (selectedDateMode == SelectedDateMode.month) {
-      int days = DateUtils.getDaysInMonth(selectedYear ?? DateTime.now().year,
-          selectedMonth ?? DateTime.now().month);
-      // Check unexistant days
-      for (int day = 1; day <= days; day++) {
-        if (!spotsMap.containsKey(day)) spotsMap[day] = 0.0;
-      }
-    }
-    // Data conversion
-    List<FlSpot> spots = [];
-    for (int key in spotsMap.keys.toList()..sort()) {
-      spots.add(FlSpot(key.toDouble(), spotsMap[key]!.toDouble()));
+  LineChartBarData _balancesChartBarData(
+      final BalanceTypeEnum balanceTypeEnum) {
+    final List<FlSpot> spots = [];
+
+    if (selectedDateMode == SelectedDateEnum.year) {
+      dailyStatisticsList.map((dailyStatistics) => spots.add(FlSpot(
+          dailyStatistics.day.toDouble(),
+          balanceTypeEnum.isExpense()
+              ? dailyStatistics.expense
+              : dailyStatistics.revenue)));
+    } else {
+      monthlyStatisticsList.map((monthlyStatistics) => spots.add(FlSpot(
+          monthlyStatistics.month.toDouble(),
+          balanceTypeEnum.isExpense()
+              ? monthlyStatistics.expense
+              : monthlyStatistics.revenue)));
     }
     return LineChartBarData(
         isCurved: true,
@@ -215,41 +204,26 @@ class BalanceLineChart extends ConsumerWidget {
 
   @visibleForTesting
   double getMaxQuantity() {
-    double quantity = 4.0;
-    Map<String, double> quantityMap = {};
-    if (revenues != null) {
-      for (BalanceEntity revenue in revenues!) {
-        final String key = selectedDateMode == SelectedDateMode.year
-            ? "${revenue.date.month}"
-            : "${revenue.date.day}";
-        if (quantityMap.containsKey(key)) {
-          quantityMap[key] = quantityMap[key]! + revenue.convertedQuantity!;
-        } else {
-          quantityMap[key] = revenue.convertedQuantity!;
-        }
-      }
-      if (revenues!.isNotEmpty) {
-        quantity = quantityMap.values.reduce(max);
-      }
+    double maxQuantity = 4.0;
+
+    final Iterable<double> revenueCollection =
+        (selectedDateMode == SelectedDateEnum.year)
+            ? monthlyStatisticsList.map((e) => e.revenue)
+            : dailyStatisticsList.map((e) => e.revenue);
+    final Iterable<double> expenseCollection =
+        (selectedDateMode == SelectedDateEnum.year)
+            ? monthlyStatisticsList.map((e) => e.expense)
+            : dailyStatisticsList.map((e) => e.expense);
+
+    if (showRevenues) {
+      final double revenuesMax = revenueCollection.reduce(max);
+      maxQuantity = revenuesMax > maxQuantity ? revenuesMax : maxQuantity;
     }
-    quantityMap = {};
-    if (expenses != null) {
-      for (BalanceEntity expense in expenses!) {
-        String key = (selectedDateMode == SelectedDateMode.year)
-            ? "${expense.date.month}"
-            : "${expense.date.day}";
-        if (quantityMap.containsKey(key)) {
-          quantityMap[key] = quantityMap[key]! + expense.convertedQuantity!;
-        } else {
-          quantityMap[key] = expense.convertedQuantity!;
-        }
-      }
-      if (expenses!.isNotEmpty && quantity < quantityMap.values.reduce(max)) {
-        quantity = quantityMap.values.reduce(max);
-      }
+    if (showExpenses) {
+      final double expensesMax = expenseCollection.reduce(max);
+      maxQuantity = expensesMax > maxQuantity ? expensesMax : maxQuantity;
     }
-    // Maximun default value is 4
-    if (quantity < 4) quantity = 4;
-    return quantity.ceilToDouble();
+
+    return maxQuantity.ceilToDouble();
   }
 }

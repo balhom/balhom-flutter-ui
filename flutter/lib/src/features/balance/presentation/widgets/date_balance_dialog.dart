@@ -36,10 +36,10 @@ class _DateBalanceDialogState extends ConsumerState<DateBalanceDialog> {
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
     final theme = ref.read(themeDataProvider);
-    isDay ??= widget.selectedDate.selectedDateMode == SelectedDateMode.day;
+    isDay ??= widget.selectedDate.selectedDateMode == SelectedDateEnum.day;
     isMonth ??=
-        widget.selectedDate.selectedDateMode == SelectedDateMode.month ||
-            widget.selectedDate.selectedDateMode == SelectedDateMode.day;
+        widget.selectedDate.selectedDateMode == SelectedDateEnum.month ||
+            widget.selectedDate.selectedDateMode == SelectedDateEnum.day;
     day ??= widget.selectedDate.day;
     month ??= widget.selectedDate.month;
     year ??= widget.selectedDate.year;
@@ -60,11 +60,11 @@ class _DateBalanceDialogState extends ConsumerState<DateBalanceDialog> {
               AppTextButton(
                   text: appLocalizations.confirmation,
                   onPressed: () {
-                    SelectedDateMode selectedDateMode = isDay!
-                        ? SelectedDateMode.day
+                    SelectedDateEnum selectedDateMode = isDay!
+                        ? SelectedDateEnum.day
                         : isMonth!
-                            ? SelectedDateMode.month
-                            : SelectedDateMode.year;
+                            ? SelectedDateEnum.month
+                            : SelectedDateEnum.year;
                     SelectedDateDto newDate = SelectedDateDto(
                         day: day!,
                         month: month!,

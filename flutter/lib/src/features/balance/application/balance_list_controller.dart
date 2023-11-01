@@ -83,11 +83,4 @@ class BalanceListController
       });
     }
   }
-
-  /// Get a list of years of stored balances
-  Future<List<int>> getAllBalanceYears(
-      final BalanceTypeEnum balanceTypeEnum) async {
-    final res = await balanceRepository.getBalanceYears(balanceTypeEnum);
-    return res.fold((_) => [], (value) => value);
-  }
 }

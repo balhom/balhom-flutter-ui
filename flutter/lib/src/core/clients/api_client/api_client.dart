@@ -9,9 +9,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:universal_io/io.dart';
 
-import 'get_default_api_client.dart'
-    if (dart.library.io) 'mobile_api_client.dart'
-    if (dart.library.html) 'web_net_config.dart';
+import 'package:balance_home_app/src/core/clients/api_client/get_default_api_client.dart'
+    if (dart.library.io) 'package:balance_home_app/src/core/clients/api_client/mobile_api_client.dart'
+    if (dart.library.html) 'package:balance_home_app/src/core/clients/api_client/web_api_client.dart';
 
 const unknownStatusCode = -1;
 
@@ -24,9 +24,9 @@ class ApiClient {
     dioClient = getDefaultClient()
       ..options = BaseOptions(
           baseUrl: baseUrl,
-          connectTimeout: const Duration(seconds: 6),
-          receiveTimeout: const Duration(seconds: 6),
-          sendTimeout: const Duration(seconds: 6),
+          connectTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 5),
+          sendTimeout: const Duration(seconds: 5),
           followRedirects: false,
           validateStatus: (status) => true,
           headers: {

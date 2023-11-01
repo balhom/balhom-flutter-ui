@@ -129,7 +129,7 @@ class StatisticsCurrencyLineChart extends StatelessWidget {
   double getMaxQuantity() {
     double quantity = 1.0;
     for (DateCurrencyConversionEntity dateCurrencyConversion
-        in dateCurrencyConversion.dateExchanges) {
+        in dateCurrencyConversion.dateConversions) {
       double current = getExchange(dateCurrencyConversion.date);
       if (current > quantity) quantity = current;
     }
@@ -142,15 +142,15 @@ class StatisticsCurrencyLineChart extends StatelessWidget {
     if (selectedCoinFrom == selectedCoinTo) return 1;
     // Search for coin
     for (DateCurrencyConversionEntity dateCurrencyConversion
-        in dateCurrencyConversion.dateExchanges) {
+        in dateCurrencyConversion.dateConversions) {
       if (dateCurrencyConversion.date.day == date.day &&
           dateCurrencyConversion.date.month == date.month &&
           dateCurrencyConversion.date.year == date.year) {
         for (CurrencyConversionListEntity currencyConversion
-            in dateCurrencyConversion.exchanges) {
+            in dateCurrencyConversion.conversions) {
           if (currencyConversion.code == selectedCoinFrom) {
             for (CurrencyConversionEntity exchange
-                in currencyConversion.exchanges) {
+                in currencyConversion.conversions) {
               if (exchange.code == selectedCoinTo) {
                 return exchange.value;
               }

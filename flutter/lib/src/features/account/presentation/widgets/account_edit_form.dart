@@ -1,6 +1,4 @@
 import 'package:balance_home_app/config/app_colors.dart';
-import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/double_form_field.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_text_form_field.dart';
@@ -88,149 +86,137 @@ class _UserEditFormState extends ConsumerState<AccountEditForm> {
 
     // This is used to refresh page in case handle controller
     return accountState.when(data: (_) {
-      return currencyTypesState.when(data: (data) {
-        return data.fold((failure) {
-          if (failure is HttpConnectionFailure ||
-              failure is NoLocalEntryFailure) {
-            return showError(
-                icon: Icons.network_wifi_1_bar,
-                text: appLocalizations.noConnection);
-          }
-          return showError(
-              background: widget.cache.value, text: failure.detail);
-        }, (currencyTypes) {
-          widget.cache.value = Form(
-            key: widget.formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                children: [
-                  verticalSpace(),
-                  // Image Widget
-                  CircleAvatar(
-                      foregroundColor: AppColors.appBarBackgroundColor,
-                      backgroundColor: AppColors.appBarBackgroundColor,
-                      backgroundImage: imageBytes == null
-                          ? Image.network(widget.account.image!).image
-                          : Image.memory(imageBytes!).image,
-                      radius: 50,
-                      child: !widget.edit
-                          ? null
-                          : Container(
-                              alignment: Alignment.bottomRight,
-                              child: IconButton(
-                                iconSize: 30,
-                                icon: const Icon(Icons.edit),
-                                onPressed: () async {
-                                  await loadImage();
-                                  setState(() {});
-                                },
-                              ))),
-                  verticalSpace(),
-                  // Username Text Field
-                  AppTextFormField(
-                    readOnly: !widget.edit,
-                    onChanged: (value) => accountEditValuesDto =
-                        accountEditValuesDto!.copyWith(
-                            usernameValue:
-                                RegisterUsernameValue(appLocalizations, value)),
-                    title: appLocalizations.username,
-                    validator: (value) =>
-                        accountEditValuesDto!.usernameValue.validate,
-                    maxCharacters: 15,
-                    maxWidth: 400,
-                    controller: widget.usernameController,
-                  ),
-                  verticalSpace(),
-                  // Email Text Field
-                  AppTextFormField(
-                    readOnly: true,
-                    title: appLocalizations.emailAddress,
-                    maxCharacters: 300,
-                    maxWidth: 400,
-                    controller: widget.emailController,
-                  ),
-                  verticalSpace(),
-                  // Expected Monthly Balance Text Field
-                  DoubleFormField(
-                    readOnly: !widget.edit,
-                    onChanged: (value) => accountEditValuesDto =
-                        accountEditValuesDto!.copyWith(
-                            expectedMonthlyBalanceValue:
-                                BalanceQuantityValue(appLocalizations, value)),
-                    title: appLocalizations.expectedMonthlyBalance,
-                    validator: (value) => accountEditValuesDto!
-                        .expectedMonthlyBalanceValue.validate,
-                    maxWidth: 300,
-                    controller: widget.expectedMonthlyBalanceController,
-                  ),
-                  verticalSpace(),
-                  // Expected Annual Balance Text Field
-                  DoubleFormField(
-                    readOnly: !widget.edit,
-                    onChanged: (value) => accountEditValuesDto =
-                        accountEditValuesDto!.copyWith(
-                            expectedAnnualBalanceValue:
-                                BalanceQuantityValue(appLocalizations, value)),
-                    title: appLocalizations.expectedAnnualBalance,
-                    validator: (value) => accountEditValuesDto!
-                        .expectedAnnualBalanceValue.validate,
-                    maxWidth: 300,
-                    controller: widget.expectedAnnualBalanceController,
-                  ),
-                  verticalSpace(),
-                  // Currency Type Picker
-                  (currencyTypes.isNotEmpty)
-                      ? DropdownPickerField(
-                          readOnly: !widget.edit,
-                          name: appLocalizations.currencyType,
-                          initialValue: accountEditValuesDto!.prefCurrencyType,
-                          items: currencyTypes.map((e) => e.code).toList(),
-                          onChanged: (newCurrencyType) =>
-                              changePrefCurrencyType(
-                                  newCurrencyType!,
-                                  currencyConversionController,
-                                  appLocalizations))
-                      : Text(appLocalizations.genericError),
-                  verticalSpace(),
-                  if (widget.edit)
-                    AppTextButton(
-                      text: appLocalizations.confirmation,
-                      width: 160,
-                      height: 50,
-                      onPressed: () async {
-                        if (widget.formKey.currentState == null ||
-                            !widget.formKey.currentState!.validate()) {
-                          return;
-                        }
-                        if (imageBytes != null && imageType != null) {
-                          bool isImageOk = true;
-                          (await accountController.updateImage(
-                                  imageBytes!, imageType!, appLocalizations))
-                              .fold((failure) {
-                            isImageOk = false;
-                            showErrorAccountEditDialog(
-                                appLocalizations, failure.detail);
-                          }, (_) => null);
-                          if (!isImageOk) return;
-                        }
-                        (await accountController.update(
-                                accountEditValuesDto!, appLocalizations))
+      return currencyTypesState.when(data: (currencyTypes) {
+        widget.cache.value = Form(
+          key: widget.formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                verticalSpace(),
+                // Image Widget
+                CircleAvatar(
+                    foregroundColor: AppColors.appBarBackgroundColor,
+                    backgroundColor: AppColors.appBarBackgroundColor,
+                    backgroundImage: imageBytes == null
+                        ? Image.network(widget.account.image!).image
+                        : Image.memory(imageBytes!).image,
+                    radius: 50,
+                    child: !widget.edit
+                        ? null
+                        : Container(
+                            alignment: Alignment.bottomRight,
+                            child: IconButton(
+                              iconSize: 30,
+                              icon: const Icon(Icons.edit),
+                              onPressed: () async {
+                                await loadImage();
+                                setState(() {});
+                              },
+                            ))),
+                verticalSpace(),
+                // Username Text Field
+                AppTextFormField(
+                  readOnly: !widget.edit,
+                  onChanged: (value) => accountEditValuesDto =
+                      accountEditValuesDto!.copyWith(
+                          usernameValue:
+                              RegisterUsernameValue(appLocalizations, value)),
+                  title: appLocalizations.username,
+                  validator: (value) =>
+                      accountEditValuesDto!.usernameValue.validate,
+                  maxCharacters: 15,
+                  maxWidth: 400,
+                  controller: widget.usernameController,
+                ),
+                verticalSpace(),
+                // Email Text Field
+                AppTextFormField(
+                  readOnly: true,
+                  title: appLocalizations.emailAddress,
+                  maxCharacters: 300,
+                  maxWidth: 400,
+                  controller: widget.emailController,
+                ),
+                verticalSpace(),
+                // Expected Monthly Balance Text Field
+                DoubleFormField(
+                  readOnly: !widget.edit,
+                  onChanged: (value) => accountEditValuesDto =
+                      accountEditValuesDto!.copyWith(
+                          expectedMonthlyBalanceValue:
+                              BalanceQuantityValue(appLocalizations, value)),
+                  title: appLocalizations.expectedMonthlyBalance,
+                  validator: (value) => accountEditValuesDto!
+                      .expectedMonthlyBalanceValue.validate,
+                  maxWidth: 300,
+                  controller: widget.expectedMonthlyBalanceController,
+                ),
+                verticalSpace(),
+                // Expected Annual Balance Text Field
+                DoubleFormField(
+                  readOnly: !widget.edit,
+                  onChanged: (value) => accountEditValuesDto =
+                      accountEditValuesDto!.copyWith(
+                          expectedAnnualBalanceValue:
+                              BalanceQuantityValue(appLocalizations, value)),
+                  title: appLocalizations.expectedAnnualBalance,
+                  validator: (value) =>
+                      accountEditValuesDto!.expectedAnnualBalanceValue.validate,
+                  maxWidth: 300,
+                  controller: widget.expectedAnnualBalanceController,
+                ),
+                verticalSpace(),
+                // Currency Type Picker
+                (currencyTypes.isNotEmpty)
+                    ? DropdownPickerField(
+                        readOnly: !widget.edit,
+                        name: appLocalizations.currencyType,
+                        initialValue: accountEditValuesDto!.prefCurrencyType,
+                        items: currencyTypes.map((e) => e.code).toList(),
+                        onChanged: (newCurrencyType) => changePrefCurrencyType(
+                            newCurrencyType!,
+                            currencyConversionController,
+                            appLocalizations))
+                    : Text(appLocalizations.genericError),
+                verticalSpace(),
+                if (widget.edit)
+                  AppTextButton(
+                    text: appLocalizations.confirmation,
+                    width: 160,
+                    height: 50,
+                    onPressed: () async {
+                      if (widget.formKey.currentState == null ||
+                          !widget.formKey.currentState!.validate()) {
+                        return;
+                      }
+                      if (imageBytes != null && imageType != null) {
+                        bool isImageOk = true;
+                        (await accountController.updateImage(
+                                imageBytes!, imageType!, appLocalizations))
                             .fold((failure) {
+                          isImageOk = false;
                           showErrorAccountEditDialog(
                               appLocalizations, failure.detail);
-                        }, (entity) {
-                          accountController.get();
-                        });
-                      },
-                    ),
-                ],
-              ),
+                        }, (_) => null);
+                        if (!isImageOk) return;
+                      }
+                      (await accountController.update(
+                              accountEditValuesDto!, appLocalizations))
+                          .fold((failure) {
+                        showErrorAccountEditDialog(
+                            appLocalizations, failure.detail);
+                      }, (entity) {
+                        accountController.get();
+                      });
+                    },
+                  ),
+              ],
             ),
-          );
-          return widget.cache.value;
-        });
+          ),
+        );
+        return widget.cache.value;
       }, error: (error, _) {
         return showError(
             error: error,

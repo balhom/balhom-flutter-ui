@@ -3,7 +3,7 @@ import 'package:balance_home_app/src/core/presentation/models/selected_date_mode
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SelectedDateState extends StateNotifier<SelectedDateDto> {
-  SelectedDateState(SelectedDateMode selectedDateMode)
+  SelectedDateState(SelectedDateEnum selectedDateMode)
       : super(SelectedDateDto(
             day: DateTime.now().day,
             month: DateTime.now().month,

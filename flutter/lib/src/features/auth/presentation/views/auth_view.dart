@@ -1,7 +1,5 @@
 import 'package:balance_home_app/config/app_colors.dart';
 import 'package:balance_home_app/config/app_layout.dart';
-import 'package:balance_home_app/src/core/domain/failures/http/http_connection_failure.dart';
-import 'package:balance_home_app/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balance_home_app/src/core/presentation/views/app_title.dart';
 import 'package:balance_home_app/src/core/presentation/widgets/app_will_pop_scope.dart';
 import 'package:balance_home_app/src/features/auth/presentation/views/auth_background_view.dart';
@@ -41,6 +39,8 @@ class AuthView extends ConsumerWidget {
     final appLocalizationStateNotifier =
         ref.read(appLocalizationsProvider.notifier);
 
+    final isConnected = connectionStateListenable.value;
+
     final currencyTypeListController =
         ref.watch(currencyTypeListsControllerProvider);
 
@@ -52,81 +52,78 @@ class AuthView extends ConsumerWidget {
             automaticallyImplyLeading: false),
         body: SafeArea(
           child: AuthBackgroundWidget(
-              child: currencyTypeListController.when<Widget>(data: (data) {
-            return data.fold((failure) {
-              if (failure is HttpConnectionFailure ||
-                  failure is NoLocalEntryFailure) {
-                return showError(
-                    icon: Icons.network_wifi_1_bar,
-                    text: appLocalizations.noConnection);
-              }
-              return showError(background: cache.value, text: failure.detail);
-            }, (currencyTypes) {
-              cache.value = Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: AppLanguagePickerDropdown(
-                        appLocalizations: appLocalizations,
-                        onValuePicked: (Language language) {
-                          Locale locale = Locale(language.isoCode);
-                          appLocalizationStateNotifier.setLocale(locale);
-                        }),
-                  ),
-                  const SizedBox(height: AppLayout.genericPadding),
-                  Expanded(
-                    child: DefaultTabController(
-                      length: 2,
-                      initialIndex: 0,
-                      child: Column(
-                        children: [
-                          TabBar(
-                              isScrollable: true,
-                              indicatorColor:
-                                  const Color.fromARGB(255, 7, 136, 76),
-                              tabs: [
-                                Tab(
-                                  child: Text(
-                                    appLocalizations.signIn,
-                                    style: GoogleFonts.openSans(
-                                        color: const Color.fromARGB(
-                                            255, 27, 27, 27),
-                                        fontSize: 20),
-                                  ),
+              child: currencyTypeListController.when<Widget>(
+                  data: (currencyTypes) {
+            cache.value = Column(
+              children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: AppLanguagePickerDropdown(
+                      appLocalizations: appLocalizations,
+                      onValuePicked: (Language language) {
+                        Locale locale = Locale(language.isoCode);
+                        appLocalizationStateNotifier.setLocale(locale);
+                      }),
+                ),
+                const SizedBox(height: AppLayout.genericPadding),
+                Expanded(
+                  child: DefaultTabController(
+                    length: 2,
+                    initialIndex: 0,
+                    child: Column(
+                      children: [
+                        TabBar(
+                            isScrollable: true,
+                            indicatorColor:
+                                const Color.fromARGB(255, 7, 136, 76),
+                            tabs: [
+                              Tab(
+                                child: Text(
+                                  appLocalizations.signIn,
+                                  style: GoogleFonts.openSans(
+                                      color:
+                                          const Color.fromARGB(255, 27, 27, 27),
+                                      fontSize: 20),
                                 ),
-                                Tab(
-                                  child: Text(
-                                    appLocalizations.register,
-                                    style: GoogleFonts.openSans(
-                                        color: const Color.fromARGB(
-                                            255, 27, 27, 27),
-                                        fontSize: 20),
-                                  ),
-                                )
-                              ]),
-                          Expanded(
-                              child: TabBarView(children: [
-                            LoginForm(
-                              emailController: loginEmailController,
-                              passwordController: loginPasswordController,
-                            ),
-                            RegisterForm(
-                                usernameController: registerUsernameController,
-                                emailController: registerEmailController,
-                                passwordController: registerPasswordController,
-                                repeatPasswordController:
-                                    registerRepeatPasswordController,
-                                currencyTypes: currencyTypes)
-                          ])),
-                        ],
-                      ),
+                              ),
+                              Tab(
+                                child: Text(
+                                  appLocalizations.register,
+                                  style: GoogleFonts.openSans(
+                                      color:
+                                          const Color.fromARGB(255, 27, 27, 27),
+                                      fontSize: 20),
+                                ),
+                              )
+                            ]),
+                        Expanded(
+                            child: TabBarView(children: [
+                          LoginForm(
+                            emailController: loginEmailController,
+                            passwordController: loginPasswordController,
+                          ),
+                          RegisterForm(
+                              usernameController: registerUsernameController,
+                              emailController: registerEmailController,
+                              passwordController: registerPasswordController,
+                              repeatPasswordController:
+                                  registerRepeatPasswordController,
+                              currencyTypes: currencyTypes)
+                        ])),
+                      ],
                     ),
-                  )
-                ],
-              );
-              return cache.value;
-            });
+                  ),
+                )
+              ],
+            );
+            return cache.value;
           }, error: (error, _) {
+            if (!isConnected) {
+              return showError(
+                  background: cache.value,
+                  icon: Icons.network_wifi_1_bar,
+                  text: appLocalizations.noConnection);
+            }
             return showError(
                 error: error,
                 background: cache.value,

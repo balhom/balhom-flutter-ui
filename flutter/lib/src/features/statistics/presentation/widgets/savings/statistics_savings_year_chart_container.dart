@@ -1,4 +1,3 @@
-import 'package:balance_home_app/src/core/clients/api_client.dart';
 import 'package:balance_home_app/src/core/presentation/models/selected_date.dart';
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/features/statistics/domain/entities/monthly_balance_entity.dart';
@@ -12,14 +11,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class StatisticsSavingsYearChartContainer extends ConsumerWidget {
   final List<MonthlyBalanceEntity> monthlyBalances;
-  final List<int> revenueYears;
-  final List<int> expenseYears;
+  final List<int> balanceYears;
 
   const StatisticsSavingsYearChartContainer(
-      {required this.monthlyBalances,
-      required this.revenueYears,
-      required this.expenseYears,
-      super.key});
+      {required this.monthlyBalances, required this.balanceYears, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,16 +24,17 @@ class StatisticsSavingsYearChartContainer extends ConsumerWidget {
         ref.watch(statisticsSavingsSelectedDateProvider);
     final selectedDateState =
         ref.read(statisticsSavingsSelectedDateProvider.notifier);
-    List<int> years = <int>{...revenueYears, ...expenseYears}.toList();
     int selectedYear = selectedDate.year;
     // Month names list
     final List<String> months =
         DateUtil.getMonthDict(appLocalizations).values.toList();
     // Adding selected year to years list
-    if (!years.contains(selectedYear)) years.add(selectedYear);
+    if (!balanceYears.contains(selectedYear)) balanceYears.add(selectedYear);
     // Adding current year to years list
-    if (!years.contains(DateTime.now().year)) years.add(DateTime.now().year);
-    years.sort();
+    if (!balanceYears.contains(DateTime.now().year)) {
+      balanceYears.add(DateTime.now().year);
+    }
+    balanceYears.sort();
     // Screen sizes:
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -74,7 +70,7 @@ class StatisticsSavingsYearChartContainer extends ConsumerWidget {
               height: 45,
               child: DropdownButton<int>(
                   value: selectedYear,
-                  items: years.map((year) {
+                  items: balanceYears.map((year) {
                     return DropdownMenuItem<int>(
                       value: year,
                       child: Text(year.toString()),

@@ -1,9 +1,8 @@
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/currency_type_entity.dart';
 import 'package:balance_home_app/src/features/currency/domain/entities/date_currency_conversion_list_entity.dart';
-import 'package:balance_home_app/src/features/statistics/presentation/models/selected_exchange.dart';
-import 'package:balance_home_app/src/features/statistics/presentation/widgets/currency/statistics_currency_line_chart.dart';
-import 'package:balance_home_app/src/features/statistics/providers.dart';
+import 'package:balance_home_app/src/features/currency/presentation/widgets/currency_line_chart.dart';
+import 'package:balance_home_app/src/features/currency/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,10 +19,9 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    SelectedExchange selectedExchange =
-        ref.watch(statisticsCurrencySelectedExchangeProvider);
-    final selectedExchangeState =
-        ref.read(statisticsCurrencySelectedExchangeProvider.notifier);
+    final selectedConversion = ref.watch(selectedCurrencyConversionProvider);
+    final selectedConversionState =
+        ref.read(selectedCurrencyConversionProvider.notifier);
     // Coin codes list
     List<String> coins = currencyTypes.map((e) => e.code).toList();
     // Screen sizes:
@@ -58,7 +56,7 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
               padding: const EdgeInsets.only(left: 10, right: 10),
               height: 45,
               child: DropdownButton<String>(
-                  value: selectedExchange.coinFrom,
+                  value: selectedConversion.currencyFrom,
                   items: coins.map((coin) {
                     return DropdownMenuItem<String>(
                       value: coin,
@@ -66,7 +64,7 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
                     );
                   }).toList(),
                   onChanged: (coin) {
-                    selectedExchangeState.setCurrencyFrom(coin!);
+                    selectedConversionState.setCurrencyFrom(coin!);
                   }),
             ),
             Container(
@@ -75,7 +73,7 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
               padding: const EdgeInsets.only(left: 10, right: 10),
               height: 45,
               child: DropdownButton<String>(
-                  value: selectedExchange.coinTo,
+                  value: selectedConversion.currencyTo,
                   items: coins.map((coin) {
                     return DropdownMenuItem<String>(
                       value: coin,
@@ -83,7 +81,7 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
                     );
                   }).toList(),
                   onChanged: (coin) {
-                    selectedExchangeState.setCurrencyTo(coin!);
+                    selectedConversionState.setCurrencyTo(coin!);
                   }),
             )
           ],
@@ -92,8 +90,8 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
             height: chartLineHeight,
             width: screenWidth * 0.90,
             child: StatisticsCurrencyLineChart(
-              selectedCoinFrom: selectedExchange.coinFrom,
-              selectedCoinTo: selectedExchange.coinTo,
+              selectedCoinFrom: selectedConversion.currencyFrom,
+              selectedCoinTo: selectedConversion.currencyTo,
               dateCurrencyConversion: dateCurrencyConversion,
             )),
       ],

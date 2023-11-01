@@ -1,1 +1,1 @@
-enum SelectedDateMode { day, month, year }
+enum SelectedDateEnum { day, month, year }

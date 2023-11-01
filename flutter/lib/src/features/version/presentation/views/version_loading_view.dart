@@ -10,11 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class VersionLoadingView extends ConsumerStatefulWidget {
-  /// Named route for [VersionLoadingView]
-  static const String routeName = 'versionLoadingView';
-
-  /// Path route for [VersionLoadingView]
-  static const String routePath = 'app-version';
 
   const VersionLoadingView({super.key});
 
