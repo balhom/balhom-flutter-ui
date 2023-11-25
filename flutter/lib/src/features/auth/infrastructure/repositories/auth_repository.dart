@@ -23,11 +23,16 @@ class AuthRepository implements AuthRepositoryInterface {
 
   @override
   Future<Either<Failure, JwtEntity>> trySignIn() async {
-    final response = await jwtRemoteDataSource.refresh();
+    final eitherRefreshToken = await jwtLocalDataSource.getRefresh();
+    final response = await eitherRefreshToken.fold(
+        (_) async => await jwtRemoteDataSource.refresh(),
+        (refreshToken) async =>
+            await jwtRemoteDataSource.refresh(refreshToken: refreshToken));
     // Check if there is a request failure
     return await response.fold((failure) => left(failure), (jwtEntity) async {
-      await jwtLocalDataSource.storeAccess(jwtEntity.access!);
-      jwtRemoteDataSource.setAccessToken(jwtEntity.access!);
+      await jwtLocalDataSource.storeAccess(jwtEntity.accessToken!);
+      await jwtLocalDataSource.storeRefresh(jwtEntity.refreshToken!);
+      jwtRemoteDataSource.setAccessToken(jwtEntity.accessToken!);
       return right(jwtEntity);
     });
   }
@@ -38,8 +43,9 @@ class AuthRepository implements AuthRepositoryInterface {
     final response = await jwtRemoteDataSource.get(credentials);
     // Check if there is a request failure
     return await response.fold((failure) => left(failure), (jwtEntity) async {
-      await jwtLocalDataSource.storeAccess(jwtEntity.access!);
-      jwtRemoteDataSource.setAccessToken(jwtEntity.access!);
+      await jwtLocalDataSource.storeAccess(jwtEntity.accessToken!);
+      await jwtLocalDataSource.storeRefresh(jwtEntity.refreshToken!);
+      jwtRemoteDataSource.setAccessToken(jwtEntity.accessToken!);
       return right(jwtEntity);
     });
   }

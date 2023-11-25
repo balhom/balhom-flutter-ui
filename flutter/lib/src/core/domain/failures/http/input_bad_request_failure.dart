@@ -8,8 +8,7 @@ part 'input_bad_request_failure.g.dart';
 class InputBadRequestFailure extends BadRequestFailure {
   final List<InputField> fields;
 
-  const InputBadRequestFailure({required String detail, required this.fields})
-      : super(detail: detail);
+  const InputBadRequestFailure({required super.detail, required this.fields});
 
   // Serialization
   factory InputBadRequestFailure.fromJson(Map<String, dynamic> json) =>

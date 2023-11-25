@@ -28,17 +28,17 @@ class AppTextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color backColor =
-        backgroundColor ?? Theme.of(context).colorScheme.primary;
     final ButtonStyle style = ButtonStyle(
-      backgroundColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-        if (states.contains(MaterialState.pressed) ||
-            states.contains(MaterialState.disabled)) {
-          return backColor.withOpacity(0.6);
-        }
-        return backColor;
-      }),
+      backgroundColor: backgroundColor != null
+          ? MaterialStateProperty.resolveWith<Color>(
+              (Set<MaterialState> states) {
+              if (states.contains(MaterialState.pressed) ||
+                  states.contains(MaterialState.disabled)) {
+                return backgroundColor!.withOpacity(0.6);
+              }
+              return backgroundColor!;
+            })
+          : null,
       foregroundColor: (foregroundColor == null)
           ? null
           : MaterialStateProperty.all<Color>(foregroundColor!),
@@ -54,8 +54,9 @@ class AppTextButton extends StatelessWidget {
             : Text(
                 text,
                 textAlign: TextAlign.center,
-                style:
-                    GoogleFonts.openSans(fontSize: fontSize, color: textColor),
+                style: fontSize != null || textColor != null
+                    ? GoogleFonts.openSans(fontSize: fontSize, color: textColor)
+                    : null,
               ),
       ),
     );

@@ -34,8 +34,7 @@ class RegisterForm extends ConsumerStatefulWidget {
       required this.passwordController,
       required this.repeatPasswordController,
       required this.currencyTypes,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   ConsumerState<RegisterForm> createState() => _RegisterFormState();
@@ -52,7 +51,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
         usernameValue: RegisterUsernameValue(
             appLocalizations, widget.usernameController.text),
         emailValue: EmailValue(appLocalizations, widget.emailController.text),
-        language: appLocalizations.localeName,
+        locale: appLocalizations.localeName,
         prefCurrencyType: widget.currencyTypes[0].code,
         passwordValue: RegisterPasswordValue(
             appLocalizations, widget.passwordController.text),

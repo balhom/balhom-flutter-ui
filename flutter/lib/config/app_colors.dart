@@ -30,4 +30,28 @@ class AppColors {
 
   static const Color expenseBackgroundDarkColor =
       Color.fromARGB(255, 182, 125, 108);
+
+  static const Color indicatorColor = Color.fromARGB(255, 7, 136, 76);
+
+  static const Color greyColor = Color.fromARGB(255, 119, 119, 119);
+
+  static MaterialColor colorToMaterialColor(Color color) {
+    final int red = color.red;
+    final int green = color.green;
+    final int blue = color.blue;
+    final int alpha = color.alpha;
+    final Map<int, Color> shades = {
+      50: Color.fromARGB(alpha, red, green, blue),
+      100: Color.fromARGB(alpha, red, green, blue),
+      200: Color.fromARGB(alpha, red, green, blue),
+      300: Color.fromARGB(alpha, red, green, blue),
+      400: Color.fromARGB(alpha, red, green, blue),
+      500: Color.fromARGB(alpha, red, green, blue),
+      600: Color.fromARGB(alpha, red, green, blue),
+      700: Color.fromARGB(alpha, red, green, blue),
+      800: Color.fromARGB(alpha, red, green, blue),
+      900: Color.fromARGB(alpha, red, green, blue),
+    };
+    return MaterialColor(color.value, shades);
+  }
 }

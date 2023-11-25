@@ -8,8 +8,7 @@ class AppLoadingWidget extends StatelessWidget {
   final double? strokeWidth;
 
   const AppLoadingWidget(
-      {this.color = Colors.green, this.text, this.strokeWidth, Key? key})
-      : super(key: key);
+      {this.color = Colors.green, this.text, this.strokeWidth, super.key});
 
   @override
   Widget build(BuildContext context) {

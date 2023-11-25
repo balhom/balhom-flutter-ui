@@ -2,8 +2,7 @@ import 'package:balance_home_app/src/features/balance/presentation/models/balanc
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BalanceOrderingTypeState extends StateNotifier<BalanceOrderingType> {
-  BalanceOrderingTypeState(BalanceOrderingType balanceOrderingType)
-      : super(balanceOrderingType);
+  BalanceOrderingTypeState(super.balanceOrderingType);
 
   void setBalanceOrderingType(BalanceOrderingType balanceOrderingType) {
     state = balanceOrderingType;

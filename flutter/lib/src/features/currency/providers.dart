@@ -20,7 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final currencyRepositoryProvider = Provider<CurrencyRepositoryInterface>(
     (ref) => CurrencyRepository(
         currencyRemoteDataSource: CurrencyRemoteDataSource(
-            apiClient: ref.read(balhomApiClientProvider))));
+            apiClient: ref.read(currencyConversionClientProvider))));
 
 ///
 /// Application dependencies

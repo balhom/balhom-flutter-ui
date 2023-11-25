@@ -23,8 +23,7 @@ class DoubleFormField extends StatelessWidget {
       this.validator,
       this.readOnly,
       this.align,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +88,6 @@ class DoubleFormField extends StatelessWidget {
                     color: Theme.of(context).brightness == Brightness.light
                         ? Colors.black
                         : Colors.white),
-                filled: true,
                 fillColor: readOnly != null && readOnly!
                     ? const Color.fromARGB(108, 167, 167, 167)
                     : Theme.of(context).brightness == Brightness.light

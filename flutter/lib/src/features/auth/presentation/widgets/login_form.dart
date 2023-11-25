@@ -25,8 +25,7 @@ class LoginForm extends ConsumerStatefulWidget {
   LoginForm(
       {required this.emailController,
       required this.passwordController,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   ConsumerState<LoginForm> createState() => _LoginFormState();
@@ -46,6 +45,10 @@ class _LoginFormState extends ConsumerState<LoginForm> {
 
     final authState = ref.watch(authControllerProvider);
     final authController = ref.read(authControllerProvider.notifier);
+
+    final resetPasswordController =
+        ref.read(resetPasswordControllerProvider.notifier);
+
     final emailVerificationState =
         ref.watch(emailVerificationControllerProvider);
     final emailVerificationController =
@@ -76,7 +79,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 maxCharacters: 300,
                 title: appLocalizations.emailAddress,
                 controller: widget.emailController,
-                onChanged: (value) => loginValuesDto!
+                onChanged: (value) => loginValuesDto = loginValuesDto!
                     .copyWith(emailValue: EmailValue(appLocalizations, value)),
                 validator: (value) => loginValuesDto!.emailValue.validate,
               ),
@@ -87,7 +90,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 maxCharacters: 400,
                 title: appLocalizations.password,
                 controller: widget.passwordController,
-                onChanged: (value) => loginValuesDto!.copyWith(
+                onChanged: (value) => loginValuesDto = loginValuesDto!.copyWith(
                     passwordValue: LoginPasswordValue(appLocalizations, value)),
                 validator: (value) => loginValuesDto!.passwordValue.validate,
               ),
@@ -124,8 +127,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               verticalSpace(),
               // Forgot Password Button
               TextButton(
-                onPressed: () {
-                  showResetPasswordAdviceDialog(appLocalizations);
+                onPressed: () async {
+                  showResetPasswordDialog(
+                      resetPasswordController, appLocalizations);
                 },
                 child: Text(
                   appLocalizations.forgotPassword,

@@ -9,8 +9,7 @@ class ApiBadRequestFailure extends BadRequestFailure {
   @JsonKey(defaultValue: -1)
   final int errorCode;
 
-  const ApiBadRequestFailure({required String detail, required this.errorCode})
-      : super(detail: detail);
+  const ApiBadRequestFailure({required super.detail, required this.errorCode});
 
   // Serialization
   factory ApiBadRequestFailure.fromJson(Map<String, dynamic> json) =>

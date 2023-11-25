@@ -21,13 +21,13 @@ class AuthLoadingView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authController = ref.read(authControllerProvider.notifier);
     Future.delayed(Duration.zero, () async {
-      final value = await authController.trySignIn();
-      if (location == "/${AuthView.routePath}") {
-        goLocation(extra: true);
-        return const Scaffold(body: AppLoadingWidget());
-      }
-      value.fold((_) {
-        AppErrorView.go404();
+      final authEither = await authController.trySignIn();
+      authEither.fold((_) {
+        if (location == "/${AuthView.routePath}") {
+          goLocation();
+        } else {
+          AppErrorView.go404();
+        }
         return const Scaffold(body: AppLoadingWidget());
       }, (_) {
         if (location != "/$routePath") {
@@ -43,7 +43,7 @@ class AuthLoadingView extends ConsumerWidget {
   }
 
   @visibleForTesting
-  void goLocation({Object? extra}) {
-    router.go(location, extra: extra);
+  void goLocation() {
+    router.go(location, extra: true);
   }
 }

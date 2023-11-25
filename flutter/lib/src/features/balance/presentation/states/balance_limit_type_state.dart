@@ -2,8 +2,7 @@ import 'package:balance_home_app/src/features/balance/presentation/models/balanc
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BalanceLimitTypeState extends StateNotifier<BalanceLimitType> {
-  BalanceLimitTypeState(BalanceLimitType balanceLimitType)
-      : super(balanceLimitType);
+  BalanceLimitTypeState(super.balanceLimitType);
 
   void setBalanceLimitType(BalanceLimitType balanceLimitType) {
     state = balanceLimitType;

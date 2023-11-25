@@ -255,7 +255,7 @@ class _UserEditFormState extends ConsumerState<AccountEditForm> {
       return;
     }
     (await currencyConversionController.getCurrencyConversion(
-            widget.account.balance,
+            widget.account.currentBalance,
             widget.account.prefCurrencyType,
             newCurrencyType,
             appLocalizations))

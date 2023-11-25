@@ -20,8 +20,10 @@ class JwtRemoteDataSource {
         (value) => right(JwtEntity.fromJson(value.data)));
   }
 
-  Future<Either<Failure, JwtEntity>> refresh() async {
-    final response = await apiClient.postRequest(BalhomAPIContract.authRefresh);
+  Future<Either<Failure, JwtEntity>> refresh(
+      {final String? refreshToken}) async {
+    final response = await apiClient.postRequest(BalhomAPIContract.authRefresh,
+        data: refreshToken != null ? {"refresh_token": refreshToken} : null);
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
         (value) => right(JwtEntity.fromJson(value.data)));

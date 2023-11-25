@@ -39,10 +39,10 @@ class AccountEditValuesDto with _$AccountEditValuesDto {
                 username: username,
                 email: email,
                 receiveEmailBalance: oldUser.receiveEmailBalance,
-                balance: oldUser.balance,
+                currentBalance: oldUser.currentBalance,
                 expectedAnnualBalance: expectedAnnualBalance,
                 expectedMonthlyBalance: expectedMonthlyBalance,
-                language: oldUser.language,
+                locale: oldUser.locale,
                 prefCurrencyType: prefCurrencyType,
                 lastLogin: null,
                 image: null));

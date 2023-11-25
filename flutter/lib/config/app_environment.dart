@@ -9,25 +9,13 @@ abstract class AppEnvironment {
   @EnviedField(varName: "BALHOM_API_URL", defaultValue: "http://localhost")
   static const String balhomApiUrl = _AppEnvironment.balhomApiUrl;
 
-  /// Keycloak URL
-  @EnviedField(varName: "KEYCLOAK_URL", defaultValue: "http://localhost")
-  static const String keycloakUrl = _AppEnvironment.keycloakUrl;
-
-  /// Keycloak Realm
-  @EnviedField(varName: "KEYCLOAK_REALM", defaultValue: "balhom")
-  static const String keycloakRealm = _AppEnvironment.keycloakRealm;
-
-  /// Keycloak Client Id
-  @EnviedField(varName: "KEYCLOAK_CLIENT_ID", defaultValue: "balhom")
-  static const String keycloakClientId = _AppEnvironment.keycloakClientId;
-
   /// Currency Conversion API Url
   @EnviedField(varName: "CURRENCY_CONVERSION_API_URL")
   static const String currencyConversionApiUrl =
       _AppEnvironment.currencyConversionApiUrl;
 
   /// Currency Conversion API Key
-  @EnviedField(varName: "CURRENCY_CONVERSION_API_KEY")
-  static const String currencyConversionApiKey =
+  @EnviedField(varName: "CURRENCY_CONVERSION_API_KEY", obfuscate: true)
+  static String currencyConversionApiKey =
       _AppEnvironment.currencyConversionApiKey;
 }

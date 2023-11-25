@@ -10,10 +10,10 @@ class AccountEntity with _$AccountEntity {
   /// [username] - [String] username
   /// [email] - [String] email
   /// [receiveEmailBalance] - [bool] receive email balance
-  /// [balance] - [double] balance
+  /// [cuurentBalance] - [double] cuurent balance
   /// [expectedAnnualBalance] - [double] expected annual balance
   /// [expectedMonthlyBalance] - [double] expected monthly balance
-  /// [language] - [double] language
+  /// [locale] - [double] locale
   /// [prefCurrencyType] - [double] preferred coin type
   /// [image] - [double] profile image
   /// [lastLogin] - [DateTime] last login date
@@ -23,10 +23,10 @@ class AccountEntity with _$AccountEntity {
     required String username,
     required String email,
     required bool receiveEmailBalance,
-    required double balance,
+    required double currentBalance,
     required double expectedAnnualBalance,
     required double expectedMonthlyBalance,
-    required String language,
+    required String locale,
     required String prefCurrencyType,
     // ignore: invalid_annotation_target
     @JsonKey(includeIfNull: false) required String? image,

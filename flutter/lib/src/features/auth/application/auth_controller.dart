@@ -17,6 +17,7 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
 
   Future<Either<Failure, void>> trySignIn() async {
     state = const AsyncValue.loading();
+    debugPrint("Trying to sign in");
     final res = await authRepository.trySignIn();
     return await res.fold((failure) {
       state = const AsyncValue.data(null);

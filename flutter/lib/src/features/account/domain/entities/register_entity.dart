@@ -9,7 +9,7 @@ class RegisterEntity with _$RegisterEntity {
   /// Factory constructor
   /// [username] - [String] username
   /// [email] - [String] email
-  /// [language] - [String] language
+  /// [locale] - [String] locale
   /// [prefCurrencyType] - [String] preferred currency type
   /// [password] - [String] password
   /// [repeatPassword] - [String] repeat password
@@ -18,7 +18,7 @@ class RegisterEntity with _$RegisterEntity {
   const factory RegisterEntity({
     required String username,
     required String email,
-    required String language,
+    required String locale,
     required String prefCurrencyType,
     required String password,
     required String repeatPassword,

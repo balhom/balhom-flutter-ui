@@ -6,9 +6,7 @@ class BalanceYearController extends StateNotifier<AsyncValue<List<int>>> {
   final BalanceRepositoryInterface balanceRepository;
 
   BalanceYearController({required this.balanceRepository})
-      : super(const AsyncValue.loading()) {
-    get();
-  }
+      : super(const AsyncValue.loading());
 
   Future<void> get() async {
     final revenueYears =

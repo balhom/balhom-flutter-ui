@@ -9,8 +9,7 @@ class AppErrorWidget extends StatelessWidget {
   final IconData? icon;
 
   const AppErrorWidget(
-      {this.color, this.text, this.strokeWidth, this.icon, Key? key})
-      : super(key: key);
+      {this.color, this.text, this.strokeWidth, this.icon, super.key});
 
   @override
   Widget build(BuildContext context) {

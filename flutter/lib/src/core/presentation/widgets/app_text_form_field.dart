@@ -48,8 +48,7 @@ class AppTextFormField extends StatelessWidget {
       this.multiLine = false,
       this.showCounterText = false,
       this.textAlign,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -72,11 +71,15 @@ class AppTextFormField extends StatelessWidget {
               onTap: readOnly ? null : onTap,
               controller: controller,
               validator: validator,
-              style: GoogleFonts.openSans(color: textColor),
+              style: textColor != null
+                  ? GoogleFonts.openSans(color: textColor)
+                  : null,
               decoration: InputDecoration(
                 counterText: showCounterText ? null : '',
                 labelText: title,
-                errorStyle: GoogleFonts.openSans(fontSize: fontSize),
+                errorStyle: fontSize != null
+                    ? GoogleFonts.openSans(fontSize: fontSize)
+                    : null,
                 enabledBorder: enabledBorderColor != null
                     ? OutlineInputBorder(
                         borderSide: BorderSide(color: enabledBorderColor!),
@@ -91,8 +94,12 @@ class AppTextFormField extends StatelessWidget {
                     ? OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor!))
                     : null,
-                labelStyle: GoogleFonts.openSans(color: textColor),
-                hintStyle: GoogleFonts.openSans(color: textColor),
+                labelStyle: textColor != null
+                    ? GoogleFonts.openSans(color: textColor)
+                    : null,
+                hintStyle: textColor != null
+                    ? GoogleFonts.openSans(color: textColor)
+                    : null,
                 filled: filled,
                 fillColor: readOnly
                     ? readOnlyColor ?? const Color.fromARGB(108, 167, 167, 167)

@@ -48,8 +48,7 @@ class AppPasswordTextFormField extends StatefulWidget {
       this.multiLine = false,
       this.showCounterText = false,
       this.textAlign,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   State<AppPasswordTextFormField> createState() =>
@@ -77,15 +76,19 @@ class _AppPasswordTextFormFieldState extends State<AppPasswordTextFormField> {
               readOnly: widget.readOnly,
               textAlign: widget.textAlign ?? TextAlign.start,
               maxLength: widget.maxCharacters,
-              onChanged: widget.onChanged,
-              onTap: widget.onTap,
+              onChanged: widget.readOnly ? null : widget.onChanged,
+              onTap: widget.readOnly ? null : widget.onTap,
               controller: widget.controller,
               validator: widget.validator,
-              style: GoogleFonts.openSans(color: widget.textColor),
+              style: widget.textColor != null
+                  ? GoogleFonts.openSans(color: widget.textColor)
+                  : null,
               decoration: InputDecoration(
                 counterText: widget.showCounterText ? null : '',
                 labelText: widget.title,
-                errorStyle: GoogleFonts.openSans(fontSize: widget.fontSize),
+                errorStyle: widget.fontSize != null
+                    ? GoogleFonts.openSans(fontSize: widget.fontSize)
+                    : null,
                 enabledBorder: widget.enabledBorderColor != null
                     ? OutlineInputBorder(
                         borderSide:
@@ -101,8 +104,12 @@ class _AppPasswordTextFormFieldState extends State<AppPasswordTextFormField> {
                     ? OutlineInputBorder(
                         borderSide: BorderSide(color: widget.borderColor!))
                     : null,
-                labelStyle: GoogleFonts.openSans(color: widget.textColor),
-                hintStyle: GoogleFonts.openSans(color: widget.textColor),
+                labelStyle: widget.textColor != null
+                    ? GoogleFonts.openSans(color: widget.textColor)
+                    : null,
+                hintStyle: widget.textColor != null
+                    ? GoogleFonts.openSans(color: widget.textColor)
+                    : null,
                 filled: widget.filled,
                 fillColor: widget.readOnly
                     ? widget.readOnlyColor ??

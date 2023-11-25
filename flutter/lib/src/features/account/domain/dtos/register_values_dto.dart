@@ -17,7 +17,7 @@ class RegisterValuesDto with _$RegisterValuesDto {
   const factory RegisterValuesDto({
     required RegisterUsernameValue usernameValue,
     required EmailValue emailValue,
-    required String language,
+    required String locale,
     required String prefCurrencyType,
     required RegisterPasswordValue passwordValue,
     required RegisterRepeatPasswordValue repeatPasswordValue,
@@ -39,7 +39,7 @@ class RegisterValuesDto with _$RegisterValuesDto {
             return right(RegisterEntity(
                 username: username,
                 email: email,
-                language: language,
+                locale: locale,
                 prefCurrencyType: prefCurrencyType,
                 password: password,
                 repeatPassword: repeatPassword));

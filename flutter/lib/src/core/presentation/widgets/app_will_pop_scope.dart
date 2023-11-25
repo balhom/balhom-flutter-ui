@@ -3,16 +3,20 @@ import 'package:universal_io/io.dart';
 
 final lastExitPressState = ValueNotifier<DateTime?>(null);
 
-class AppWillPopScope extends StatelessWidget {
+class AppPopScope extends StatelessWidget {
   final Widget child;
   final String? snackBarText;
 
-  const AppWillPopScope({super.key, required this.child, this.snackBarText});
+  const AppPopScope({super.key, required this.child, this.snackBarText});
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) {
+          return;
+        }
         final now = DateTime.now();
         if (lastExitPressState.value != null &&
             now.difference(lastExitPressState.value!) <
@@ -26,7 +30,6 @@ class AppWillPopScope extends StatelessWidget {
                 duration: const Duration(seconds: 2));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
-          return false;
         }
       },
       child: child,

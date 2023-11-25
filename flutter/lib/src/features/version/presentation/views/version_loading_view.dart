@@ -10,6 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class VersionLoadingView extends ConsumerStatefulWidget {
+  /// Named route for [VersionLoadingView]
+  static const String routeName = 'version';
+
+  /// Path route for [VersionLoadingView]
+  static const String routePath = 'version';
 
   const VersionLoadingView({super.key});
 
@@ -22,15 +27,14 @@ class _VersionLoadingViewState extends ConsumerState<VersionLoadingView> {
 
   @override
   Widget build(BuildContext context) {
-    final appLocalizations = ref.watch(appLocalizationsProvider);
+    final appLocalizations = ref.read(appLocalizationsProvider);
+    final versionState = ref.watch(versionController);
+
     return Scaffold(
-        body: ref.watch(versionController).when<Widget>(
-            data: (final failureOrAppVersion) {
+        body: versionState.when<Widget>(data: (final failureOrAppVersion) {
       return failureOrAppVersion.fold((failure) {
         if (failure is HttpConnectionFailure) {
-          Future.delayed(Duration.zero, () {
-            router.goNamed(AuthView.routeName);
-          });
+          goAuth();
           return showLoading();
         }
         return showError(
@@ -38,9 +42,7 @@ class _VersionLoadingViewState extends ConsumerState<VersionLoadingView> {
             text: appLocalizations.genericError);
       }, (appVersion) {
         if (appVersion.isLower != null && !appVersion.isLower!) {
-          Future.delayed(Duration.zero, () {
-            router.goNamed(AuthView.routeName);
-          });
+          goAuth();
           return AppLoadingWidget(
             color: AppColors.circularProgressColor,
             text: "${appLocalizations.version} "
@@ -56,5 +58,11 @@ class _VersionLoadingViewState extends ConsumerState<VersionLoadingView> {
     }, loading: () {
       return showLoading();
     }));
+  }
+
+  void goAuth() {
+    Future.delayed(Duration.zero, () {
+      router.go("/${AuthView.routePath}");
+    });
   }
 }

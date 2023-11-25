@@ -15,7 +15,9 @@ class AccountController extends StateNotifier<AsyncValue<AccountEntity?>> {
   final AccountRepositoryInterface accountRepository;
 
   AccountController({required this.accountRepository})
-      : super(const AsyncValue.data(null));
+      : super(const AsyncValue.data(null)) {
+    get();
+  }
 
   Future<Either<Failure, void>> get() async {
     state = const AsyncValue.loading();

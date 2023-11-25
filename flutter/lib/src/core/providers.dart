@@ -34,7 +34,7 @@ Future<void> initializeProviders(ProviderContainer container) async {
         accountEntityState.asData!.value != null) {
       container
           .read(appLocalizationsProvider.notifier)
-          .setLocale(Locale(accountEntityState.asData!.value!.language));
+          .setLocale(Locale(accountEntityState.asData!.value!.locale));
     }
   });
   // Change theme
@@ -71,7 +71,7 @@ final balhomApiClientProvider = Provider((ref) {
 final currencyConversionClientProvider = Provider((ref) {
   return ApiClient(baseUrl: AppEnvironment.currencyConversionApiUrl)
     ..setHeader(HttpHeaders.authorizationHeader,
-        AppEnvironment.currencyConversionApiKey);
+        "APIKey ${AppEnvironment.currencyConversionApiKey}");
 });
 
 ///

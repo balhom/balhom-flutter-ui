@@ -3,6 +3,8 @@ import 'package:balance_home_app/src/core/presentation/widgets/app_will_pop_scop
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/platform_utils.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
+import 'package:balance_home_app/src/features/balance/providers.dart';
+import 'package:balance_home_app/src/features/currency/providers.dart';
 import 'package:balance_home_app/src/features/home/presentation/views/home_tabs.dart';
 import 'package:balance_home_app/src/features/home/presentation/widgets/app_bar.dart';
 import 'package:balance_home_app/src/features/statistics/presentation/views/statistics_view.dart';
@@ -33,7 +35,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         showNoConnectionSnackBar(appLocalizations);
       });
     }
-    return AppWillPopScope(
+    return AppPopScope(
       snackBarText: appLocalizations.exitRepeatMessage,
       child: AdaptiveNavigationScaffold(
         appBar: const PreferredSize(
@@ -46,7 +48,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
             case HomeTab.statistics:
               final selectedDate =
                   ref.read(statisticsBalanceSelectedDateProvider);
+
+              ref.read(balanceYearsControllerProvider.notifier).get();
+              ref
+                  .read(monthlyBalanceListControllerProvider.notifier)
+                  .get(selectedDate);
+              ref
+                  .read(annualBalanceListControllerProvider.notifier)
+                  .get(selectedDate);
               ref.read(statisticsControllerProvider.notifier).get(selectedDate);
+              ref
+                  .read(daysCurrencyConversionsControllerProvider.notifier)
+                  .get(20);
+
               context.go("/${StatisticsView.routePath}");
               break;
             case HomeTab.revenues:

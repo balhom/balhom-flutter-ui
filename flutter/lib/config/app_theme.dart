@@ -24,7 +24,47 @@ class AppTheme {
       primaryColor: AppColors.primaryColor,
       navigationRailTheme: navigationRailTheme,
       bottomNavigationBarTheme: bottomNavigationBarTheme,
-      textTheme: GoogleFonts.openSansTextTheme(),
+      primaryTextTheme: GoogleFonts.openSansTextTheme().apply(
+        bodyColor: Colors.black,
+        displayColor: Colors.black,
+        decorationColor: Colors.black,
+      ),
+      // Text widget theme
+      textTheme: GoogleFonts.openSansTextTheme().apply(
+        bodyColor: Colors.black,
+        displayColor: Colors.black,
+        decorationColor: Colors.black,
+      ),
+      // Text field widget theme
+      inputDecorationTheme: InputDecorationTheme(
+          border: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black)),
+          errorStyle: GoogleFonts.openSans(fontSize: 14),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.indicatorColor),
+          ),
+          hintStyle: GoogleFonts.openSans(color: Colors.black),
+          labelStyle: GoogleFonts.openSans(color: Colors.black),
+          filled: true,
+          fillColor: Colors.white),
+      // Elevated button widget theme
+      elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+          const backColor = Colors.white;
+          if (states.contains(MaterialState.pressed) ||
+              states.contains(MaterialState.disabled)) {
+            return backColor.withOpacity(0.6);
+          }
+          return backColor;
+        }),
+      )),
+      // Icon widget theme
+      iconTheme: const IconThemeData(color: Colors.black),
+      // Default color scheme theme
       colorScheme: ColorScheme.fromSwatch(
               brightness: Brightness.light,
               primarySwatch: AppColors.primaryColor)
@@ -36,9 +76,49 @@ class AppTheme {
       primaryColor: AppColors.primaryColor,
       navigationRailTheme: navigationRailTheme,
       bottomNavigationBarTheme: bottomNavigationBarTheme,
-      textTheme: GoogleFonts.openSansTextTheme(),
-      colorScheme: ColorScheme.fromSwatch(primarySwatch: AppColors.primaryColor)
+      primaryTextTheme: GoogleFonts.openSansTextTheme().apply(
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
+        decorationColor: Colors.white,
+      ),
+      // Text widget theme
+      textTheme: GoogleFonts.openSansTextTheme().apply(
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
+        decorationColor: Colors.white,
+      ),
+      // Text field widget theme
+      inputDecorationTheme: InputDecorationTheme(
+          border: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black)),
+          errorStyle: GoogleFonts.openSans(fontSize: 14),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.indicatorColor),
+          ),
+          hintStyle: GoogleFonts.openSans(color: Colors.white),
+          labelStyle: GoogleFonts.openSans(color: Colors.white),
+          filled: true,
+          fillColor: AppColors.greyColor),
+      // Elevated button widget theme
+      elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+          const backColor = AppColors.greyColor;
+          if (states.contains(MaterialState.pressed) ||
+              states.contains(MaterialState.disabled)) {
+            return backColor.withOpacity(0.6);
+          }
+          return backColor;
+        }),
+      )),
+      // Icon widget theme
+      iconTheme: const IconThemeData(color: Colors.white),
+      // Default color scheme theme
+      colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: AppColors.colorToMaterialColor(Colors.white))
           .copyWith(
-              brightness: Brightness.dark,
-              background: const Color.fromARGB(254, 254, 252, 224)));
+              brightness: Brightness.dark, background: AppColors.greyColor));
 }

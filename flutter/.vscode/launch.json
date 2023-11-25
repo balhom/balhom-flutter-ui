@@ -10,12 +10,22 @@
             "type": "dart"
         },
         {
-            "name": "web",
+            "name": "web-html",
             "request": "launch",
             "type": "dart",
             "deviceId": "chrome",
             "args": [
                 "--web-renderer", "html",
+                "--web-port", "5000"
+            ]
+        },
+        {
+            "name": "web-canvaskit",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "chrome",
+            "args": [
+                "--web-renderer", "canvaskit",
                 "--web-port", "5000"
             ]
         }

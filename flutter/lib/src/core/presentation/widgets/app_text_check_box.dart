@@ -12,8 +12,7 @@ class AppTextCheckBox extends StatefulWidget {
       this.onChanged,
       this.fillColor,
       isChecked = false,
-      Key? key})
-      : super(key: key) {
+      super.key}) {
     isCheckedState.value = isChecked;
   }
 

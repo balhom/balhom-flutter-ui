@@ -156,7 +156,7 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
                                 onChanged: (value) {
                                   balanceValuesDto = balanceValuesDto!
                                       .copyWith(currencyType: value!);
-                                  // TODO show warning gialog about current conversion value
+                                  // TODO show warning dialog about current conversion value
                                 })
                             : const Icon(
                                 Icons.error_outline,

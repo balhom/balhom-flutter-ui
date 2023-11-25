@@ -11,8 +11,8 @@ WORKDIR /flutter
 RUN  apt-get update \
   && apt-get install -y wget tar xz-utils git \
   && rm -rf /var/lib/apt/lists/*
-RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.7.12-stable.tar.xz
-RUN tar -xf ./flutter_linux_3.7.12-stable.tar.xz && rm flutter_linux_3.7.12-stable.tar.xz
+RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.16.0-stable.tar.xz
+RUN tar -xf ./flutter_linux_3.16.0-stable.tar.xz && rm flutter_linux_3.16.0-stable.tar.xz
 ENV PATH="$PATH:/flutter/flutter/bin"
 RUN git config --global --add safe.directory /flutter/flutter
 RUN flutter precache

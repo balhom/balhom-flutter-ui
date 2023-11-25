@@ -4,7 +4,6 @@ import 'package:balance_home_app/src/core/domain/failures/failure.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/config/balhom_api_contract.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_summary_entity.dart';
-import 'package:balance_home_app/src/features/balance/domain/entities/balance_years_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_sorting_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:fpdart/fpdart.dart';
@@ -53,8 +52,10 @@ class BalanceRemoteDataSource {
         "${BalhomAPIContract.balanceYears}/${balanceTypeEnum.name.toUpperCase()}";
     final response = await apiClient.getRequest(balanceUrl);
     // Check if there is a request failure
-    return response.fold((failure) => left(failure),
-        (value) => right(BalanceYearsEntity.fromJson(value.data).years));
+    return response.fold(
+        (failure) => left(failure),
+        (value) =>
+            right((value.data as List<dynamic>).map((e) => e as int).toList()));
   }
 
   Future<Either<Failure, List<BalanceSummaryEntity>>> getMonthSummary(

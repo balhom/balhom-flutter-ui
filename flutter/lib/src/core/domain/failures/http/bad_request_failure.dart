@@ -8,8 +8,7 @@ part 'bad_request_failure.g.dart';
 /// Represents 400 request error
 @JsonSerializable(fieldRename: FieldRename.snake)
 class BadRequestFailure extends HttpRequestFailure {
-  const BadRequestFailure({required String detail})
-      : super(statusCode: 400, detail: detail);
+  const BadRequestFailure({required super.detail}) : super(statusCode: 400);
 
   // Serialization
   factory BadRequestFailure.fromJson(final Map<String, dynamic> json) {

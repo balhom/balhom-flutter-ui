@@ -15,13 +15,18 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppBar extends ConsumerWidget {
-  const CustomAppBar({Key? key}) : super(key: key);
+  const CustomAppBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final account = ref.watch(accountControllerProvider).asData?.value;
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
+    final accountState = ref.watch(accountControllerProvider);
+    final account = accountState.asData?.value;
+
+    ref.read(accountControllerProvider.notifier);
+
+    // TODO change to customized widget
     return AppBar(
       automaticallyImplyLeading: false,
       systemOverlayStyle: const SystemUiOverlayStyle(
@@ -49,11 +54,20 @@ class CustomAppBar extends ConsumerWidget {
           ? 250
           : 0,
       actions: [
-        _profileButton(appLocalizations, account),
-        if (account == null)
-          Container(
+        accountState.when(data: (account) {
+          return _profileButton(appLocalizations, account);
+        }, loading: () {
+          return Container(
               margin: const EdgeInsets.all(5),
-              child: const CircularProgressIndicator(strokeWidth: 5)),
+              child: const CircularProgressIndicator(strokeWidth: 5));
+        }, error: (_, __) {
+          return Container(
+              margin: const EdgeInsets.all(5),
+              child: const Icon(
+                Icons.error_outline,
+                color: Colors.red,
+              ));
+        })
       ],
     );
   }
@@ -68,7 +82,7 @@ class CustomAppBar extends ConsumerWidget {
         color: const Color.fromARGB(255, 12, 12, 12),
         child: Center(
           child: Text(
-            "${appLocalizations.balance}: ${account == null ? "-" : account.balance} "
+            "${appLocalizations.balance}: ${account == null ? "-" : account.currentBalance} "
             "${account == null ? "" : account.prefCurrencyType}",
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.openSans(fontSize: 17, color: Colors.white),

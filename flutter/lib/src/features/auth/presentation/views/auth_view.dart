@@ -41,10 +41,10 @@ class AuthView extends ConsumerWidget {
 
     final isConnected = connectionStateListenable.value;
 
-    final currencyTypeListController =
+    final currencyTypeListState =
         ref.watch(currencyTypeListsControllerProvider);
 
-    return AppWillPopScope(
+    return AppPopScope(
       child: Scaffold(
         appBar: AppBar(
             title: const AppTitle(fontSize: 30),
@@ -52,7 +52,7 @@ class AuthView extends ConsumerWidget {
             automaticallyImplyLeading: false),
         body: SafeArea(
           child: AuthBackgroundWidget(
-              child: currencyTypeListController.when<Widget>(
+              child: currencyTypeListState.when<Widget>(
                   data: (currencyTypes) {
             cache.value = Column(
               children: [
@@ -73,9 +73,11 @@ class AuthView extends ConsumerWidget {
                     child: Column(
                       children: [
                         TabBar(
+                            tabAlignment: TabAlignment.center,
                             isScrollable: true,
-                            indicatorColor:
-                                const Color.fromARGB(255, 7, 136, 76),
+                            indicatorColor: AppColors.indicatorColor,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            dividerColor: Colors.transparent,
                             tabs: [
                               Tab(
                                 child: Text(
