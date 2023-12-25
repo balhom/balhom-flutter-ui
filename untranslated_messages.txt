@@ -1,0 +1,15 @@
+{
+  "es": [
+    "send",
+    "emailVerifiaction",
+    "emailVerifiactionAdvice",
+    "passwordTooCommon"
+  ],
+
+  "fr": [
+    "send",
+    "emailVerifiaction",
+    "emailVerifiactionAdvice",
+    "passwordTooCommon"
+  ]
+}
