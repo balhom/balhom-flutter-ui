@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'flutter/**'
 
 jobs:
   build-test-upload:
@@ -23,7 +21,7 @@ jobs:
 
       - name: Check build Docker Image
         run: |
-          export APP_VERSION=$(grep -m 1 version flutter/pubspec.yaml | tr -s ' ' | cut -d' ' -f2 | cut -d'+' -f1 | tr -d '\n' | tr -d '\r')
+          export APP_VERSION=$(grep -m 1 version pubspec.yaml | tr -s ' ' | cut -d' ' -f2 | cut -d'+' -f1 | tr -d '\n' | tr -d '\r')
           export MAJOR_VERSION=$(echo "${APP_VERSION}" | cut -d. -f1,2)
           echo "Using version ${APP_VERSION}"
           # Tag variables
@@ -47,4 +45,3 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_REPO_NAME: ${{ secrets.DOCKER_REPO_NAME }}
-        working-directory: ./flutter
