@@ -71,6 +71,8 @@ dev_dependencies:
   json_serializable: ^6.7.1
   # Env code generator
   envied_generator: ^0.5.2
+  # Icons generation
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   # Material Icons font is included with your application.
@@ -81,5 +83,14 @@ flutter:
   assets:
     - assets/images/
     - assets/google_fonts/
-  # To add custom fonts to your application, add a fonts section here
-  # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  image_path: "assets/icon/balhom_icon.png"
+  android: true
+  ios: true
+  web:
+    generate: true
+  windows:
+    generate: true
+  macos:
+    generate: true
