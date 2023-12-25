@@ -16,18 +16,17 @@ class DateUtil {
   }
 
   static String monthNumToString(int month, AppLocalizations appLocalizations) {
-    return DateFormat("MMM", appLocalizations.localeName)
-        .format(DateTime(DateTime.now().year, month));
+    return DateFormat.MMM(appLocalizations.localeName)
+        .format(DateTime(DateTime.now().year, month))
+        .toUpperCase();
   }
 
   static Map<int, String> getMonthDict(AppLocalizations appLocalizations,
       {int? year}) {
     final monthDict = <int, String>{};
-    final monthFormatter = DateFormat.MMM(appLocalizations.localeName);
     final now = DateTime.now();
     for (int monthIndex = 1; monthIndex <= 12; monthIndex++) {
-      monthDict[monthIndex] =
-          monthFormatter.format(DateTime(now.year, monthIndex));
+      monthDict[monthIndex] = monthNumToString(monthIndex, appLocalizations);
       if (year == now.year && monthIndex == now.month) {
         return monthDict;
       }

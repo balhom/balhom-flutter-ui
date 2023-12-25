@@ -16,8 +16,12 @@ class BalanceListController
   final SelectedDateDto selectedDateDto;
 
   BalanceListController(
-      {required this.balanceRepository, required this.selectedDateDto})
-      : super(AsyncValue.data(right([])));
+      {required this.balanceRepository,
+      required this.selectedDateDto,
+      required BalanceTypeEnum balanceTypeEnum})
+      : super(AsyncValue.data(right([]))) {
+    getBalances(balanceTypeEnum, BalanceSortingEnum.descDate, 1);
+  }
 
   Future<void> getBalances(final BalanceTypeEnum balanceTypeEnum,
       final BalanceSortingEnum balanceSortingEnum, final int page) async {

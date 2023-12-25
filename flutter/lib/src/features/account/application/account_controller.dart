@@ -52,17 +52,18 @@ class AccountController extends StateNotifier<AsyncValue<AccountEntity?>> {
   Future<Either<Failure, AccountEntity>> update(
       final AccountEditValuesDto accountEditValuesDto,
       final AppLocalizations appLocalizations) async {
+    final stateCache = state.asData?.value;
     state = const AsyncValue.loading();
     return await accountEditValuesDto.toEntity().fold((failure) {
-      state = const AsyncValue.data(null);
+      state = AsyncValue.data(stateCache);
       return left(failure);
     }, (accountEntity) async {
       final res = await accountRepository.update(accountEntity);
       return res.fold((failure) {
-        state = const AsyncValue.data(null);
+        state = AsyncValue.data(stateCache);
         return left(AccountEditFailure.fromFailure(failure, appLocalizations));
       }, (value) {
-        state = const AsyncValue.data(null);
+        state = AsyncValue.data(value);
         return right(value);
       });
     });

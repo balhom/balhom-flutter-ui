@@ -131,46 +131,47 @@ class BalanceView extends ConsumerWidget {
     final dateText = (selectedDate.selectedDateMode == SelectedDateEnum.year)
         ? yearFormatter.format(selectedDate.dateFrom)
         : (selectedDate.selectedDateMode == SelectedDateEnum.month)
-            ? monthFormatter.format(selectedDate.dateFrom)
-            : dayFormatter.format(selectedDate.dateFrom);
+            ? monthFormatter.format(selectedDate.dateFrom).toUpperCase()
+            : dayFormatter.format(selectedDate.dateFrom).toUpperCase();
 
     final screenWidth = MediaQuery.of(context).size.width;
     final topContainer = Container(
-      color: balanceTypeEnum.isExpense()
-          ? const Color.fromARGB(255, 212, 112, 78)
-          : const Color.fromARGB(255, 76, 122, 52),
-      constraints: BoxConstraints.tightFor(
-          height: 45,
-          width: screenWidth < 550
-              ? screenWidth
-              : screenWidth < 1024
-                  ? screenWidth - 100
-                  : screenWidth - 173),
-      child: Center(
-          child: Text(dateText,
-              style: GoogleFonts.openSans(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold))),
-    );
+        color: balanceTypeEnum.isExpense()
+            ? const Color.fromARGB(255, 212, 112, 78)
+            : const Color.fromARGB(255, 76, 122, 52),
+        height: 45,
+        alignment: Alignment.center,
+        child: Text(dateText,
+            style: GoogleFonts.openSans(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold)));
 
-    final dateBtn = AppTextButton(
-      text: appLocalizations.date,
-      backgroundColor: balanceTypeEnum.isExpense()
+    final dateBtn = Container(
+      color: balanceTypeEnum.isExpense()
           ? const Color.fromARGB(255, 160, 71, 41)
           : const Color.fromARGB(255, 54, 90, 35),
-      onPressed: () async {
-        await showDateBalanceDialog(
-            appLocalizations, selectedDateState, selectedDate, balanceYears);
-      },
-      height: 45,
-      width: screenWidth < 550 ? screenWidth : 100,
+      child: AppTextButton(
+        text: appLocalizations.date,
+        backgroundColor: balanceTypeEnum.isExpense()
+            ? const Color.fromARGB(255, 160, 71, 41)
+            : const Color.fromARGB(255, 54, 90, 35),
+        onPressed: () async {
+          await showDateBalanceDialog(
+              appLocalizations, selectedDateState, selectedDate, balanceYears);
+        },
+        height: 45,
+        width: screenWidth < 550 ? screenWidth : 100,
+      ),
     );
 
     return ResponsiveLayout(
-        mobileChild: Column(children: [dateBtn, topContainer]),
-        tabletChild: Row(children: [dateBtn, topContainer]),
-        desktopChild: Row(children: [dateBtn, topContainer]));
+        mobileChild: Column(children: [
+          dateBtn,
+          SizedBox(width: screenWidth, child: topContainer)
+        ]),
+        tabletChild: Row(children: [dateBtn, Expanded(child: topContainer)]),
+        desktopChild: Row(children: [dateBtn, Expanded(child: topContainer)]));
   }
 
   Future<void> showDateBalanceDialog(

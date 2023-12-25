@@ -68,30 +68,30 @@ class BalanceList extends ConsumerWidget {
 
   @visibleForTesting
   List<BalanceEntity> orderBalances(
-      BalanceOrderingType orderingType, BalanceLimitType limitType) {
+      BalanceOrderingTypeEnum orderingType, BalanceLimitTypeEnum limitType) {
     List<BalanceEntity> aux = [];
     for (BalanceEntity balance in balances) {
       int i = 0;
       while (i < aux.length) {
         // Case Date ordering
-        if (orderingType == BalanceOrderingType.date &&
+        if (orderingType == BalanceOrderingTypeEnum.date &&
             balance.date.isAfter(aux.elementAt(i).date)) break;
         // Case Quantity ordering
-        if (orderingType == BalanceOrderingType.quantity &&
+        if (orderingType == BalanceOrderingTypeEnum.quantity &&
             balance.convertedQuantity! > aux.elementAt(i).convertedQuantity!) {
           break;
         }
         // Case Name ordering
-        if (orderingType == BalanceOrderingType.name &&
+        if (orderingType == BalanceOrderingTypeEnum.name &&
             balance.name.compareTo(aux.elementAt(i).name) < 0) break;
         i++;
       }
       aux.insert(i, balance);
     }
-    if (limitType != BalanceLimitType.none) {
-      if (limitType == BalanceLimitType.limit5) {
+    if (limitType != BalanceLimitTypeEnum.none) {
+      if (limitType == BalanceLimitTypeEnum.limit5) {
         aux = aux.take(5).toList();
-      } else if (limitType == BalanceLimitType.limit15) {
+      } else if (limitType == BalanceLimitTypeEnum.limit15) {
         aux = aux.take(15).toList();
       }
     }

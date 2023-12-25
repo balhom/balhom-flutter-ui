@@ -9,6 +9,7 @@ import 'package:balance_home_app/src/features/balance/application/balance_type_l
 import 'package:balance_home_app/src/features/balance/application/balance_year_controller.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balance_home_app/src/features/balance/domain/entities/balance_type_entity.dart';
+import 'package:balance_home_app/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_repository_interface.dart';
 import 'package:balance_home_app/src/features/balance/domain/repositories/balance_type_respository_interface.dart';
 import 'package:balance_home_app/src/features/balance/infrastructure/datasources/local/balance_type_local_data_source.dart';
@@ -78,7 +79,9 @@ final revenueListControllerProvider = StateNotifierProvider<
   final balanceRepository = ref.watch(balanceRepositoryProvider);
   final selectedDate = ref.watch(revenueSelectedDateProvider);
   return BalanceListController(
-      balanceRepository: balanceRepository, selectedDateDto: selectedDate);
+      balanceRepository: balanceRepository,
+      selectedDateDto: selectedDate,
+      balanceTypeEnum: BalanceTypeEnum.revenue);
 });
 
 final expenseListControllerProvider = StateNotifierProvider<
@@ -87,7 +90,9 @@ final expenseListControllerProvider = StateNotifierProvider<
   final balanceRepository = ref.watch(balanceRepositoryProvider);
   final selectedDate = ref.watch(revenueSelectedDateProvider);
   return BalanceListController(
-      balanceRepository: balanceRepository, selectedDateDto: selectedDate);
+      balanceRepository: balanceRepository,
+      selectedDateDto: selectedDate,
+      balanceTypeEnum: BalanceTypeEnum.expense);
 });
 
 final balanceCreateControllerProvider =
@@ -104,11 +109,20 @@ final balanceEditControllerProvider =
   return BalanceEditController(balanceRepository: balanceRepository);
 });
 
-final balanceTypeListControllerProvider = StateNotifierProvider<
+final expenseTypeListControllerProvider = StateNotifierProvider<
     BalanceTypeListController, AsyncValue<List<BalanceTypeEntity>>>((ref) {
   final balanceTypeRepository = ref.watch(balanceTypeRepositoryProvider);
   return BalanceTypeListController(
-      balanceTypeRepository: balanceTypeRepository);
+      balanceTypeRepository: balanceTypeRepository,
+      balanceTypeEnum: BalanceTypeEnum.expense);
+});
+
+final revenueTypeListControllerProvider = StateNotifierProvider<
+    BalanceTypeListController, AsyncValue<List<BalanceTypeEntity>>>((ref) {
+  final balanceTypeRepository = ref.watch(balanceTypeRepositoryProvider);
+  return BalanceTypeListController(
+      balanceTypeRepository: balanceTypeRepository,
+      balanceTypeEnum: BalanceTypeEnum.revenue);
 });
 
 final balanceYearsControllerProvider =
@@ -123,26 +137,28 @@ final balanceYearsControllerProvider =
 
 /// Limit type for revenues
 final revenueLimitTypeProvider =
-    StateNotifierProvider<BalanceLimitTypeState, BalanceLimitType>((ref) {
-  return BalanceLimitTypeState(BalanceLimitType.limit15);
+    StateNotifierProvider<BalanceLimitTypeState, BalanceLimitTypeEnum>((ref) {
+  return BalanceLimitTypeState(BalanceLimitTypeEnum.limit15);
 });
 
 /// Limit type for expenses
 final expenseLimitTypeProvider =
-    StateNotifierProvider<BalanceLimitTypeState, BalanceLimitType>((ref) {
-  return BalanceLimitTypeState(BalanceLimitType.limit15);
+    StateNotifierProvider<BalanceLimitTypeState, BalanceLimitTypeEnum>((ref) {
+  return BalanceLimitTypeState(BalanceLimitTypeEnum.limit15);
 });
 
 /// Ordering type for revenues
 final revenueOrderingTypeProvider =
-    StateNotifierProvider<BalanceOrderingTypeState, BalanceOrderingType>((ref) {
-  return BalanceOrderingTypeState(BalanceOrderingType.date);
+    StateNotifierProvider<BalanceOrderingTypeState, BalanceOrderingTypeEnum>(
+        (ref) {
+  return BalanceOrderingTypeState(BalanceOrderingTypeEnum.date);
 });
 
 /// Ordering type for expenses
 final expenseOrderingTypeProvider =
-    StateNotifierProvider<BalanceOrderingTypeState, BalanceOrderingType>((ref) {
-  return BalanceOrderingTypeState(BalanceOrderingType.date);
+    StateNotifierProvider<BalanceOrderingTypeState, BalanceOrderingTypeEnum>(
+        (ref) {
+  return BalanceOrderingTypeState(BalanceOrderingTypeEnum.date);
 });
 
 /// Selected date for revenues

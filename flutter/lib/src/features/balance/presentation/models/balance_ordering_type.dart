@@ -1,1 +1,1 @@
-enum BalanceOrderingType { name, quantity, date }
+enum BalanceOrderingTypeEnum { name, quantity, date }

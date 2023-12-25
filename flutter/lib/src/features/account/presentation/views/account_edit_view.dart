@@ -43,7 +43,7 @@ class _AccountEditViewState extends ConsumerState<AccountEditView> {
     final isConnected = connectionStateListenable.value;
 
     return accountState.when(data: (accountEntity) {
-      String lastLogin = accountEntity == null
+      final String lastLogin = accountEntity == null
           ? "-"
           : accountEntity.lastLogin == null
               ? "-"
@@ -103,7 +103,7 @@ class _AccountEditViewState extends ConsumerState<AccountEditView> {
           background: widget.cache.value,
           text: appLocalizations.genericError);
     }, loading: () {
-      return showLoading(background: widget.cache.value);
+      return widget.cache.value;
     });
   }
 }

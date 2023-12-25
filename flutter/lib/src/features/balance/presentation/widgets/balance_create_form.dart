@@ -63,7 +63,9 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
         ref.read(balanceCreateControllerProvider.notifier);
     final balanceCreate = ref.watch(balanceCreateControllerProvider);
 
-    final balanceTypes = ref.watch(balanceTypeListControllerProvider);
+    final balanceTypesState = widget.balanceTypeEnum.isExpense()
+        ? ref.watch(expenseTypeListControllerProvider)
+        : ref.watch(revenueTypeListControllerProvider);
 
     final accountController = ref.read(accountControllerProvider.notifier);
     final accountState = ref.watch(accountControllerProvider);
@@ -73,7 +75,7 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
     return accountState.when(data: (accountEntity) {
       // This is used to refresh page in case handle controller
       return balanceCreate.when(data: (_) {
-        return balanceTypes.when(data: (balanceTypes) {
+        return balanceTypesState.when(data: (balanceTypes) {
           // Initialize balance values dto
           balanceValuesDto ??= defaultBalanceValuesDto(
               accountEntity!.prefCurrencyType,

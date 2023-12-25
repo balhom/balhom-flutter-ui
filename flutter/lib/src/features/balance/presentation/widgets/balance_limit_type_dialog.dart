@@ -16,7 +16,7 @@ class BalanceLimitTypeDialog extends ConsumerWidget {
         ? ref.read(expenseLimitTypeProvider.notifier)
         : ref.read(revenueLimitTypeProvider.notifier);
 
-    final BalanceLimitType limitType = balanceTypeEnum.isExpense()
+    final BalanceLimitTypeEnum limitType = balanceTypeEnum.isExpense()
         ? ref.watch(expenseLimitTypeProvider)
         : ref.watch(revenueLimitTypeProvider);
     final appLocalizations = ref.read(appLocalizationsProvider);
@@ -30,14 +30,14 @@ class BalanceLimitTypeDialog extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                BalanceLimitType.limit5,
-                BalanceLimitType.limit15,
-                BalanceLimitType.none,
+                BalanceLimitTypeEnum.limit5,
+                BalanceLimitTypeEnum.limit15,
+                BalanceLimitTypeEnum.none,
               ]
                   .map((e) => RadioListTile(
-                        title: Text(e == BalanceLimitType.limit5
+                        title: Text(e == BalanceLimitTypeEnum.limit5
                             ? "5"
-                            : e == BalanceLimitType.limit15
+                            : e == BalanceLimitTypeEnum.limit15
                                 ? "15"
                                 : appLocalizations.noLimit),
                         value: e,

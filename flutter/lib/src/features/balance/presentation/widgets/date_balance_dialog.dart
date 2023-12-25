@@ -47,7 +47,7 @@ class _DateBalanceDialogState extends ConsumerState<DateBalanceDialog> {
         title: Text(appLocalizations.date),
         content: SingleChildScrollView(
           child: SizedBox(
-            height: 250,
+            height: 270,
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               dayRow(appLocalizations, theme),

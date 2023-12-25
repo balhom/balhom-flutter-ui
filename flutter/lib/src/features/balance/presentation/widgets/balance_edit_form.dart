@@ -76,7 +76,9 @@ class _BalanceEditFormState extends ConsumerState<BalanceEditForm> {
     final balanceEditController =
         ref.read(balanceEditControllerProvider.notifier);
 
-    final balanceTypesState = ref.watch(balanceTypeListControllerProvider);
+    final balanceTypesState = widget.balanceTypeEnum.isExpense()
+        ? ref.watch(expenseTypeListControllerProvider)
+        : ref.watch(revenueTypeListControllerProvider);
 
     final accountController = ref.read(accountControllerProvider.notifier);
 

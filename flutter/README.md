@@ -1,5 +1,7 @@
 # Flutter Frontend
 
+> Flutter Version: 3.16.3
+
 Multiplatform frontend of Balance Home App, ```riverpod``` is used for state management and ```go_router``` for navigation.
 
 ## Architecture diagram

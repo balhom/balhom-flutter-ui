@@ -3,10 +3,9 @@ import 'package:balance_home_app/src/core/presentation/widgets/app_will_pop_scop
 import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/core/utils/platform_utils.dart';
 import 'package:balance_home_app/src/features/balance/presentation/views/balance_view.dart';
-import 'package:balance_home_app/src/features/balance/providers.dart';
 import 'package:balance_home_app/src/features/currency/providers.dart';
 import 'package:balance_home_app/src/features/home/presentation/views/home_tabs.dart';
-import 'package:balance_home_app/src/features/home/presentation/widgets/app_bar.dart';
+import 'package:balance_home_app/src/features/home/presentation/widgets/custom_app_bar.dart';
 import 'package:balance_home_app/src/features/statistics/presentation/views/statistics_view.dart';
 import 'package:balance_home_app/src/features/statistics/providers.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeView extends ConsumerStatefulWidget {
-  final HomeTab selectedSection;
+  final HomeTabEnum selectedSection;
   final Widget child;
 
   const HomeView(
@@ -44,12 +43,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
         body: SafeArea(child: widget.child),
         selectedIndex: widget.selectedSection.index,
         onDestinationSelected: (int index) {
-          switch (HomeTab.values[index]) {
-            case HomeTab.statistics:
+          switch (HomeTabEnum.values[index]) {
+            case HomeTabEnum.statistics:
               final selectedDate =
                   ref.read(statisticsBalanceSelectedDateProvider);
 
-              ref.read(balanceYearsControllerProvider.notifier).get();
               ref
                   .read(monthlyBalanceListControllerProvider.notifier)
                   .get(selectedDate);
@@ -63,10 +61,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
               context.go("/${StatisticsView.routePath}");
               break;
-            case HomeTab.revenues:
+            case HomeTabEnum.revenues:
               context.go("/${BalanceView.routeRevenuePath}");
               break;
-            case HomeTab.expenses:
+            case HomeTabEnum.expenses:
               context.go("/${BalanceView.routeExpensePath}");
               break;
           }

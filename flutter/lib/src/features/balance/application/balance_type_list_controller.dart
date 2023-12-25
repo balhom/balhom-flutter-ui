@@ -8,8 +8,12 @@ class BalanceTypeListController
     extends StateNotifier<AsyncValue<List<BalanceTypeEntity>>> {
   final BalanceTypeRepositoryInterface balanceTypeRepository;
 
-  BalanceTypeListController({required this.balanceTypeRepository})
-      : super(const AsyncValue.data([]));
+  BalanceTypeListController(
+      {required this.balanceTypeRepository,
+      required BalanceTypeEnum balanceTypeEnum})
+      : super(const AsyncValue.data([])) {
+    get(balanceTypeEnum);
+  }
 
   Future<void> get(final BalanceTypeEnum balanceTypeEnum) async {
     state = const AsyncValue.loading();

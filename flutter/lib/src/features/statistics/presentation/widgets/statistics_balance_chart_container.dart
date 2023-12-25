@@ -70,7 +70,7 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
                   child: Text(
                       dateMode == SelectedDateEnum.month
                           ? "${appLocalizations.balanceChartTitle} $selectedMonthAsStr"
-                          : "${appLocalizations.balanceChartTitle} $selectedDate.year",
+                          : "${appLocalizations.balanceChartTitle} ${selectedDate.year}",
                       style: GoogleFonts.openSans(
                           color: Colors.white,
                           fontSize: 18,

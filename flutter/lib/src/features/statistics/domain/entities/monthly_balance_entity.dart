@@ -10,7 +10,7 @@ class MonthlyBalanceEntity with _$MonthlyBalanceEntity {
   /// Factory constructor
   /// [grossQuantity] - [double] gross quantity
   /// [expectedQuantity] - [double] expected quantity
-  /// [coinType] - [String] coin type code
+  /// [currencyType] - [String] coin type code
   /// [year] - [int] year
   /// [month] - [int] month
   /// [created] - [DateTime] created
@@ -19,7 +19,7 @@ class MonthlyBalanceEntity with _$MonthlyBalanceEntity {
   const factory MonthlyBalanceEntity({
     required double grossQuantity,
     required double expectedQuantity,
-    required String coinType,
+    required String currencyType,
     required int year,
     required int month,
     required DateTime created,

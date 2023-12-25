@@ -1,4 +1,4 @@
-enum HomeTab {
+enum HomeTabEnum {
   statistics,
   revenues,
   expenses

@@ -9,7 +9,6 @@ import 'package:balance_home_app/src/core/providers.dart';
 import 'package:balance_home_app/src/features/account/domain/entities/account_entity.dart';
 import 'package:balance_home_app/src/features/settings/presentation/views/settings_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,49 +25,60 @@ class CustomAppBar extends ConsumerWidget {
 
     ref.read(accountControllerProvider.notifier);
 
-    // TODO change to customized widget
-    return AppBar(
-      automaticallyImplyLeading: false,
-      systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.white10,
-          statusBarBrightness: Brightness.dark, //Dark icons for Android
-          statusBarIconBrightness: Brightness.dark //Dark icons for iOS
+    final width = MediaQueryData.fromView(
+            WidgetsBinding.instance.platformDispatcher.views.first)
+        .size
+        .width;
+
+    return Container(
+      width: width,
+      height: 70,
+      color: AppColors.appBarBackgroundColor,
+      child: Row(
+        children: [
+          // Left Corner
+          if (PlatformUtils.isLargeWindow(context) ||
+              PlatformUtils.isMediumWindow(context))
+            SizedBox(
+              width: width / 3,
+              child: Container(
+                alignment: Alignment.centerLeft,
+                child: _balanceBox(appLocalizations, account),
+              ),
+            ),
+          // Center Corner
+          Expanded(
+            child: Container(
+              alignment: Alignment.center,
+              child: (PlatformUtils.isLargeWindow(context) ||
+                      PlatformUtils.isMediumWindow(context))
+                  ? const AppTitle(fontSize: 30)
+                  : _balanceBox(appLocalizations, account),
+            ),
           ),
-      titleSpacing: 0,
-      elevation: 0,
-      centerTitle: true,
-      backgroundColor: AppColors.appBarBackgroundColor,
-      // If platform window is considered as large or medium, then the [AppTittle]
-      // should be shown, otherwise if mobile is the current platform nothing will be shown,
-      // else cases a balance counter should be rendered
-      title: (PlatformUtils.isLargeWindow(context) ||
-              PlatformUtils.isMediumWindow(context))
-          ? const AppTitle(fontSize: 30)
-          : _balanceBox(appLocalizations, account),
-      leading: (PlatformUtils.isLargeWindow(context) ||
-              PlatformUtils.isMediumWindow(context))
-          ? _balanceBox(appLocalizations, account)
-          : null,
-      leadingWidth: (PlatformUtils.isLargeWindow(context) ||
-              PlatformUtils.isMediumWindow(context))
-          ? 250
-          : 0,
-      actions: [
-        accountState.when(data: (account) {
-          return _profileButton(appLocalizations, account);
-        }, loading: () {
-          return Container(
-              margin: const EdgeInsets.all(5),
-              child: const CircularProgressIndicator(strokeWidth: 5));
-        }, error: (_, __) {
-          return Container(
-              margin: const EdgeInsets.all(5),
-              child: const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-              ));
-        })
-      ],
+          // Right Corner
+          Container(
+            width: PlatformUtils.isSmallWindow(context) ? null : width / 3,
+            alignment: Alignment.centerRight,
+            child: Container(
+                alignment: Alignment.centerRight,
+                child: accountState.when(data: (account) {
+                  return _profileButton(context, appLocalizations, account);
+                }, loading: () {
+                  return Container(
+                      margin: const EdgeInsets.all(5),
+                      child: const CircularProgressIndicator(strokeWidth: 5));
+                }, error: (_, __) {
+                  return Container(
+                      margin: const EdgeInsets.all(5),
+                      child: const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                      ));
+                })),
+          ),
+        ],
+      ),
     );
   }
 
@@ -77,7 +87,6 @@ class CustomAppBar extends ConsumerWidget {
   Widget _balanceBox(
       AppLocalizations appLocalizations, AccountEntity? account) {
     return Container(
-        width: 400,
         height: 100,
         color: const Color.fromARGB(255, 12, 12, 12),
         child: Center(
@@ -92,8 +101,8 @@ class CustomAppBar extends ConsumerWidget {
 
   /// Returns a [Widget] that includes a button with the image
   /// profile and name of the account.
-  Widget _profileButton(
-      AppLocalizations appLocalizations, AccountEntity? account) {
+  Widget _profileButton(BuildContext context, AppLocalizations appLocalizations,
+      AccountEntity? account) {
     final isConnected = connectionStateListenable.value;
     return PopupMenuButton(
       onSelected: (value) {
@@ -126,6 +135,7 @@ class CustomAppBar extends ConsumerWidget {
         ];
       },
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           if (account != null)
             Container(
@@ -141,11 +151,12 @@ class CustomAppBar extends ConsumerWidget {
                   : Image.network(account.image!),
             ),
           if (account != null)
-            if (!PlatformUtils.isMobile)
+            if (!PlatformUtils.isSmallWindow(context))
               Container(
                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 child: Text(
                   account.username,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.openSans(
                       fontSize: 17,
                       color: const Color.fromARGB(255, 202, 202, 202)),

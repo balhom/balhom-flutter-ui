@@ -15,7 +15,7 @@ class BalanceOrderingTypeDialog extends ConsumerWidget {
     final balanceOrderingTypeNotifier = balanceTypeEnum.isExpense()
         ? ref.read(expenseOrderingTypeProvider.notifier)
         : ref.read(revenueOrderingTypeProvider.notifier);
-    final BalanceOrderingType orderingType = balanceTypeEnum.isExpense()
+    final BalanceOrderingTypeEnum orderingType = balanceTypeEnum.isExpense()
         ? ref.watch(expenseOrderingTypeProvider)
         : ref.watch(revenueOrderingTypeProvider);
     final appLocalizations = ref.read(appLocalizationsProvider);
@@ -27,14 +27,14 @@ class BalanceOrderingTypeDialog extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                BalanceOrderingType.date,
-                BalanceOrderingType.name,
-                BalanceOrderingType.quantity,
+                BalanceOrderingTypeEnum.date,
+                BalanceOrderingTypeEnum.name,
+                BalanceOrderingTypeEnum.quantity,
               ]
                   .map((e) => RadioListTile(
-                        title: Text((e == BalanceOrderingType.date)
+                        title: Text((e == BalanceOrderingTypeEnum.date)
                             ? appLocalizations.date
-                            : (e == BalanceOrderingType.name)
+                            : (e == BalanceOrderingTypeEnum.name)
                                 ? appLocalizations.name
                                 : appLocalizations.quantity),
                         value: e,

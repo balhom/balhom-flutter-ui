@@ -1,1 +1,1 @@
-enum BalanceLimitType { limit5, limit15, none }
+enum BalanceLimitTypeEnum { limit5, limit15, none }

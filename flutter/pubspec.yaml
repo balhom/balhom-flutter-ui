@@ -28,7 +28,7 @@ dependencies:
     sdk: flutter
   intl: ^0.18.0
   # Get version info
-  package_info_plus: ^4.0.0
+  package_info_plus: ^5.0.1
   # Http request
   dio: ^5.1.1
   http_parser: ^4.0.2
@@ -59,7 +59,7 @@ dependencies:
   # Flags images
   flag: ^7.0.0
   # Graphics
-  fl_chart: ^0.64.0
+  fl_chart: ^0.65.0
   syncfusion_flutter_charts: ^23.1.44
   # Env code generation
   envied: ^0.5.1
