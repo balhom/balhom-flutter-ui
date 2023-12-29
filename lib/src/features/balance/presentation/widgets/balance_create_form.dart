@@ -1,3 +1,4 @@
+import 'package:balhom/src/core/domain/failures/failure.dart';
 import 'package:balhom/src/core/presentation/widgets/app_date_time_form_picker.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/src/core/presentation/widgets/double_form_field.dart';
@@ -55,26 +56,22 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
   Widget build(BuildContext context) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
-    final balanceListController = widget.balanceTypeEnum.isExpense()
-        ? ref.read(expenseListControllerProvider.notifier)
-        : ref.read(revenueListControllerProvider.notifier);
-
-    final balanceCreateController =
-        ref.read(balanceCreateControllerProvider.notifier);
-    final balanceCreate = ref.watch(balanceCreateControllerProvider);
+    final balanceCreateUseCase =
+        ref.read(balanceCreateUseCaseProvider.notifier);
+    final balanceCreateState = ref.watch(balanceCreateUseCaseProvider);
 
     final balanceTypesState = widget.balanceTypeEnum.isExpense()
-        ? ref.watch(expenseTypeListControllerProvider)
-        : ref.watch(revenueTypeListControllerProvider);
+        ? ref.watch(expenseTypeListUseCaseProvider)
+        : ref.watch(revenueTypeListUseCaseProvider);
 
-    final accountController = ref.read(accountControllerProvider.notifier);
-    final accountState = ref.watch(accountControllerProvider);
+    final accountGetUseCase = ref.read(accountGetUseCaseProvider.notifier);
+    final accountGetState = ref.watch(accountGetUseCaseProvider);
 
-    final currencyTypesState = ref.watch(currencyTypeListsControllerProvider);
+    final currencyTypesState = ref.watch(currencyTypeListsUseCaseProvider);
 
-    return accountState.when(data: (accountEntity) {
+    return accountGetState.when(data: (accountEntity) {
       // This is used to refresh page in case handle controller
-      return balanceCreate.when(data: (_) {
+      return balanceCreateState.when(data: (_) {
         return balanceTypesState.when(data: (balanceTypes) {
           // Initialize balance values dto
           balanceValuesDto ??= defaultBalanceValuesDto(
@@ -196,19 +193,24 @@ class _BalanceCreateFormState extends ConsumerState<BalanceCreateForm> {
                               !widget.formKey.currentState!.validate()) {
                             return;
                           }
-                          (await balanceCreateController.create(
-                                  balanceValuesDto!, appLocalizations))
-                              .fold((failure) {
-                            showErrorBalanceCreationDialog(appLocalizations,
-                                failure.detail, widget.balanceTypeEnum);
-                          }, (entity) {
+                          await balanceCreateUseCase.handle(
+                              balanceValuesDto!, appLocalizations);
+                          final updatedBalanceCreateState =
+                              ref.read(balanceCreateUseCaseProvider);
+                          if (updatedBalanceCreateState.hasError) {
+                            showErrorBalanceCreationDialog(
+                                appLocalizations,
+                                (updatedBalanceCreateState.asError!.error
+                                        as Failure)
+                                    .detail,
+                                widget.balanceTypeEnum);
+                          } else {
                             router.goNamed(widget.balanceTypeEnum.isExpense()
                                 ? BalanceView.routeExpenseName
                                 : BalanceView.routeRevenueName);
-                            balanceListController.addBalance(entity);
                             // Refresh UI account data
-                            accountController.get();
-                          });
+                            accountGetUseCase.handle();
+                          }
                         },
                         text: appLocalizations.create,
                       ),

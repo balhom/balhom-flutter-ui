@@ -7,5 +7,8 @@ class AppLayout {
   static const double cardRadius = 10;
   
   /// Default Card border radius
-  static const double containerRadius = 20;
+  static const double containerBorderRadius = 20;
+  
+  /// Default Button border radius
+  static const double buttonBorderRadius = 20;
 }

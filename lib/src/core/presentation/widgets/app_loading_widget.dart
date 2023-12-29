@@ -17,7 +17,7 @@ class AppLoadingWidget extends StatelessWidget {
         width: 170,
         height: 170,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppLayout.containerRadius),
+          borderRadius: BorderRadius.circular(AppLayout.containerBorderRadius),
           color: const Color.fromARGB(115, 231, 231, 231),
         ),
         child: Column(

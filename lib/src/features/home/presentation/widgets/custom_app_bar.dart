@@ -20,10 +20,8 @@ class CustomAppBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
-    final accountState = ref.watch(accountControllerProvider);
-    final account = accountState.asData?.value;
-
-    ref.read(accountControllerProvider.notifier);
+    final accountGetState = ref.watch(accountGetUseCaseProvider);
+    final account = accountGetState.asData?.value;
 
     final width = MediaQueryData.fromView(
             WidgetsBinding.instance.platformDispatcher.views.first)
@@ -62,7 +60,7 @@ class CustomAppBar extends ConsumerWidget {
             alignment: Alignment.centerRight,
             child: Container(
                 alignment: Alignment.centerRight,
-                child: accountState.when(data: (account) {
+                child: accountGetState.when(data: (account) {
                   return _profileButton(context, appLocalizations, account);
                 }, loading: () {
                   return Container(
@@ -91,7 +89,7 @@ class CustomAppBar extends ConsumerWidget {
         color: const Color.fromARGB(255, 12, 12, 12),
         child: Center(
           child: Text(
-            "${appLocalizations.balance}: ${account == null ? "-" : account.currentBalance} "
+            "${appLocalizations.balance}: ${account == null ? "-" : account.currentBalance.toStringAsFixed(2)} "
             "${account == null ? "" : account.prefCurrencyType}",
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.openSans(fontSize: 17, color: Colors.white),

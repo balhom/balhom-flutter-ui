@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 /// Application color constants.
 class AppColors {
   /// Primary color of the app.
-  static const MaterialColor primaryColor = Colors.grey;
+  static MaterialColor primaryColor =
+      colorToMaterialColor(const Color.fromARGB(255, 236, 222, 185));
 
-  static const Color secondaryColor = Color.fromARGB(255, 253, 255, 205);
+  static const Color appLightBackgroundColor = Colors.white;
+
+  static const Color appDarkBackgroundColor = AppColors.greyColor;
 
   static const Color appBarBackgroundColor = Color.fromARGB(255, 43, 43, 43);
 

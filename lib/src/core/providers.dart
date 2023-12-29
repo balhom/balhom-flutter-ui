@@ -9,8 +9,8 @@ import 'package:balhom/src/features/account/infrastructure/datasources/local/acc
 import 'package:balhom/src/features/account/providers.dart';
 import 'package:balhom/src/features/balance/infrastructure/datasources/local/balance_type_local_data_source.dart';
 import 'package:balhom/src/features/settings/providers.dart';
-import 'package:balhom/src/features/statistics/infrastructure/datasources/local/annual_balance_local_data_source.dart';
-import 'package:balhom/src/features/statistics/infrastructure/datasources/local/monthly_balance_local_data_source.dart';
+import 'package:balhom/src/features/statistics/infrastructure/datasources/local/annual_savings_local_data_source.dart';
+import 'package:balhom/src/features/statistics/infrastructure/datasources/local/monthly_savings_local_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +29,7 @@ Future<void> initializeProviders(ProviderContainer container) async {
   container.read(currencyConversionClientProvider);
 
   // Change aplication language at account fetch
-  container.listen(accountControllerProvider, (_, accountEntityState) {
+  container.listen(accountGetUseCaseProvider, (_, accountEntityState) {
     if (accountEntityState.asData != null &&
         accountEntityState.asData!.value != null) {
       container
@@ -58,8 +58,8 @@ final localDbClientProvider =
     Provider((ref) => LocalDbClient(dbName: "balhomDb_v2", tableNames: {
           UserLocalDataSource.tableName,
           BalanceTypeLocalDataSource.tableName,
-          AnnualBalanceLocalDataSource.tableName,
-          MonthlyBalanceLocalDataSource.tableName,
+          AnnualSavingsLocalDataSource.tableName,
+          MonthlySavingLocalDataSource.tableName,
         }));
 
 /// Exposes balhom [ApiClient] instance

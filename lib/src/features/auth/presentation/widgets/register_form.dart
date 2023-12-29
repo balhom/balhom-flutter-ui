@@ -1,3 +1,4 @@
+import 'package:balhom/src/core/domain/failures/failure.dart';
 import 'package:balhom/src/core/presentation/widgets/app_password_text_form_field.dart';
 import 'package:balhom/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balhom/src/core/presentation/widgets/app_text_form_field.dart';
@@ -60,15 +61,14 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
             widget.passwordController.text,
             widget.repeatPasswordController.text));
 
-    final accountState = ref.watch(accountControllerProvider);
-    final accountController = ref.read(accountControllerProvider.notifier);
-    final emailVerificationState =
-        ref.watch(emailVerificationControllerProvider);
-    final emailVerificationController =
-        ref.read(emailVerificationControllerProvider.notifier);
+    final accountCreateUseCase =
+        ref.read(accountCreateUseCaseProvider.notifier);
+    final accountGetState = ref.read(accountGetUseCaseProvider);
 
-    final isLoading = accountState.maybeWhen(
-          data: (_) => accountState.isRefreshing,
+    final emailVerificationState = ref.watch(emailVerificationUseCaseProvider);
+
+    final isLoading = accountGetState.maybeWhen(
+          data: (_) => accountGetState.isRefreshing,
           loading: () => true,
           orElse: () => false,
         ) ||
@@ -163,17 +163,19 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                           return;
                         }
 
-                        (await accountController.create(
-                                registerValuesDto!, appLocalizations))
-                            .fold((failure) {
+                        await accountCreateUseCase.handle(
+                            registerValuesDto!, appLocalizations);
+                        final accountCreateState =
+                            ref.read(accountCreateUseCaseProvider);
+                        if (accountCreateState.hasError) {
                           showErrorRegisterDialog(
-                              appLocalizations, failure.detail);
-                        }, (_) async {
-                          await showEmailVerificationDialog(
-                              emailVerificationController,
-                              registerValuesDto!.emailValue,
-                              appLocalizations);
-                        });
+                              appLocalizations,
+                              (accountCreateState.asError!.error as Failure)
+                                  .detail);
+                        } else {
+                          await showEmailVerificationDialog(ref,
+                              registerValuesDto!.emailValue, appLocalizations);
+                        }
                       },
                       text: appLocalizations.register)),
             ],

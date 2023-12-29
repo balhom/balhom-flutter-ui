@@ -1,3 +1,4 @@
+import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/presentation/widgets/app_loading_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class AppLoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (func != null) func!(context);
-    return const Scaffold(
+    return const AppScaffold(
       body: AppLoadingWidget()
     );
   }

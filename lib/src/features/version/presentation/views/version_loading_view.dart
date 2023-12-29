@@ -1,5 +1,6 @@
 import 'package:balhom/config/app_colors.dart';
 import 'package:balhom/src/core/domain/failures/http/http_connection_failure.dart';
+import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/src/core/presentation/widgets/app_loading_widget.dart';
 import 'package:balhom/src/core/providers.dart';
@@ -30,7 +31,7 @@ class _VersionLoadingViewState extends ConsumerState<VersionLoadingView> {
     final appLocalizations = ref.read(appLocalizationsProvider);
     final versionState = ref.watch(versionController);
 
-    return Scaffold(
+    return AppScaffold(
         body: versionState.when<Widget>(data: (final failureOrAppVersion) {
       return failureOrAppVersion.fold((failure) {
         if (failure is HttpConnectionFailure) {

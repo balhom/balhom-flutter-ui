@@ -1,6 +1,6 @@
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart';
-import 'package:balhom/src/features/balance/presentation/models/balance_limit_type.dart';
+import 'package:balhom/src/features/balance/domain/enums/balance_limit_type_enum.dart';
 import 'package:balhom/src/features/balance/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

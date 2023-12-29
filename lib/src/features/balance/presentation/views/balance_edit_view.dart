@@ -1,8 +1,7 @@
 import 'package:balhom/config/app_colors.dart';
-import 'package:balhom/src/core/domain/failures/http/http_connection_failure.dart';
+import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/config/app_theme.dart';
-import 'package:balhom/src/core/domain/failures/local_db/no_local_entry_failure.dart';
 import 'package:balhom/src/core/presentation/views/app_title.dart';
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/core/utils/widget_utils.dart';
@@ -40,64 +39,52 @@ class _BalanceEditViewState extends ConsumerState<BalanceEditView> {
     final appLocalizations = ref.read(appLocalizationsProvider);
     final theme = ref.watch(themeDataProvider);
 
-    final balanceListState = widget.balanceTypeEnum.isExpense()
-        ? ref.watch(expenseListControllerProvider)
-        : ref.watch(revenueListControllerProvider);
+    final balanceListState = ref.read(balanceListUseCaseProvider);
 
-    return balanceListState.when(data: (data) {
-      return data.fold((failure) {
-        if (failure is HttpConnectionFailure ||
-            failure is NoLocalEntryFailure) {
-          return showError(
-              icon: Icons.network_wifi_1_bar,
-              text: appLocalizations.noConnection);
-        }
-        return showError(text: failure.detail);
-      }, (entities) {
-        return Scaffold(
-          backgroundColor: widget.balanceTypeEnum.isExpense()
-              ? theme == AppTheme.darkTheme
-                  ? AppColors.expenseBackgroundDarkColor
-                  : AppColors.expenseBackgroundLightColor
-              : theme == AppTheme.darkTheme
-                  ? AppColors.revenueBackgroundDarkColor
-                  : AppColors.revenueBackgroundLightColor,
-          appBar: AppBar(
-            title: const AppTitle(fontSize: 30),
-            backgroundColor: AppColors.appBarBackgroundColor,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => router.goNamed(widget.balanceTypeEnum.isExpense()
-                  ? BalanceView.routeExpenseName
-                  : BalanceView.routeRevenueName),
-            ),
-            actions: [
-              if (isConnected)
-                IconButton(
-                  icon: Icon(
-                    (!edit) ? Icons.edit : Icons.cancel_outlined,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      edit = !edit;
-                    });
-                  },
-                )
-            ],
+    return balanceListState.when(data: (balanceList) {
+      return AppScaffold(
+        backgroundColor: widget.balanceTypeEnum.isExpense()
+            ? theme == AppTheme.darkTheme
+                ? AppColors.expenseBackgroundDarkColor
+                : AppColors.expenseBackgroundLightColor
+            : theme == AppTheme.darkTheme
+                ? AppColors.revenueBackgroundDarkColor
+                : AppColors.revenueBackgroundLightColor,
+        appBar: AppBar(
+          title: const AppTitle(fontSize: 30),
+          backgroundColor: AppColors.appBarBackgroundColor,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => router.goNamed(widget.balanceTypeEnum.isExpense()
+                ? BalanceView.routeExpenseName
+                : BalanceView.routeRevenueName),
           ),
-          body: BalanceEditForm(
-              edit: edit,
-              balance:
-                  entities.firstWhere((element) => element.id == widget.id),
-              balanceTypeEnum: widget.balanceTypeEnum),
-        );
-      });
+          actions: [
+            if (isConnected)
+              IconButton(
+                icon: Icon(
+                  (!edit) ? Icons.edit : Icons.cancel_outlined,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  setState(() {
+                    edit = !edit;
+                  });
+                },
+              )
+          ],
+        ),
+        body: BalanceEditForm(
+            edit: edit,
+            balance:
+                balanceList.firstWhere((element) => element.id == widget.id),
+            balanceTypeEnum: widget.balanceTypeEnum),
+      );
     }, error: (error, _) {
-      return Scaffold(
+      return AppScaffold(
           body: showError(error: error, text: appLocalizations.genericError));
     }, loading: () {
-      return Scaffold(body: showLoading());
+      return AppScaffold(body: showLoading());
     });
   }
 }

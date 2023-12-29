@@ -1,3 +1,4 @@
+import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/src/core/presentation/widgets/app_error_widget.dart';
 import 'package:balhom/src/core/providers.dart';
@@ -23,8 +24,8 @@ class AppErrorView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appLocalizations = ref.watch(appLocalizationsProvider);
-    return Scaffold(
+    final appLocalizations = ref.read(appLocalizationsProvider);
+    return AppScaffold(
       body: AppErrorWidget(
           text: (location == '/$notFoundPath')
               ? appLocalizations.pageNotFound

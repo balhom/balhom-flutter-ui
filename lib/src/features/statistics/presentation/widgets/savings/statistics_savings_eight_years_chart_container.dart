@@ -1,13 +1,13 @@
 import 'package:balhom/src/core/utils/platform_utils.dart';
 import 'package:balhom/src/core/providers.dart';
-import 'package:balhom/src/features/statistics/domain/entities/annual_balance_entity.dart';
+import 'package:balhom/src/features/statistics/domain/entities/annual_saving_entity.dart';
 import 'package:balhom/src/features/statistics/presentation/widgets/savings/statistics_savings_eight_years_line_chart.dart';
+import 'package:balhom/src/features/statistics/presentation/widgets/statistics_chart_title_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class StatisticsSavingsEightYearsChartContainer extends ConsumerWidget {
-  final List<AnnualBalanceEntity> annualBalances;
+  final List<AnnualSavingEntity> annualBalances;
 
   const StatisticsSavingsEightYearsChartContainer(
       {required this.annualBalances, super.key});
@@ -23,37 +23,23 @@ class StatisticsSavingsEightYearsChartContainer extends ConsumerWidget {
         : (screenHeight * 0.45 <= 350)
             ? screenHeight * 0.45
             : 350;
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 20, bottom: 10),
-              color: const Color.fromARGB(255, 194, 56, 235),
-              height: 45,
+    return Expanded(
+      child: Column(
+        children: [
+          StatisticsChartTitleContainer(
+            backgroundColor: const Color.fromARGB(255, 194, 56, 235),
+            text: appLocalizations.savingsEightChartTitle,
+          ),
+          SizedBox(
+              height: chartLineHeight,
               width: (PlatformUtils.isSmallWindow(context))
                   ? screenWidth * 0.95
-                  : screenWidth * 0.35,
-              child: Center(
-                  child: Text(
-                      style: GoogleFonts.openSans(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                      appLocalizations.savingsEightChartTitle)),
-            )
-          ],
-        ),
-        SizedBox(
-            height: chartLineHeight,
-            width: (PlatformUtils.isSmallWindow(context))
-                ? screenWidth * 0.95
-                : screenWidth * 0.45,
-            child: StatisticsSavingsEightYearsLineChart(
-              annualBalances: annualBalances,
-            )),
-      ],
+                  : screenWidth * 0.45,
+              child: StatisticsSavingsEightYearsLineChart(
+                annualBalances: annualBalances,
+              )),
+        ],
+      ),
     );
   }
 }

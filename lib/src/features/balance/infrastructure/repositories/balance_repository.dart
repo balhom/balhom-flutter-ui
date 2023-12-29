@@ -89,8 +89,7 @@ class BalanceRepository implements BalanceRepositoryInterface {
 
   /// Delete a [BalanceEntity].
   @override
-  Future<Either<Failure, void>> deleteBalance(
-      final BalanceEntity balance) async {
-    return await balanceRemoteDataSource.delete(balance);
+  Future<Either<Failure, void>> deleteBalance(final int id) async {
+    return await balanceRemoteDataSource.delete(id);
   }
 }

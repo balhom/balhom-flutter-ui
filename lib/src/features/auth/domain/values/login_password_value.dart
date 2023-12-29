@@ -26,7 +26,7 @@ Either<Failure, String> _validate(
     return right(input);
   }
   return left(
-    UnprocessableValueFailure(
+    InvalidValueFailure(
       detail: appLocalizations.needPassword,
     ),
   );

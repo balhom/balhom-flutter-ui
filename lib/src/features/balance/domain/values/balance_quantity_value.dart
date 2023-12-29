@@ -30,7 +30,7 @@ Either<Failure, double> _validate(
       ? appLocalizations.balanceQuantityRequired
       : appLocalizations.balanceQuantityMinValue;
   return left(
-    UnprocessableValueFailure(
+    InvalidValueFailure(
       detail: message,
     ),
   );

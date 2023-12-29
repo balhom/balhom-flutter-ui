@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:balhom/src/core/utils/platform_utils.dart';
 import 'package:balhom/src/core/router.dart';
-import 'package:balhom/src/core/presentation/models/selected_date_mode.dart';
+import 'package:balhom/src/core/domain/enums/selected_date_enum.dart';
 import 'package:balhom/src/core/presentation/widgets/chart_indicator.dart';
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart';
@@ -35,13 +35,13 @@ class BalanceLineChart extends ConsumerWidget {
           final style = GoogleFonts.openSans(
             fontSize: 12,
           );
-          final tittle = (selectedDateMode == SelectedDateEnum.year)
+          final title = (selectedDateMode == SelectedDateEnum.year)
               ? monthList[value.toInt() - 1]
               : "${value.toInt()}";
           return SideTitleWidget(
             axisSide: meta.axisSide,
             space: 5,
-            child: Text(tittle, style: style),
+            child: Text(title, style: style),
           );
         },
       );
@@ -60,7 +60,7 @@ class BalanceLineChart extends ConsumerWidget {
         reservedSize: 30,
       );
 
-  /// Border chart side tittles setup
+  /// Border chart side titles setup
   FlTitlesData get titlesData => FlTitlesData(
         bottomTitles: AxisTitles(
           sideTitles: bottomTitles,
@@ -101,6 +101,12 @@ class BalanceLineChart extends ConsumerWidget {
   /// Required for `SelectedDate.month` as [dateType]
   final int? selectedYear;
 
+  double get maxX => selectedDateMode == SelectedDateEnum.year
+      ? 12.0
+      : DateUtils.getDaysInMonth(selectedYear ?? DateTime.now().year,
+              selectedMonth ?? DateTime.now().month)
+          .toDouble();
+
   const BalanceLineChart(
       {required this.monthList,
       required this.dailyStatisticsList,
@@ -132,12 +138,7 @@ class BalanceLineChart extends ConsumerWidget {
                     _balancesChartBarData(BalanceTypeEnum.expense),
                 ],
                 minX: 1,
-                maxX: selectedDateMode == SelectedDateEnum.year
-                    ? 12
-                    : DateUtils.getDaysInMonth(
-                            selectedYear ?? DateTime.now().year,
-                            selectedMonth ?? DateTime.now().month)
-                        .toDouble(),
+                maxX: maxX,
                 maxY: getMaxQuantity(),
                 minY: 0,
               ),
@@ -171,19 +172,31 @@ class BalanceLineChart extends ConsumerWidget {
       final BalanceTypeEnum balanceTypeEnum) {
     final List<FlSpot> spots = [];
 
-    if (selectedDateMode == SelectedDateEnum.year) {
-      dailyStatisticsList.map((dailyStatistics) => spots.add(FlSpot(
-          dailyStatistics.day.toDouble(),
-          balanceTypeEnum.isExpense()
-              ? dailyStatistics.expense
-              : dailyStatistics.revenue)));
-    } else {
-      monthlyStatisticsList.map((monthlyStatistics) => spots.add(FlSpot(
-          monthlyStatistics.month.toDouble(),
-          balanceTypeEnum.isExpense()
-              ? monthlyStatistics.expense
-              : monthlyStatistics.revenue)));
+    for (int i = 1; i <= maxX; i++) {
+      if (selectedDateMode == SelectedDateEnum.month) {
+        final dailyStatistic = dailyStatisticsList.firstWhere((dailyStatistic) {
+          return dailyStatistic.day == i;
+        }, orElse: () => DailyStatisticsEntity(day: i, expense: 0, revenue: 0));
+        spots.add(FlSpot(
+            dailyStatistic.day.toDouble(),
+            balanceTypeEnum.isExpense()
+                ? dailyStatistic.expense
+                : dailyStatistic.revenue));
+      } else {
+        final monthlyStatistic = monthlyStatisticsList.firstWhere(
+            (monthlyStatistic) {
+          return monthlyStatistic.month == i;
+        },
+            orElse: () =>
+                MonthlyStatisticsEntity(month: i, expense: 0, revenue: 0));
+        spots.add(FlSpot(
+            monthlyStatistic.month.toDouble(),
+            balanceTypeEnum.isExpense()
+                ? monthlyStatistic.expense
+                : monthlyStatistic.revenue));
+      }
     }
+
     return LineChartBarData(
         isCurved: true,
         preventCurveOverShooting: true,
@@ -208,12 +221,20 @@ class BalanceLineChart extends ConsumerWidget {
 
     final Iterable<double> revenueCollection =
         (selectedDateMode == SelectedDateEnum.year)
-            ? monthlyStatisticsList.map((e) => e.revenue)
-            : dailyStatisticsList.map((e) => e.revenue);
+            ? (monthlyStatisticsList.isEmpty
+                ? [0]
+                : monthlyStatisticsList.map((e) => e.revenue))
+            : (dailyStatisticsList.isEmpty
+                ? [0]
+                : dailyStatisticsList.map((e) => e.revenue));
     final Iterable<double> expenseCollection =
         (selectedDateMode == SelectedDateEnum.year)
-            ? monthlyStatisticsList.map((e) => e.expense)
-            : dailyStatisticsList.map((e) => e.expense);
+            ? (monthlyStatisticsList.isEmpty
+                ? [0]
+                : monthlyStatisticsList.map((e) => e.expense))
+            : (dailyStatisticsList.isEmpty
+                ? [0]
+                : dailyStatisticsList.map((e) => e.expense));
 
     if (showRevenues) {
       final double revenuesMax = revenueCollection.reduce(max);

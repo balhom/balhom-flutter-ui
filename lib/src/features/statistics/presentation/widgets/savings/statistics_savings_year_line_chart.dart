@@ -1,8 +1,11 @@
 import 'dart:math';
-import 'package:balhom/src/core/presentation/models/min_max.dart';
+import 'package:balhom/src/core/domain/dtos/min_max_dto.dart';
 import 'package:balhom/src/core/presentation/widgets/chart_indicator.dart';
 import 'package:balhom/src/core/providers.dart';
-import 'package:balhom/src/features/statistics/domain/entities/monthly_balance_entity.dart';
+import 'package:balhom/src/core/utils/date_util.dart';
+import 'package:balhom/src/core/utils/widget_utils.dart';
+import 'package:balhom/src/features/statistics/domain/entities/monthly_saving_entity.dart';
+import 'package:balhom/src/features/statistics/providers.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,117 +40,126 @@ class StatisticsSavingsYearLineChart extends ConsumerWidget {
         },
       );
 
-  SideTitles get leftTitles => SideTitles(
-        getTitlesWidget: (double value, TitleMeta meta) {
-          final style = GoogleFonts.openSans(
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          );
-          return Text("$value", style: style, textAlign: TextAlign.center);
-        },
-        showTitles: true,
-        interval: (([
-                  getMinMaxQuantity().max.ceilToDouble(),
-                  getMinMaxQuantity().min.floorToDouble().abs()
-                ].reduce(max)) /
-                5)
-            .abs()
-            .ceilToDouble(),
-        reservedSize: 40,
-      );
+  late final List<String> monthList;
 
-  /// Border chart side tittles setup
-  FlTitlesData get titlesData => FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: bottomTitles,
-        ),
-        // Ignore right details
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        // Ignore top details
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: leftTitles,
-        ),
-      );
+  final minMaxModelState = ValueNotifier<MinMaxDto?>(null);
 
-  List<LineChartBarData> get lineBarsData => [
-        quantityChartBarData(),
-        expectedChartBarData(),
-      ];
-
-  final List<String> monthList;
-  final List<MonthlyBalanceEntity> monthlyBalances;
-
-  final minMaxModelState = ValueNotifier<MinMax?>(null);
-
-  StatisticsSavingsYearLineChart(
-      {required this.monthList,
-      required this.monthlyBalances,
-      MinMax? minMaxModel,
-      super.key}) {
+  StatisticsSavingsYearLineChart({MinMaxDto? minMaxModel, super.key}) {
     minMaxModelState.value = minMaxModel;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
-    return Padding(
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        children: [
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: const FlGridData(show: true),
-                titlesData: titlesData,
-                borderData: borderData,
-                lineBarsData: lineBarsData,
-                minX: 1,
-                maxX: 12,
-                maxY: getMinMaxQuantity().max.ceilToDouble(),
-                minY: getMinMaxQuantity().min.floorToDouble(),
+
+    // Month names list
+    monthList = DateUtil.getMonthDict(appLocalizations).values.toList();
+
+    final monthlySavingsState = ref.read(monthlySavingsUseCaseProvider);
+
+    return monthlySavingsState.when<Widget>(
+        data: (monthlySavings) => Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: LineChart(
+                      LineChartData(
+                        gridData: const FlGridData(show: true),
+                        titlesData: FlTitlesData(
+                          bottomTitles: AxisTitles(
+                            sideTitles: bottomTitles,
+                          ),
+                          // Ignore right details
+                          rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          // Ignore top details
+                          topTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                final style = GoogleFonts.openSans(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                );
+                                return Text("$value",
+                                    style: style, textAlign: TextAlign.center);
+                              },
+                              showTitles: true,
+                              interval: (([
+                                        getMinMaxQuantity(monthlySavings)
+                                            .max
+                                            .ceilToDouble(),
+                                        getMinMaxQuantity(monthlySavings)
+                                            .min
+                                            .floorToDouble()
+                                            .abs()
+                                      ].reduce(max)) /
+                                      5)
+                                  .abs()
+                                  .ceilToDouble(),
+                              reservedSize: 40,
+                            ),
+                          ),
+                        ),
+                        borderData: borderData,
+                        lineBarsData: [
+                          quantityChartBarData(monthlySavings),
+                          expectedChartBarData(monthlySavings),
+                        ],
+                        minX: 1,
+                        maxX: 12,
+                        maxY: getMinMaxQuantity(monthlySavings)
+                            .max
+                            .ceilToDouble(),
+                        minY: getMinMaxQuantity(monthlySavings)
+                            .min
+                            .floorToDouble(),
+                      ),
+                      duration: const Duration(milliseconds: 250),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ChartIndicator(
+                        color: const Color.fromARGB(225, 224, 167, 231),
+                        text: appLocalizations.expected,
+                        isSquare: true,
+                      ),
+                      const SizedBox(width: 10),
+                      ChartIndicator(
+                        color: const Color.fromARGB(184, 7, 95, 15),
+                        text: appLocalizations.quantity,
+                        isSquare: true,
+                      ),
+                    ],
+                  )
+                ],
               ),
-              duration: const Duration(milliseconds: 250),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ChartIndicator(
-                color: const Color.fromARGB(225, 224, 167, 231),
-                text: appLocalizations.expected,
-                isSquare: true,
-              ),
-              const SizedBox(width: 10),
-              ChartIndicator(
-                color: const Color.fromARGB(184, 7, 95, 15),
-                text: appLocalizations.quantity,
-                isSquare: true,
-              ),
-            ],
-          )
-        ],
-      ),
-    );
+        error: (error, __) =>
+            showError(error: error, text: appLocalizations.genericError),
+        loading: () => showLoading());
   }
 
   @visibleForTesting
-  LineChartBarData quantityChartBarData() {
+  LineChartBarData quantityChartBarData(
+      final List<MonthlySavingEntity> monthlySavings) {
     // Dictionary with months and gross quantities per month
-    Map<int, double> spotsMap = {};
-    for (MonthlyBalanceEntity monthlyBalance in monthlyBalances) {
-      if (spotsMap.containsKey(monthlyBalance.month)) {
-        spotsMap[monthlyBalance.month] =
-            spotsMap[monthlyBalance.month]! + monthlyBalance.grossQuantity;
+    final Map<int, double> spotsMap = {};
+    for (final monthlySaving in monthlySavings) {
+      if (spotsMap.containsKey(monthlySaving.month)) {
+        spotsMap[monthlySaving.month] =
+            spotsMap[monthlySaving.month]! + monthlySaving.grossQuantity;
       } else {
-        spotsMap[monthlyBalance.month] = monthlyBalance.grossQuantity;
+        spotsMap[monthlySaving.month] = monthlySaving.grossQuantity;
       }
-      spotsMap[monthlyBalance.month] =
-          (spotsMap[monthlyBalance.month]! * 100).roundToDouble() / 100;
+      spotsMap[monthlySaving.month] =
+          (spotsMap[monthlySaving.month]! * 100).roundToDouble() / 100;
     }
     // Check unexistant months
     for (int month = 1; month <= 12; month++) {
@@ -175,18 +187,19 @@ class StatisticsSavingsYearLineChart extends ConsumerWidget {
   }
 
   @visibleForTesting
-  LineChartBarData expectedChartBarData() {
+  LineChartBarData expectedChartBarData(
+      final List<MonthlySavingEntity> monthlySavings) {
     // Dictionary with months and expected quantities per month
     Map<int, double> spotsMap = {};
-    for (MonthlyBalanceEntity monthlyBalance in monthlyBalances) {
-      if (spotsMap.containsKey(monthlyBalance.month)) {
-        spotsMap[monthlyBalance.month] =
-            spotsMap[monthlyBalance.month]! + monthlyBalance.expectedQuantity;
+    for (final monthlySaving in monthlySavings) {
+      if (spotsMap.containsKey(monthlySaving.month)) {
+        spotsMap[monthlySaving.month] =
+            spotsMap[monthlySaving.month]! + monthlySaving.expectedQuantity;
       } else {
-        spotsMap[monthlyBalance.month] = monthlyBalance.expectedQuantity;
+        spotsMap[monthlySaving.month] = monthlySaving.expectedQuantity;
       }
-      spotsMap[monthlyBalance.month] =
-          (spotsMap[monthlyBalance.month]! * 100).roundToDouble() / 100;
+      spotsMap[monthlySaving.month] =
+          (spotsMap[monthlySaving.month]! * 100).roundToDouble() / 100;
     }
     // Check unexistant months
     for (int month = 1; month <= 12; month++) {
@@ -214,26 +227,26 @@ class StatisticsSavingsYearLineChart extends ConsumerWidget {
   }
 
   @visibleForTesting
-  MinMax getMinMaxQuantity() {
+  MinMaxDto getMinMaxQuantity(final List<MonthlySavingEntity> monthlySavings) {
     if (minMaxModelState.value != null) return minMaxModelState.value!;
     double maxQuantity = 4.0;
     double minQuantity = 0.0;
     Map<String, double> quantityMap = {};
     Map<String, double> expectedMap = {};
-    for (MonthlyBalanceEntity monthlyBalance in monthlyBalances) {
-      String key = "${monthlyBalance.month}";
+    for (final monthlySaving in monthlySavings) {
+      String key = "${monthlySaving.month}";
       if (quantityMap.containsKey(key)) {
-        quantityMap[key] = quantityMap[key]! + monthlyBalance.grossQuantity;
+        quantityMap[key] = quantityMap[key]! + monthlySaving.grossQuantity;
       } else {
-        quantityMap[key] = monthlyBalance.grossQuantity;
+        quantityMap[key] = monthlySaving.grossQuantity;
       }
       if (expectedMap.containsKey(key)) {
-        expectedMap[key] = expectedMap[key]! + monthlyBalance.expectedQuantity;
+        expectedMap[key] = expectedMap[key]! + monthlySaving.expectedQuantity;
       } else {
-        expectedMap[key] = monthlyBalance.expectedQuantity;
+        expectedMap[key] = monthlySaving.expectedQuantity;
       }
     }
-    if (monthlyBalances.isNotEmpty) {
+    if (monthlySavings.isNotEmpty) {
       maxQuantity = quantityMap.values.reduce(max);
       double maxExpected = expectedMap.values.reduce(max);
       if (maxQuantity < maxExpected) maxQuantity = maxExpected;
@@ -243,7 +256,7 @@ class StatisticsSavingsYearLineChart extends ConsumerWidget {
     }
     if (maxQuantity < 4) maxQuantity = 4;
     if (minQuantity > 0) minQuantity = 0;
-    minMaxModelState.value = MinMax(min: minQuantity, max: maxQuantity);
+    minMaxModelState.value = MinMaxDto(min: minQuantity, max: maxQuantity);
     return minMaxModelState.value!;
   }
 }

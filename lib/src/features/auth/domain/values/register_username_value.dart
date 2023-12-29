@@ -35,7 +35,7 @@ Either<Failure, String> _validate(
           ? appLocalizations.usernameMaxSize
           : appLocalizations.usernameNotValid;
   return left(
-    UnprocessableValueFailure(
+    InvalidValueFailure(
       detail: message,
     ),
   );

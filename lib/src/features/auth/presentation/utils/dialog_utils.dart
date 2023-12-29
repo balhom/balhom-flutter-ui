@@ -1,15 +1,16 @@
 import 'package:balhom/config/app_layout.dart';
+import 'package:balhom/src/core/domain/failures/failure.dart';
 import 'package:balhom/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balhom/src/core/presentation/widgets/app_text_form_field.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/src/core/presentation/widgets/app_error_dialog.dart';
 import 'package:balhom/src/core/presentation/widgets/info_dialog.dart';
 import 'package:balhom/src/core/utils/widget_utils.dart';
-import 'package:balhom/src/features/auth/application/email_verification_controller.dart';
-import 'package:balhom/src/features/auth/application/reset_password_controller.dart';
 import 'package:balhom/src/features/auth/domain/values/email_value.dart';
+import 'package:balhom/src/features/auth/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 ///
@@ -46,17 +47,19 @@ Future<void> showErrorLoginDialog(
 /// Email Verification Dialogs
 ///
 
-Future<void> showEmailVerificationDialog(
-    final EmailVerificationController emailVerificationController,
-    final EmailValue emailValue,
-    final appLocalizations) async {
+Future<void> showEmailVerificationDialog(final WidgetRef ref,
+    final EmailValue emailValue, final appLocalizations) async {
   final bool sendEmail =
       await showEmailVerificationAdviceDialog(appLocalizations);
   if (sendEmail) {
-    (await emailVerificationController.sendEmail(emailValue, appLocalizations))
-        .fold((failure) {
+    await ref
+        .read(emailVerificationUseCaseProvider.notifier)
+        .handle(emailValue, appLocalizations);
+    final emailVerificationState = ref.read(emailVerificationUseCaseProvider);
+    if (emailVerificationState.hasError) {
+      final failure = emailVerificationState.error as Failure;
       showErrorEmailVerifiactionDialog(appLocalizations, failure.detail);
-    }, (_) => null);
+    }
   }
 }
 
@@ -102,8 +105,7 @@ Future<void> showErrorResetPasswordDialog(
 }
 
 Future<void> showResetPasswordDialog(
-    final ResetPasswordController resetPasswordController,
-    final appLocalizations) async {
+    final WidgetRef ref, final appLocalizations) async {
   final formKey = GlobalKey<FormState>();
   EmailValue emailValue = EmailValue(appLocalizations, "");
   await showDialog(
@@ -139,28 +141,36 @@ Future<void> showResetPasswordDialog(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         // Send Button
-                        SizedBox(
-                            height: 40,
-                            width: 150,
+                        Container(
+                            constraints: const BoxConstraints(
+                                maxHeight: 40, maxWidth: 150),
                             child: AppTextButton(
                                 onPressed: () async {
                                   if (formKey.currentState == null ||
                                       !formKey.currentState!.validate()) {
                                     return;
                                   }
-                                  (await resetPasswordController.sendEmail(
-                                          emailValue, appLocalizations))
-                                      .fold((failure) {
+                                  final resetPasswordUseCase = ref.read(
+                                      resetPasswordUseCaseProvider.notifier);
+                                  await resetPasswordUseCase.handle(
+                                      emailValue, appLocalizations);
+                                  final resetPasswordState =
+                                      ref.read(resetPasswordUseCaseProvider);
+                                  if (resetPasswordState.hasError) {
+                                    final failure =
+                                        resetPasswordState.error as Failure;
                                     showErrorResetPasswordDialog(
                                         appLocalizations, failure.detail);
-                                  }, (_) => Navigator.pop(context));
+                                  } else {
+                                    router.pop();
+                                  }
                                 },
                                 text: appLocalizations.send)),
                         horizontalSpace(),
                         // Cancel Button
-                        SizedBox(
-                            height: 40,
-                            width: 150,
+                        Container(
+                            constraints: const BoxConstraints(
+                                maxHeight: 40, maxWidth: 150),
                             child: AppTextButton(
                                 onPressed: () async {
                                   Navigator.pop(context);

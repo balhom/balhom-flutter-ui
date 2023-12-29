@@ -8,7 +8,7 @@ import 'package:fpdart/fpdart.dart';
 abstract class AccountRepositoryInterface {
   Future<Either<Failure, void>> delete();
 
-  Future<Either<Failure, void>> create(RegisterEntity registration);
+  Future<Either<Failure, AccountEntity>> create(RegisterEntity registration);
 
   Future<Either<Failure, AccountEntity>> update(AccountEntity user);
 

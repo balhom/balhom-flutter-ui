@@ -1,7 +1,7 @@
 import 'package:balhom/config/app_colors.dart';
 import 'package:balhom/src/core/utils/platform_utils.dart';
 import 'package:balhom/config/app_theme.dart';
-import 'package:balhom/src/core/presentation/models/selected_date_mode.dart';
+import 'package:balhom/src/core/domain/enums/selected_date_enum.dart';
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/core/utils/date_util.dart';
 import 'package:balhom/src/core/utils/widget_utils.dart';
@@ -33,7 +33,7 @@ class BalanaceLeftPanel extends ConsumerWidget {
         ? ref.watch(expenseSelectedDateProvider)
         : ref.watch(revenueSelectedDateProvider);
 
-    final statisticsState = ref.watch(statisticsControllerProvider);
+    final statisticsState = ref.watch(statisticsUseCaseProvider);
 
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;

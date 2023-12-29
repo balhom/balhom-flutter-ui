@@ -1,3 +1,4 @@
+import 'package:balhom/config/app_layout.dart';
 import 'package:balhom/src/core/utils/type_util.dart';
 import 'package:balhom/src/core/utils/widget_utils.dart';
 import 'package:balhom/src/features/balance/domain/entities/balance_type_entity.dart';
@@ -31,13 +32,16 @@ class BalanceTypeDropdownPicker extends StatefulWidget {
 class _BalanceTypeDropdownPickerState extends State<BalanceTypeDropdownPicker> {
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context);
     return Center(
       child: Container(
         margin: const EdgeInsets.fromLTRB(0, 15, 0, 20),
         width: 280,
-        color: Theme.of(context).brightness == Brightness.light
-            ? const Color.fromARGB(200, 163, 163, 163)
-            : const Color.fromARGB(198, 104, 104, 104),
+        decoration: BoxDecoration(
+            color: appTheme.colorScheme.background,
+            border: Border.all(color: Colors.black),
+            borderRadius: const BorderRadius.all(
+                Radius.circular(AppLayout.containerBorderRadius))),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 18, 0),

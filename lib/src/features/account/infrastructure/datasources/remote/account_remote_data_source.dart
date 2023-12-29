@@ -13,23 +13,26 @@ class AccountRemoteDataSource {
   AccountRemoteDataSource({required this.apiClient});
 
   Future<Either<Failure, AccountEntity>> get() async {
-    final response = await apiClient.getRequest(BalhomAPIContract.accountProfile);
+    final response =
+        await apiClient.getRequest(BalhomAPIContract.accountProfile);
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
         (value) => right(AccountEntity.fromJson(value.data)));
   }
 
-  Future<Either<Failure, void>> create(
+  Future<Either<Failure, AccountEntity>> create(
       final RegisterEntity registration) async {
-    final response = await apiClient.postRequest(BalhomAPIContract.accountCreation,
+    final response = await apiClient.postRequest(
+        BalhomAPIContract.accountCreation,
         data: registration.toJson());
     // Check if there is a request failure
-    return response.fold((failure) => left(failure), (_) => right(null));
+    return response.fold((failure) => left(failure),
+        (value) => right(AccountEntity.fromJson(value.data)));
   }
 
   Future<Either<Failure, AccountEntity>> update(AccountEntity user) async {
-    final response = await apiClient.patchRequest(BalhomAPIContract.accountProfile,
-        data: user.toJson());
+    final response = await apiClient
+        .patchRequest(BalhomAPIContract.accountProfile, data: user.toJson());
     // Check if there is a request failure
     return response.fold((failure) => left(failure),
         (value) => right(AccountEntity.fromJson(value.data)));
@@ -44,7 +47,8 @@ class AccountRemoteDataSource {
   }
 
   Future<Either<Failure, void>> delete() async {
-    final response = await apiClient.delRequest(BalhomAPIContract.accountProfile);
+    final response =
+        await apiClient.delRequest(BalhomAPIContract.accountProfile);
     // Check if there is a request failure
     return response.fold((failure) => left(failure), (_) => right(null));
   }

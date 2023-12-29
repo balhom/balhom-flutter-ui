@@ -14,6 +14,7 @@ class AppTextFormField extends StatelessWidget {
   final int? maxLines;
   final bool multiLine;
   final bool showCounterText;
+  final bool showCursor;
   final TextAlign? textAlign;
   final Function(String)? onChanged;
   final Function()? onTap;
@@ -35,6 +36,7 @@ class AppTextFormField extends StatelessWidget {
       this.maxLines = 1,
       this.multiLine = false,
       this.showCounterText = false,
+      this.showCursor = true,
       this.textAlign,
       super.key});
 
@@ -53,6 +55,8 @@ class AppTextFormField extends StatelessWidget {
               minLines: minLines,
               maxLines: maxLines,
               readOnly: readOnly,
+              showCursor: showCursor,
+              enableInteractiveSelection: showCursor,
               textAlign: textAlign ?? TextAlign.start,
               maxLength: maxCharacters,
               onChanged: readOnly ? null : onChanged,

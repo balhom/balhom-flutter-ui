@@ -1,9 +1,11 @@
+import 'package:balhom/src/core/domain/failures/failure.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/src/core/presentation/widgets/app_password_text_form_field.dart';
 import 'package:balhom/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balhom/src/core/presentation/widgets/app_text_form_field.dart';
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/core/utils/widget_utils.dart';
+import 'package:balhom/src/features/account/providers.dart';
 import 'package:balhom/src/features/auth/domain/dtos/login_values_dto.dart';
 import 'package:balhom/src/features/auth/domain/values/login_password_value.dart';
 import 'package:balhom/src/features/auth/domain/values/email_value.dart';
@@ -43,19 +45,15 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         passwordValue: LoginPasswordValue(
             appLocalizations, widget.passwordController.text));
 
-    final authState = ref.watch(authControllerProvider);
-    final authController = ref.read(authControllerProvider.notifier);
+    final loginState = ref.watch(loginUseCaseProvider);
+    final loginUseCase = ref.read(loginUseCaseProvider.notifier);
 
-    final resetPasswordController =
-        ref.read(resetPasswordControllerProvider.notifier);
+    final accountGetUseCase = ref.read(accountGetUseCaseProvider.notifier);
 
-    final emailVerificationState =
-        ref.watch(emailVerificationControllerProvider);
-    final emailVerificationController =
-        ref.read(emailVerificationControllerProvider.notifier);
+    final emailVerificationState = ref.watch(emailVerificationUseCaseProvider);
 
-    final isLoading = authState.maybeWhen(
-          data: (_) => authState.isRefreshing,
+    final isLoading = loginState.maybeWhen(
+          data: (_) => loginState.isRefreshing,
           loading: () => true,
           orElse: () => false,
         ) ||
@@ -106,30 +104,31 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                             !widget.formKey.currentState!.validate()) {
                           return;
                         }
-                        (await authController.login(
-                                loginValuesDto!, appLocalizations))
-                            .fold((failure) async {
+                        await loginUseCase.handle(
+                            loginValuesDto!, appLocalizations);
+
+                        final loginState = ref.read(loginUseCaseProvider);
+                        if (loginState.hasError) {
+                          final failure = loginState.error as Failure;
                           if (failure.detail ==
                               appLocalizations.emailNotVerified) {
-                            await showEmailVerificationDialog(
-                                emailVerificationController,
-                                loginValuesDto!.emailValue,
-                                appLocalizations);
+                            await showEmailVerificationDialog(ref,
+                                loginValuesDto!.emailValue, appLocalizations);
                           } else {
                             showErrorLoginDialog(
                                 appLocalizations, failure.detail);
                           }
-                        }, (_) {
+                        } else {
+                          await accountGetUseCase.handle();
                           router.goNamed(StatisticsView.routeName);
-                        });
+                        }
                       },
                       text: appLocalizations.signIn)),
               verticalSpace(),
               // Forgot Password Button
               TextButton(
                 onPressed: () async {
-                  showResetPasswordDialog(
-                      resetPasswordController, appLocalizations);
+                  showResetPasswordDialog(ref, appLocalizations);
                 },
                 child: Text(
                   appLocalizations.forgotPassword,

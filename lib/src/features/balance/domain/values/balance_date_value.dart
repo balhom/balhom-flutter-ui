@@ -30,7 +30,7 @@ Either<Failure, DateTime> _validate(
       ? appLocalizations.balanceDateRequired
       : appLocalizations.balanceDateFuture;
   return left(
-    UnprocessableValueFailure(
+    InvalidValueFailure(
       detail: message,
     ),
   );

@@ -32,7 +32,7 @@ Either<Failure, String> _validate(
       ? appLocalizations.needEmail
       : appLocalizations.emailNotValid;
   return left(
-    UnprocessableValueFailure(
+    InvalidValueFailure(
       detail: message,
     ),
   );

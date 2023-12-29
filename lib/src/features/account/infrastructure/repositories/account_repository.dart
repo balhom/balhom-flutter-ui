@@ -38,7 +38,7 @@ class AccountRepository implements AccountRepositoryInterface {
   }
 
   @override
-  Future<Either<Failure, void>> create(
+  Future<Either<Failure, AccountEntity>> create(
       final RegisterEntity registration) async {
     return await accountRemoteDataSource.create(registration);
   }

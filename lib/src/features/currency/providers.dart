@@ -1,8 +1,8 @@
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/features/account/providers.dart';
-import 'package:balhom/src/features/currency/application/currency_conversion_controller.dart';
-import 'package:balhom/src/features/currency/application/currency_type_list_controller.dart';
-import 'package:balhom/src/features/currency/application/days_currency_conversions_controller.dart';
+import 'package:balhom/src/features/currency/application/currency_conversion_use_case.dart';
+import 'package:balhom/src/features/currency/application/currency_type_list_use_case.dart';
+import 'package:balhom/src/features/currency/application/days_currency_conversions_use_case.dart';
 import 'package:balhom/src/features/currency/domain/dtos/selected_conversion_dto.dart';
 import 'package:balhom/src/features/currency/domain/entities/currency_type_entity.dart';
 import 'package:balhom/src/features/currency/domain/entities/date_currency_conversion_list_entity.dart';
@@ -26,23 +26,23 @@ final currencyRepositoryProvider = Provider<CurrencyRepositoryInterface>(
 /// Application dependencies
 ///
 
-final currencyTypeListsControllerProvider = StateNotifierProvider<
-    CurrencyTypeListController, AsyncValue<List<CurrencyTypeEntity>>>((ref) {
+final currencyTypeListsUseCaseProvider = StateNotifierProvider<
+    CurrencyTypeListUseCase, AsyncValue<List<CurrencyTypeEntity>>>((ref) {
   final currencyRepository = ref.watch(currencyRepositoryProvider);
-  return CurrencyTypeListController(currencyRepository: currencyRepository);
+  return CurrencyTypeListUseCase(currencyRepository: currencyRepository);
 });
 
-final currencyConversionControllerProvider =
-    Provider<CurrencyConversionController>((ref) {
+final currencyConversionUseCaseProvider =
+    Provider<CurrencyConversionUseCase>((ref) {
   final currencyRepository = ref.watch(currencyRepositoryProvider);
-  return CurrencyConversionController(currencyRepository: currencyRepository);
+  return CurrencyConversionUseCase(currencyRepository: currencyRepository);
 });
 
-final daysCurrencyConversionsControllerProvider = StateNotifierProvider<
-    DaysCurrencyConversionsController,
+final daysCurrencyConversionsUseCaseProvider = StateNotifierProvider<
+    DaysCurrencyConversionsUseCase,
     AsyncValue<DateCurrencyConversionListEntity>>((ref) {
   final currencyRepository = ref.read(currencyRepositoryProvider);
-  return DaysCurrencyConversionsController(
+  return DaysCurrencyConversionsUseCase(
     currencyRepository: currencyRepository,
   );
 });
@@ -55,7 +55,7 @@ final daysCurrencyConversionsControllerProvider = StateNotifierProvider<
 final selectedCurrencyConversionProvider =
     StateNotifierProvider<SelectedConversionState, SelectedConversionDto>(
         (ref) {
-  final account = ref.watch(accountControllerProvider).asData?.value;
+  final account = ref.watch(accountGetUseCaseProvider).asData?.value;
   final String currencyFrom =
       account != null ? account.prefCurrencyType : "EUR";
   final String currencyTo = currencyFrom == "EUR" ? "USD" : "EUR";

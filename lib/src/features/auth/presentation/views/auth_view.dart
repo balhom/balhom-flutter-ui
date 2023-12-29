@@ -1,5 +1,6 @@
 import 'package:balhom/config/app_colors.dart';
 import 'package:balhom/config/app_layout.dart';
+import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/presentation/views/app_title.dart';
 import 'package:balhom/src/core/presentation/widgets/app_will_pop_scope.dart';
 import 'package:balhom/src/features/auth/presentation/views/auth_background_view.dart';
@@ -41,19 +42,17 @@ class AuthView extends ConsumerWidget {
 
     final isConnected = connectionStateListenable.value;
 
-    final currencyTypeListState =
-        ref.watch(currencyTypeListsControllerProvider);
+    final currencyTypeListState = ref.watch(currencyTypeListsUseCaseProvider);
 
     return AppPopScope(
-      child: Scaffold(
-        appBar: AppBar(
-            title: const AppTitle(fontSize: 30),
-            backgroundColor: AppColors.appBarBackgroundColor,
-            automaticallyImplyLeading: false),
-        body: SafeArea(
-          child: AuthBackgroundWidget(
-              child: currencyTypeListState.when<Widget>(
-                  data: (currencyTypes) {
+      child: AuthBackgroundWidget(
+        child: AppScaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+              title: const AppTitle(fontSize: 30),
+              backgroundColor: AppColors.appBarBackgroundColor,
+              automaticallyImplyLeading: false),
+          body: currencyTypeListState.when<Widget>(data: (currencyTypes) {
             cache.value = Column(
               children: [
                 Align(
@@ -132,7 +131,7 @@ class AuthView extends ConsumerWidget {
                 text: appLocalizations.genericError);
           }, loading: () {
             return showLoading(background: cache.value);
-          })),
+          }),
         ),
       ),
     );

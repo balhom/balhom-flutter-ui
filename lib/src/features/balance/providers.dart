@@ -1,14 +1,15 @@
-import 'package:balhom/src/core/domain/failures/failure.dart';
-import 'package:balhom/src/core/presentation/models/selected_date.dart';
-import 'package:balhom/src/core/presentation/models/selected_date_mode.dart';
+import 'package:balhom/src/core/domain/dtos/selected_date_dto.dart';
+import 'package:balhom/src/core/domain/enums/selected_date_enum.dart';
 import 'package:balhom/src/core/providers.dart';
-import 'package:balhom/src/features/balance/application/balance_create_controller.dart';
-import 'package:balhom/src/features/balance/application/balance_edit_controller.dart';
-import 'package:balhom/src/features/balance/application/balance_list_controller.dart';
-import 'package:balhom/src/features/balance/application/balance_type_list_controller.dart';
-import 'package:balhom/src/features/balance/application/balance_year_controller.dart';
+import 'package:balhom/src/features/balance/application/balance_create_use_case.dart';
+import 'package:balhom/src/features/balance/application/balance_delete_use_case.dart';
+import 'package:balhom/src/features/balance/application/balance_edit_use_case.dart';
+import 'package:balhom/src/features/balance/application/balance_list_use_case.dart';
+import 'package:balhom/src/features/balance/application/balance_type_list_use_case.dart';
+import 'package:balhom/src/features/balance/application/balance_year_use_case.dart';
 import 'package:balhom/src/features/balance/domain/entities/balance_entity.dart';
 import 'package:balhom/src/features/balance/domain/entities/balance_type_entity.dart';
+import 'package:balhom/src/features/balance/domain/enums/balance_sorting_enum.dart';
 import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balhom/src/features/balance/domain/repositories/balance_repository_interface.dart';
 import 'package:balhom/src/features/balance/domain/repositories/balance_type_respository_interface.dart';
@@ -17,21 +18,19 @@ import 'package:balhom/src/features/balance/infrastructure/datasources/remote/ba
 import 'package:balhom/src/features/balance/infrastructure/datasources/remote/balance_type_remote_data_source.dart';
 import 'package:balhom/src/features/balance/infrastructure/repositories/balance_repository.dart';
 import 'package:balhom/src/features/balance/infrastructure/repositories/balance_type_respository.dart';
-import 'package:balhom/src/features/balance/presentation/models/balance_limit_type.dart';
-import 'package:balhom/src/features/balance/presentation/models/balance_ordering_type.dart';
+import 'package:balhom/src/features/balance/domain/enums/balance_limit_type_enum.dart';
 import 'package:balhom/src/features/balance/presentation/states/balance_limit_type_state.dart';
-import 'package:balhom/src/features/balance/presentation/states/balance_ordering_type_state.dart';
+import 'package:balhom/src/features/balance/presentation/states/balance_sorting_state.dart';
 import 'package:balhom/src/core/presentation/states/selected_date_state.dart';
-import 'package:balhom/src/features/statistics/domain/repositories/annual_balance_repository_interface.dart';
-import 'package:balhom/src/features/statistics/domain/repositories/monthly_balance_repository_interface.dart';
-import 'package:balhom/src/features/statistics/infrastructure/datasources/local/annual_balance_local_data_source.dart';
-import 'package:balhom/src/features/statistics/infrastructure/datasources/local/monthly_balance_local_data_source.dart';
-import 'package:balhom/src/features/statistics/infrastructure/datasources/remote/annual_balance_remote_data_source.dart';
-import 'package:balhom/src/features/statistics/infrastructure/datasources/remote/monthly_balance_remote_data_source.dart';
-import 'package:balhom/src/features/statistics/infrastructure/repositories/annual_balance_repository.dart';
-import 'package:balhom/src/features/statistics/infrastructure/repositories/monthly_balance_repository.dart';
+import 'package:balhom/src/features/statistics/domain/repositories/annual_savings_repository_interface.dart';
+import 'package:balhom/src/features/statistics/domain/repositories/monthly_savings_repository_interface.dart';
+import 'package:balhom/src/features/statistics/infrastructure/datasources/local/annual_savings_local_data_source.dart';
+import 'package:balhom/src/features/statistics/infrastructure/datasources/local/monthly_savings_local_data_source.dart';
+import 'package:balhom/src/features/statistics/infrastructure/datasources/remote/annual_savings_remote_data_source.dart';
+import 'package:balhom/src/features/statistics/infrastructure/datasources/remote/monthly_savings_remote_data_source.dart';
+import 'package:balhom/src/features/statistics/infrastructure/repositories/annual_savings_repository.dart';
+import 'package:balhom/src/features/statistics/infrastructure/repositories/monthly_savings_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fpdart/fpdart.dart';
 
 ///
 /// Infrastructure dependencies
@@ -54,81 +53,70 @@ final balanceRepositoryProvider =
 
 /// Annual balance repository
 final annualBalanceRepositoryProvider =
-    Provider<AnnualBalanceRepositoryInterface>((ref) => AnnualBalanceRepository(
-        annualBalanceRemoteDataSource: AnnualBalanceRemoteDataSource(
+    Provider<AnnualSavingsRepositoryInterface>((ref) => AnnualSavingsRepository(
+        annualBalanceRemoteDataSource: AnnualSavingsRemoteDataSource(
             apiClient: ref.read(balhomApiClientProvider)),
-        annualBalanceLocalDataSource: AnnualBalanceLocalDataSource(
+        annualBalanceLocalDataSource: AnnualSavingsLocalDataSource(
             localDbClient: ref.read(localDbClientProvider))));
 
 /// Monthly balance repository
 final monthlyBalanceRepositoryProvider =
-    Provider<MonthlyBalanceRepositoryInterface>((ref) =>
-        MonthlyBalanceRepository(
-            monthlyBalanceRemoteDataSource: MonthlyBalanceRemoteDataSource(
+    Provider<MonthlySavingsRepositoryInterface>((ref) =>
+        MonthlySavingsRepository(
+            monthlyBalanceRemoteDataSource: MonthlySavingsRemoteDataSource(
                 apiClient: ref.read(balhomApiClientProvider)),
-            monthlyBalanceLocalDataSource: MonthlyBalanceLocalDataSource(
+            monthlyBalanceLocalDataSource: MonthlySavingLocalDataSource(
                 localDbClient: ref.read(localDbClientProvider))));
 
 ///
 /// Application dependencies
 ///
 
-final revenueListControllerProvider = StateNotifierProvider<
-    BalanceListController,
-    AsyncValue<Either<Failure, List<BalanceEntity>>>>((ref) {
-  final balanceRepository = ref.watch(balanceRepositoryProvider);
-  final selectedDate = ref.watch(revenueSelectedDateProvider);
-  return BalanceListController(
-      balanceRepository: balanceRepository,
-      selectedDateDto: selectedDate,
-      balanceTypeEnum: BalanceTypeEnum.revenue);
-});
-
-final expenseListControllerProvider = StateNotifierProvider<
-    BalanceListController,
-    AsyncValue<Either<Failure, List<BalanceEntity>>>>((ref) {
-  final balanceRepository = ref.watch(balanceRepositoryProvider);
-  final selectedDate = ref.watch(revenueSelectedDateProvider);
-  return BalanceListController(
-      balanceRepository: balanceRepository,
-      selectedDateDto: selectedDate,
-      balanceTypeEnum: BalanceTypeEnum.expense);
-});
-
-final balanceCreateControllerProvider =
-    StateNotifierProvider<BalanceCreateController, AsyncValue<BalanceEntity?>>(
+final balanceListUseCaseProvider =
+    StateNotifierProvider<BalanceListUseCase, AsyncValue<List<BalanceEntity>>>(
         (ref) {
   final balanceRepository = ref.watch(balanceRepositoryProvider);
-  return BalanceCreateController(balanceRepository: balanceRepository);
+  return BalanceListUseCase(balanceRepository: balanceRepository);
+});
+
+final balanceCreateUseCaseProvider =
+    StateNotifierProvider<BalanceCreateUseCase, AsyncValue<void>>((ref) {
+  final balanceRepository = ref.watch(balanceRepositoryProvider);
+  return BalanceCreateUseCase(balanceRepository: balanceRepository);
 });
 
 final balanceEditControllerProvider =
-    StateNotifierProvider<BalanceEditController, AsyncValue<BalanceEntity?>>(
-        (ref) {
+    StateNotifierProvider<BalanceEditUseCase, AsyncValue<void>>((ref) {
   final balanceRepository = ref.watch(balanceRepositoryProvider);
-  return BalanceEditController(balanceRepository: balanceRepository);
+  return BalanceEditUseCase(balanceRepository: balanceRepository);
 });
 
-final expenseTypeListControllerProvider = StateNotifierProvider<
-    BalanceTypeListController, AsyncValue<List<BalanceTypeEntity>>>((ref) {
+final balanceDeleteUseCaseProvider =
+    StateNotifierProvider<BalanceDeleteUseCase, AsyncValue<void>>((ref) {
+  final balanceRepository = ref.watch(balanceRepositoryProvider);
+  return BalanceDeleteUseCase(balanceRepository: balanceRepository);
+});
+
+final expenseTypeListUseCaseProvider = StateNotifierProvider<
+    BalanceTypeListUseCase, AsyncValue<List<BalanceTypeEntity>>>((ref) {
   final balanceTypeRepository = ref.watch(balanceTypeRepositoryProvider);
-  return BalanceTypeListController(
+  return BalanceTypeListUseCase(
       balanceTypeRepository: balanceTypeRepository,
       balanceTypeEnum: BalanceTypeEnum.expense);
 });
 
-final revenueTypeListControllerProvider = StateNotifierProvider<
-    BalanceTypeListController, AsyncValue<List<BalanceTypeEntity>>>((ref) {
+final revenueTypeListUseCaseProvider = StateNotifierProvider<
+    BalanceTypeListUseCase, AsyncValue<List<BalanceTypeEntity>>>((ref) {
   final balanceTypeRepository = ref.watch(balanceTypeRepositoryProvider);
-  return BalanceTypeListController(
+  return BalanceTypeListUseCase(
       balanceTypeRepository: balanceTypeRepository,
       balanceTypeEnum: BalanceTypeEnum.revenue);
 });
 
-final balanceYearsControllerProvider =
-    StateNotifierProvider<BalanceYearController, AsyncValue<List<int>>>((ref) {
+final balanceYearsUseCaseProvider =
+    StateNotifierProvider<BalanceYearUseCase, AsyncValue<List<int>>>((ref) {
   final balanceRepository = ref.watch(balanceRepositoryProvider);
-  return BalanceYearController(balanceRepository: balanceRepository);
+  return BalanceYearUseCase(balanceRepository: balanceRepository);
 });
 
 ///
@@ -147,18 +135,16 @@ final expenseLimitTypeProvider =
   return BalanceLimitTypeState(BalanceLimitTypeEnum.limit15);
 });
 
-/// Ordering type for revenues
-final revenueOrderingTypeProvider =
-    StateNotifierProvider<BalanceOrderingTypeState, BalanceOrderingTypeEnum>(
-        (ref) {
-  return BalanceOrderingTypeState(BalanceOrderingTypeEnum.date);
+/// Sorting for revenues
+final revenueSortingProvider =
+    StateNotifierProvider<BalanceSortingState, BalanceSortingEnum>((ref) {
+  return BalanceSortingState(BalanceSortingEnum.descDate);
 });
 
-/// Ordering type for expenses
-final expenseOrderingTypeProvider =
-    StateNotifierProvider<BalanceOrderingTypeState, BalanceOrderingTypeEnum>(
-        (ref) {
-  return BalanceOrderingTypeState(BalanceOrderingTypeEnum.date);
+/// Sorting for expenses
+final expenseSortingProvider =
+    StateNotifierProvider<BalanceSortingState, BalanceSortingEnum>((ref) {
+  return BalanceSortingState(BalanceSortingEnum.descDate);
 });
 
 /// Selected date for revenues

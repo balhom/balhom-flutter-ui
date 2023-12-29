@@ -1,6 +1,6 @@
 import 'package:balhom/config/app_theme.dart';
-import 'package:balhom/src/core/presentation/models/selected_date.dart';
-import 'package:balhom/src/core/presentation/models/selected_date_mode.dart';
+import 'package:balhom/src/core/domain/dtos/selected_date_dto.dart';
+import 'package:balhom/src/core/domain/enums/selected_date_enum.dart';
 import 'package:balhom/src/core/presentation/widgets/app_text_button.dart';
 import 'package:balhom/src/core/presentation/widgets/app_text_check_box.dart';
 import 'package:balhom/src/core/providers.dart';

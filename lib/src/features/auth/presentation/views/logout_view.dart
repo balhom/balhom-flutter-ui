@@ -1,6 +1,6 @@
+import 'package:balhom/src/core/presentation/views/app_loading_view.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/src/core/presentation/views/app_error_view.dart';
-import 'package:balhom/src/core/presentation/widgets/app_loading_widget.dart';
 import 'package:balhom/src/features/auth/presentation/views/auth_view.dart';
 import 'package:balhom/src/features/auth/providers.dart';
 import 'package:flutter/material.dart';
@@ -17,15 +17,16 @@ class LogoutView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authController = ref.read(authControllerProvider.notifier);
+    final logoutUseCase = ref.read(logoutUseCaseProvider.notifier);
     Future.delayed(Duration.zero, () async {
-      final value = await authController.logout();
-      value.fold((_) {
+      await logoutUseCase.handle();
+      final logoutState = ref.read(logoutUseCaseProvider);
+      if (logoutState.hasError) {
         AppErrorView.go();
-      }, (_) {
+      } else {
         router.goNamed(AuthView.routeName);
-      });
+      }
     });
-    return const Scaffold(body: AppLoadingWidget());
+    return const AppLoadingView();
   }
 }

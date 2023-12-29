@@ -26,10 +26,16 @@ class BalanceCard extends ConsumerWidget {
 
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
-    final accountController = ref.read(accountControllerProvider.notifier);
-    final balanceListController = balanceTypeEnum.isExpense()
-        ? ref.read(expenseListControllerProvider.notifier)
-        : ref.read(revenueListControllerProvider.notifier);
+    final accountGetUseCase = ref.read(accountGetUseCaseProvider.notifier);
+    final balanceListUseCase = ref.read(balanceListUseCaseProvider.notifier);
+    final balanceDeleteUseCase =
+        ref.read(balanceDeleteUseCaseProvider.notifier);
+    final balanceSelectedDateState = balanceTypeEnum.isExpense()
+        ? ref.read(expenseSelectedDateProvider)
+        : ref.read(revenueSelectedDateProvider);
+    final balanceSortingState = balanceTypeEnum.isExpense()
+        ? ref.read(expenseSortingProvider)
+        : ref.read(revenueSortingProvider);
 
     return GestureDetector(
       onTap: () {
@@ -77,8 +83,14 @@ class BalanceCard extends ConsumerWidget {
                       ? () async {
                           if (await showDeleteAdviceDialog(
                               balanceTypeEnum, appLocalizations)) {
-                            balanceListController.deleteBalance(balance);
-                            accountController.get();
+                            await balanceDeleteUseCase.handle(
+                                balance.id!, appLocalizations);
+                            await balanceListUseCase.handle(
+                                balanceSelectedDateState,
+                                balanceTypeEnum,
+                                balanceSortingState,
+                                1);
+                            await accountGetUseCase.handle();
                           }
                         }
                       : null,

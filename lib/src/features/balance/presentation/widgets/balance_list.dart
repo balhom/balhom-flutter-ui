@@ -1,8 +1,8 @@
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/features/balance/domain/entities/balance_entity.dart';
+import 'package:balhom/src/features/balance/domain/enums/balance_sorting_enum.dart';
 import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart';
-import 'package:balhom/src/features/balance/presentation/models/balance_limit_type.dart';
-import 'package:balhom/src/features/balance/presentation/models/balance_ordering_type.dart';
+import 'package:balhom/src/features/balance/domain/enums/balance_limit_type_enum.dart';
 import 'package:balhom/src/features/balance/presentation/views/balance_create_view.dart';
 import 'package:balhom/src/features/balance/presentation/views/balance_view.dart';
 import 'package:balhom/src/features/balance/presentation/widgets/balance_card.dart';
@@ -23,8 +23,8 @@ class BalanceList extends ConsumerWidget {
     final isConnected = connectionStateListenable.value;
 
     final orderingType = balanceTypeEnum.isExpense()
-        ? ref.watch(expenseOrderingTypeProvider)
-        : ref.watch(revenueOrderingTypeProvider);
+        ? ref.watch(expenseSortingProvider)
+        : ref.watch(revenueSortingProvider);
 
     final limitType = balanceTypeEnum.isExpense()
         ? ref.watch(expenseLimitTypeProvider)
@@ -68,21 +68,21 @@ class BalanceList extends ConsumerWidget {
 
   @visibleForTesting
   List<BalanceEntity> orderBalances(
-      BalanceOrderingTypeEnum orderingType, BalanceLimitTypeEnum limitType) {
+      BalanceSortingEnum sortingEnum, BalanceLimitTypeEnum limitType) {
     List<BalanceEntity> aux = [];
-    for (BalanceEntity balance in balances) {
+    for (final balance in balances) {
       int i = 0;
       while (i < aux.length) {
         // Case Date ordering
-        if (orderingType == BalanceOrderingTypeEnum.date &&
+        if (sortingEnum == BalanceSortingEnum.descDate &&
             balance.date.isAfter(aux.elementAt(i).date)) break;
         // Case Quantity ordering
-        if (orderingType == BalanceOrderingTypeEnum.quantity &&
+        if (sortingEnum == BalanceSortingEnum.descConvertedQuantity &&
             balance.convertedQuantity! > aux.elementAt(i).convertedQuantity!) {
           break;
         }
         // Case Name ordering
-        if (orderingType == BalanceOrderingTypeEnum.name &&
+        if (sortingEnum == BalanceSortingEnum.name &&
             balance.name.compareTo(aux.elementAt(i).name) < 0) break;
         i++;
       }

@@ -18,7 +18,7 @@ class DateUtil {
   static String monthNumToString(int month, AppLocalizations appLocalizations) {
     return DateFormat.MMM(appLocalizations.localeName)
         .format(DateTime(DateTime.now().year, month))
-        .toUpperCase();
+        .toLowerCase();
   }
 
   static Map<int, String> getMonthDict(AppLocalizations appLocalizations,

@@ -1,4 +1,5 @@
 import 'package:balhom/config/app_colors.dart';
+import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/src/core/presentation/views/app_title.dart';
 import 'package:balhom/src/features/account/providers.dart';
@@ -25,10 +26,10 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
-    final account = ref.watch(accountControllerProvider);
+    final accountGetState = ref.watch(accountGetUseCaseProvider);
 
-    return account.when(data: (data) {
-      cache.value = Scaffold(
+    return accountGetState.when(data: (data) {
+      cache.value = AppScaffold(
           appBar: AppBar(
             title: const AppTitle(fontSize: 30),
             backgroundColor: AppColors.appBarBackgroundColor,

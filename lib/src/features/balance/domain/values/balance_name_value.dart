@@ -30,7 +30,7 @@ Either<Failure, String> _validate(
       ? appLocalizations.balanceNameRequired
       : appLocalizations.balanceNameMaxLength;
   return left(
-    UnprocessableValueFailure(
+    InvalidValueFailure(
       detail: message,
     ),
   );

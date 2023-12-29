@@ -21,6 +21,7 @@ class AppTheme {
   /// Light [ThemeData]
   static ThemeData lightTheme = ThemeData(
       brightness: Brightness.light,
+      useMaterial3: true,
       primaryColor: AppColors.primaryColor,
       navigationRailTheme: navigationRailTheme,
       bottomNavigationBarTheme: bottomNavigationBarTheme,
@@ -68,11 +69,12 @@ class AppTheme {
       colorScheme: ColorScheme.fromSwatch(
               brightness: Brightness.light,
               primarySwatch: AppColors.primaryColor)
-          .copyWith(background: const Color.fromARGB(254, 254, 252, 224)));
+          .copyWith(background: AppColors.appLightBackgroundColor));
 
   /// Dark [ThemeData]
   static ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
+      useMaterial3: true,
       primaryColor: AppColors.primaryColor,
       navigationRailTheme: navigationRailTheme,
       bottomNavigationBarTheme: bottomNavigationBarTheme,
@@ -120,5 +122,6 @@ class AppTheme {
       colorScheme: ColorScheme.fromSwatch(
               primarySwatch: AppColors.colorToMaterialColor(Colors.white))
           .copyWith(
-              brightness: Brightness.dark, background: AppColors.greyColor));
+              brightness: Brightness.dark,
+              background: AppColors.appDarkBackgroundColor));
 }

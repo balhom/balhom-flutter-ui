@@ -1,9 +1,8 @@
 import 'package:balhom/config/app_colors.dart';
 import 'package:balhom/config/app_theme.dart';
-import 'package:balhom/src/core/presentation/models/selected_date_mode.dart';
+import 'package:balhom/src/core/domain/enums/selected_date_enum.dart';
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/core/utils/widget_utils.dart';
-import 'package:balhom/src/features/balance/providers.dart';
 import 'package:balhom/src/features/currency/domain/entities/currency_type_entity.dart';
 import 'package:balhom/src/features/currency/domain/entities/date_currency_conversion_list_entity.dart';
 import 'package:balhom/src/features/currency/presentation/widgets/currency_chart_container.dart';
@@ -28,96 +27,70 @@ class StatisticsViewDesktop extends ConsumerWidget {
     final theme = ref.watch(themeDataProvider);
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
-    final statisticsDataState = ref.watch(statisticsControllerProvider);
+    final statisticsDataState = ref.watch(statisticsUseCaseProvider);
 
-    final balanceYearsState = ref.watch(balanceYearsControllerProvider);
-
-    final monthlyBalanceListState =
-        ref.watch(monthlyBalanceListControllerProvider);
-    final annualBalanceListState =
-        ref.watch(annualBalanceListControllerProvider);
+    final monthlySavingsState = ref.watch(monthlySavingsUseCaseProvider);
+    final annualSavingsState = ref.watch(annualSavingsUseCaseProvider);
 
     final daysCurrencyConversionsState =
-        ref.watch(daysCurrencyConversionsControllerProvider);
-    final currencyTypesState = ref.watch(currencyTypeListsControllerProvider);
+        ref.watch(daysCurrencyConversionsUseCaseProvider);
+    final currencyTypesState = ref.watch(currencyTypeListsUseCaseProvider);
 
-    return balanceYearsState.when<Widget>(data: (balanceYears) {
-      return monthlyBalanceListState.when<Widget>(data: (monthlyBalanceList) {
-        return annualBalanceListState.when<Widget>(data: (annualBalanceList) {
-          return statisticsDataState.when<Widget>(data: (statisticsData) {
-            return daysCurrencyConversionsState.when<Widget>(
-                data: (daysCurrencyConversions) {
-              return currencyTypesState.when<Widget>(data: (currencyTypes) {
-                cache.value = SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        color: theme == AppTheme.lightTheme
-                            ? AppColors.balanceBackgroundColor
-                            : AppColors.balanceDarkBackgroundColor,
-                        foregroundDecoration:
-                            BoxDecoration(border: Border.all()),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            StatisticsBalanceChartContainer(
-                              dateMode: SelectedDateEnum.month,
-                              dailyStatistics: statisticsData.dailyStatistics,
-                              monthlyStatistics:
-                                  statisticsData.monthlyStatistics,
-                              balanceYears: balanceYears,
-                            ),
-                            StatisticsBalanceChartContainer(
-                              dateMode: SelectedDateEnum.year,
-                              dailyStatistics: statisticsData.dailyStatistics,
-                              monthlyStatistics:
-                                  statisticsData.monthlyStatistics,
-                              balanceYears: balanceYears,
-                            ),
-                          ],
-                        ),
+    return monthlySavingsState.when<Widget>(data: (monthlyBalanceList) {
+      return annualSavingsState.when<Widget>(data: (annualBalanceList) {
+        return statisticsDataState.when<Widget>(data: (statisticsData) {
+          return daysCurrencyConversionsState.when<Widget>(
+              data: (daysCurrencyConversions) {
+            return currencyTypesState.when<Widget>(data: (currencyTypes) {
+              cache.value = SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      color: theme.colorScheme.background,
+                      foregroundDecoration: BoxDecoration(border: Border.all()),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          StatisticsBalanceChartContainer(
+                            dateMode: SelectedDateEnum.month,
+                            dailyStatistics: statisticsData.dailyStatistics,
+                            monthlyStatistics: statisticsData.monthlyStatistics,
+                          ),
+                          StatisticsBalanceChartContainer(
+                            dateMode: SelectedDateEnum.year,
+                            dailyStatistics: statisticsData.dailyStatistics,
+                            monthlyStatistics: statisticsData.monthlyStatistics,
+                          ),
+                        ],
                       ),
-                      Container(
-                        color: theme == AppTheme.lightTheme
-                            ? AppColors.balanceBackgroundColor
-                            : AppColors.balanceDarkBackgroundColor,
-                        foregroundDecoration:
-                            BoxDecoration(border: Border.all()),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            StatisticsSavingsYearChartContainer(
-                              monthlyBalances: monthlyBalanceList,
-                              balanceYears: balanceYears,
-                            ),
-                            StatisticsSavingsEightYearsChartContainer(
-                              annualBalances: annualBalanceList,
-                            )
-                          ],
-                        ),
+                    ),
+                    Container(
+                      color: theme == AppTheme.lightTheme
+                          ? AppColors.balanceBackgroundColor
+                          : AppColors.balanceDarkBackgroundColor,
+                      foregroundDecoration: BoxDecoration(border: Border.all()),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const StatisticsSavingsYearChartContainer(),
+                          StatisticsSavingsEightYearsChartContainer(
+                            annualBalances: annualBalanceList,
+                          )
+                        ],
                       ),
-                      (isConnected)
-                          ? statisticsCurrencyChartContainer(
-                              daysCurrencyConversions, currencyTypes, theme)
-                          : showError(
-                              background: statisticsCurrencyChartContainer(
-                                  daysCurrencyConversions,
-                                  currencyTypes,
-                                  theme),
-                              icon: Icons.network_wifi_1_bar,
-                              text: appLocalizations.noConnection)
-                    ],
-                  ),
-                );
-                return cache.value;
-              }, error: (error, _) {
-                return showError(
-                    error: error,
-                    background: cache.value,
-                    text: appLocalizations.genericError);
-              }, loading: () {
-                return showLoading(background: cache.value);
-              });
+                    ),
+                    (isConnected)
+                        ? statisticsCurrencyChartContainer(
+                            daysCurrencyConversions, currencyTypes, theme)
+                        : showError(
+                            background: statisticsCurrencyChartContainer(
+                                daysCurrencyConversions, currencyTypes, theme),
+                            icon: Icons.network_wifi_1_bar,
+                            text: appLocalizations.noConnection)
+                  ],
+                ),
+              );
+              return cache.value;
             }, error: (error, _) {
               return showError(
                   error: error,

@@ -4,7 +4,7 @@ import 'package:balhom/src/features/balance/domain/entities/balance_entity.dart'
 import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balhom/src/features/balance/presentation/widgets/balance_limit_type_dialog.dart';
 import 'package:balhom/src/features/balance/presentation/widgets/balance_list.dart';
-import 'package:balhom/src/features/balance/presentation/widgets/balance_ordering_type_dialog.dart';
+import 'package:balhom/src/features/balance/presentation/widgets/balance_sorting_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

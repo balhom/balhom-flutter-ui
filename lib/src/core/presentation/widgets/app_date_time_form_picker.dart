@@ -21,6 +21,7 @@ class AppDateTimeFormPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppTextFormField(
+      showCursor: false,
       onTap: () async {
         // Below line stops keyboard from appearing
         FocusScope.of(context).requestFocus(FocusNode());
@@ -39,7 +40,8 @@ class AppDateTimeFormPicker extends StatelessWidget {
           );
 
           if (newTime != null) {
-            onTap(newDate);
+            onTap(DateTime(newDate.year, newDate.month, newDate.day,
+                newTime.hour, newTime.minute));
           }
         }
       },

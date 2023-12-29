@@ -1,4 +1,5 @@
 import 'package:balhom/config/app_colors.dart';
+import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/src/core/presentation/views/app_error_view.dart';
 import 'package:balhom/src/core/presentation/widgets/info_dialog.dart';
@@ -21,22 +22,26 @@ class AccountDeleteView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final accountController = ref.read(accountControllerProvider.notifier);
-    final appLocalizations = ref.watch(appLocalizationsProvider);
+    final accountDeleteUseCase =
+        ref.read(accountDeleteUseCaseProvider.notifier);
+    final appLocalizations = ref.read(appLocalizationsProvider);
+
     Future.microtask(() {
       showDeleteAdviceDialog(appLocalizations).then((value) async {
         if (value) {
-          (await accountController.delete()).fold((_) {
-            AppErrorView.go();
-          }, (_) {
+          await accountDeleteUseCase.handle();
+          final accountDeleteState = ref.read(accountDeleteUseCaseProvider);
+          if (accountDeleteState.asData != null) {
             router.goNamed(AuthView.routeName);
-          });
+          } else {
+            AppErrorView.go();
+          }
         } else {
           router.pop();
         }
       });
     });
-    return const Scaffold(
+    return const AppScaffold(
         body: AppLoadingWidget(
       color: AppColors.circularProgressColor,
     ));

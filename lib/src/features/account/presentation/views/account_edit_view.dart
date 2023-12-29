@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/presentation/views/app_scaffold.dart';
+
 class AccountEditView extends ConsumerStatefulWidget {
   /// Route name
   static const routeName = 'accountEdit';
@@ -36,19 +38,19 @@ class _AccountEditViewState extends ConsumerState<AccountEditView> {
 
   @override
   Widget build(BuildContext context) {
-    final accountState = ref.watch(accountControllerProvider);
+    final accountGetState = ref.watch(accountGetUseCaseProvider);
 
     final appLocalizations = ref.watch(appLocalizationsProvider);
 
     final isConnected = connectionStateListenable.value;
 
-    return accountState.when(data: (accountEntity) {
+    return accountGetState.when(data: (accountEntity) {
       final String lastLogin = accountEntity == null
           ? "-"
           : accountEntity.lastLogin == null
               ? "-"
               : widget.dateFormatter.format(accountEntity.lastLogin!);
-      widget.cache.value = Scaffold(
+      widget.cache.value = AppScaffold(
           appBar: AppBar(
             title: const AppTitle(fontSize: 30),
             backgroundColor: AppColors.appBarBackgroundColor,

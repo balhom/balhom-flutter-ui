@@ -3,11 +3,9 @@ import 'package:balhom/src/core/presentation/widgets/app_will_pop_scope.dart';
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/core/utils/platform_utils.dart';
 import 'package:balhom/src/features/balance/presentation/views/balance_view.dart';
-import 'package:balhom/src/features/currency/providers.dart';
 import 'package:balhom/src/features/home/presentation/views/home_tabs.dart';
 import 'package:balhom/src/features/home/presentation/widgets/custom_app_bar.dart';
 import 'package:balhom/src/features/statistics/presentation/views/statistics_view.dart';
-import 'package:balhom/src/features/statistics/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,38 +25,24 @@ class HomeView extends ConsumerStatefulWidget {
 class _HomeViewState extends ConsumerState<HomeView> {
   @override
   Widget build(BuildContext context) {
-    final appLocalizations = ref.watch(appLocalizationsProvider);
+    final appLocalizations = ref.read(appLocalizationsProvider);
     final isConnected = connectionStateListenable.value;
     if (!isConnected) {
       Future.delayed(Duration.zero, () {
         showNoConnectionSnackBar(appLocalizations);
       });
     }
-    return AppPopScope(
-      snackBarText: appLocalizations.exitRepeatMessage,
+
+    final child = SafeArea(
       child: AdaptiveNavigationScaffold(
         appBar: const PreferredSize(
             preferredSize: Size.fromHeight(40), child: CustomAppBar()),
         resizeToAvoidBottomInset: false,
-        body: SafeArea(child: widget.child),
+        body: widget.child,
         selectedIndex: widget.selectedSection.index,
         onDestinationSelected: (int index) {
           switch (HomeTabEnum.values[index]) {
             case HomeTabEnum.statistics:
-              final selectedDate =
-                  ref.read(statisticsBalanceSelectedDateProvider);
-
-              ref
-                  .read(monthlyBalanceListControllerProvider.notifier)
-                  .get(selectedDate);
-              ref
-                  .read(annualBalanceListControllerProvider.notifier)
-                  .get(selectedDate);
-              ref.read(statisticsControllerProvider.notifier).get(selectedDate);
-              ref
-                  .read(daysCurrencyConversionsControllerProvider.notifier)
-                  .get(20);
-
               context.go("/${StatisticsView.routePath}");
               break;
             case HomeTabEnum.revenues:
@@ -86,6 +70,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
         navigationTypeResolver: navigationTypeResolver,
       ),
     );
+    return AppPopScope(
+        snackBarText: appLocalizations.exitRepeatMessage, child: child);
   }
 
   @visibleForTesting

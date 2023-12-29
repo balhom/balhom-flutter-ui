@@ -106,9 +106,9 @@ class BalanceRemoteDataSource {
         (value) => right(BalanceEntity.fromJson(value.data)));
   }
 
-  Future<Either<Failure, void>> delete(final BalanceEntity balance) async {
+  Future<Either<Failure, void>> delete(final int id) async {
     final response = await apiClient
-        .delRequest('${BalhomAPIContract.balance}/${balance.id.toString()}');
+        .delRequest('${BalhomAPIContract.balance}/${id.toString()}');
     // Check if there is a request failure
     return response.fold((failure) => left(failure), (_) => right(null));
   }

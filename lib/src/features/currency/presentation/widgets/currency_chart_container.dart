@@ -3,9 +3,9 @@ import 'package:balhom/src/features/currency/domain/entities/currency_type_entit
 import 'package:balhom/src/features/currency/domain/entities/date_currency_conversion_list_entity.dart';
 import 'package:balhom/src/features/currency/presentation/widgets/currency_line_chart.dart';
 import 'package:balhom/src/features/currency/providers.dart';
+import 'package:balhom/src/features/statistics/presentation/widgets/statistics_chart_title_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class StatisticsCurrencyChartContainer extends ConsumerWidget {
   final DateCurrencyConversionListEntity dateCurrencyConversion;
@@ -34,58 +34,43 @@ class StatisticsCurrencyChartContainer extends ConsumerWidget {
             : 500;
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 20, bottom: 10),
-              color: const Color.fromARGB(255, 61, 138, 247),
-              height: 45,
-              width: screenWidth * 0.70,
-              child: Center(
-                  child: Text(
-                      style: GoogleFonts.openSans(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                      appLocalizations.currencyChartTitle)),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 20, bottom: 10),
-              color: const Color.fromARGB(255, 117, 169, 249),
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              height: 45,
-              child: DropdownButton<String>(
-                  value: selectedConversion.currencyFrom,
-                  items: coins.map((coin) {
-                    return DropdownMenuItem<String>(
-                      value: coin,
-                      child: Text(coin),
-                    );
-                  }).toList(),
-                  onChanged: (coin) {
-                    selectedConversionState.setCurrencyFrom(coin!);
-                  }),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 20, bottom: 10),
-              color: const Color.fromARGB(255, 117, 169, 249),
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              height: 45,
-              child: DropdownButton<String>(
-                  value: selectedConversion.currencyTo,
-                  items: coins.map((coin) {
-                    return DropdownMenuItem<String>(
-                      value: coin,
-                      child: Text(coin),
-                    );
-                  }).toList(),
-                  onChanged: (coin) {
-                    selectedConversionState.setCurrencyTo(coin!);
-                  }),
-            )
-          ],
-        ),
+        StatisticsChartTitleContainer(
+            backgroundColor: const Color.fromARGB(255, 61, 138, 247),
+            text: appLocalizations.currencyChartTitle,
+            button: Row(
+              children: [
+                Container(
+                  color: const Color.fromARGB(255, 117, 169, 249),
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  child: DropdownButton<String>(
+                      value: selectedConversion.currencyFrom,
+                      items: coins.map((coin) {
+                        return DropdownMenuItem<String>(
+                          value: coin,
+                          child: Text(coin),
+                        );
+                      }).toList(),
+                      onChanged: (coin) {
+                        selectedConversionState.setCurrencyFrom(coin!);
+                      }),
+                ),
+                Container(
+                  color: const Color.fromARGB(255, 117, 169, 249),
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  child: DropdownButton<String>(
+                      value: selectedConversion.currencyTo,
+                      items: coins.map((coin) {
+                        return DropdownMenuItem<String>(
+                          value: coin,
+                          child: Text(coin),
+                        );
+                      }).toList(),
+                      onChanged: (coin) {
+                        selectedConversionState.setCurrencyTo(coin!);
+                      }),
+                )
+              ],
+            )),
         SizedBox(
             height: chartLineHeight,
             width: screenWidth * 0.90,

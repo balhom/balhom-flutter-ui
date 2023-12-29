@@ -34,5 +34,5 @@ abstract class BalanceRepositoryInterface {
   Future<Either<Failure, BalanceEntity>> updateBalance(BalanceEntity balance);
 
   /// Delete a [BalanceEntity].
-  Future<Either<Failure, void>> deleteBalance(BalanceEntity balance);
+  Future<Either<Failure, void>> deleteBalance(int id);
 }

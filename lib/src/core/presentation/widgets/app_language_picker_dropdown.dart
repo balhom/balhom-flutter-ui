@@ -1,3 +1,4 @@
+import 'package:balhom/config/app_layout.dart';
 import 'package:flag/flag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -13,9 +14,13 @@ class AppLanguagePickerDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context);
     return Container(
-      color: Theme.of(context).brightness == Brightness.light ?
-        Colors.grey[300] : Colors.grey[600],
+      decoration: BoxDecoration(
+          color: appTheme.colorScheme.background,
+          border: Border.all(color: Colors.black),
+          borderRadius: const BorderRadius.all(
+              Radius.circular(AppLayout.containerBorderRadius))),
       padding: const EdgeInsets.all(10.0),
       constraints: const BoxConstraints(maxWidth: 180),
       child: LanguagePickerDropdown(

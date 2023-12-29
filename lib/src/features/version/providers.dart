@@ -1,5 +1,5 @@
 import 'package:balhom/src/core/providers.dart';
-import 'package:balhom/src/features/version/application/version_controller.dart';
+import 'package:balhom/src/features/version/application/version_use_case.dart';
 import 'package:balhom/src/core/domain/failures/failure.dart';
 import 'package:balhom/src/features/version/domain/dtos/app_version_dto.dart';
 import 'package:balhom/src/features/version/domain/repositories/version_repository_interface.dart';

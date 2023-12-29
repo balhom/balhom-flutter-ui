@@ -1,14 +1,14 @@
-import 'package:balhom/src/core/presentation/models/selected_date.dart';
-import 'package:balhom/src/core/presentation/models/selected_date_mode.dart';
+import 'package:balhom/src/core/domain/dtos/selected_date_dto.dart';
+import 'package:balhom/src/core/domain/enums/selected_date_enum.dart';
 import 'package:balhom/src/core/presentation/states/selected_date_state.dart';
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/features/balance/providers.dart';
-import 'package:balhom/src/features/statistics/application/annual_balance_controller.dart';
-import 'package:balhom/src/features/statistics/application/monthly_balance_list_controller.dart';
-import 'package:balhom/src/features/statistics/application/statistics_controller.dart';
+import 'package:balhom/src/features/statistics/application/annual_savings_use_case.dart';
+import 'package:balhom/src/features/statistics/application/monthly_savings_use_case.dart';
+import 'package:balhom/src/features/statistics/application/statistics_use_case.dart';
 import 'package:balhom/src/features/statistics/domain/dtos/statistics_data_dto.dart';
-import 'package:balhom/src/features/statistics/domain/entities/annual_balance_entity.dart';
-import 'package:balhom/src/features/statistics/domain/entities/monthly_balance_entity.dart';
+import 'package:balhom/src/features/statistics/domain/entities/annual_saving_entity.dart';
+import 'package:balhom/src/features/statistics/domain/entities/monthly_saving_entity.dart';
 import 'package:balhom/src/features/statistics/domain/repositories/daily_statistics_repository_interface.dart';
 import 'package:balhom/src/features/statistics/domain/repositories/monthly_statistics_repository_interface.dart';
 import 'package:balhom/src/features/statistics/infrastructure/datasources/remote/daily_statistics_remote_data_source.dart';
@@ -42,30 +42,28 @@ final monthlyStatisticsRepositoryProvider =
 /// Application dependencies
 ///
 
-final monthlyBalanceListControllerProvider = StateNotifierProvider<
-    MonthlyBalanceListController,
-    AsyncValue<List<MonthlyBalanceEntity>>>((ref) {
-  final monthlyBalanceRepository = ref.read(monthlyBalanceRepositoryProvider);
-  return MonthlyBalanceListController(
-      monthlyBalanceRepository: monthlyBalanceRepository);
-});
-
-final annualBalanceListControllerProvider = StateNotifierProvider<
-    AnnualBalanceListController, AsyncValue<List<AnnualBalanceEntity>>>((ref) {
-  final annualBalanceRepository = ref.read(annualBalanceRepositoryProvider);
-  return AnnualBalanceListController(
-      annualBalanceRepository: annualBalanceRepository);
-});
-
-final statisticsControllerProvider =
-    StateNotifierProvider<StatisticsController, AsyncValue<StatisticsDataDto>>(
+final statisticsUseCaseProvider =
+    StateNotifierProvider<StatisticsUseCase, AsyncValue<StatisticsDataDto>>(
         (ref) {
   final dailyStatisticsRepository = ref.read(dailyStatisticsRepositoryProvider);
   final monthlyStatisticsRepository =
       ref.read(monthlyStatisticsRepositoryProvider);
-  return StatisticsController(
+  return StatisticsUseCase(
       dailyStatisticsRepository: dailyStatisticsRepository,
       monthlyStatisticsRepository: monthlyStatisticsRepository);
+});
+
+final monthlySavingsUseCaseProvider = StateNotifierProvider<
+    MonthlySavingsUseCase, AsyncValue<List<MonthlySavingEntity>>>((ref) {
+  final monthlyBalanceRepository = ref.read(monthlyBalanceRepositoryProvider);
+  return MonthlySavingsUseCase(
+      monthlyBalanceRepository: monthlyBalanceRepository);
+});
+
+final annualSavingsUseCaseProvider = StateNotifierProvider<AnnualSavingsUseCase,
+    AsyncValue<List<AnnualSavingEntity>>>((ref) {
+  final annualBalanceRepository = ref.read(annualBalanceRepositoryProvider);
+  return AnnualSavingsUseCase(annualBalanceRepository: annualBalanceRepository);
 });
 
 ///

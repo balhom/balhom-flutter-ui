@@ -1,4 +1,5 @@
 import 'package:balhom/config/app_colors.dart';
+import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/router.dart';
 import 'package:balhom/config/app_theme.dart';
 import 'package:balhom/src/core/presentation/views/app_title.dart';
@@ -23,7 +24,7 @@ class BalanceCreateView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeDataProvider);
-    return Scaffold(
+    return AppScaffold(
       backgroundColor: balanceTypeEnum.isExpense()
           ? theme == AppTheme.darkTheme
               ? AppColors.expenseBackgroundDarkColor

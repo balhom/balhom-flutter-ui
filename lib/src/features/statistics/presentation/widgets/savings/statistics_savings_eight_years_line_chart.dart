@@ -1,8 +1,8 @@
 import 'dart:math';
-import 'package:balhom/src/core/presentation/models/min_max.dart';
+import 'package:balhom/src/core/domain/dtos/min_max_dto.dart';
 import 'package:balhom/src/core/presentation/widgets/chart_indicator.dart';
 import 'package:balhom/src/core/providers.dart';
-import 'package:balhom/src/features/statistics/domain/entities/annual_balance_entity.dart';
+import 'package:balhom/src/features/statistics/domain/entities/annual_saving_entity.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,7 +55,7 @@ class StatisticsSavingsEightYearsLineChart extends ConsumerWidget {
         reservedSize: 40,
       );
 
-  /// Border chart side tittles setup
+  /// Border chart side titles setup
   FlTitlesData get titlesData => FlTitlesData(
         bottomTitles: AxisTitles(
           sideTitles: bottomTitles,
@@ -78,12 +78,12 @@ class StatisticsSavingsEightYearsLineChart extends ConsumerWidget {
         expectedChartBarData(),
       ];
 
-  final List<AnnualBalanceEntity> annualBalances;
+  final List<AnnualSavingEntity> annualBalances;
 
-  final minMaxModelState = ValueNotifier<MinMax?>(null);
+  final minMaxModelState = ValueNotifier<MinMaxDto?>(null);
 
   StatisticsSavingsEightYearsLineChart(
-      {required this.annualBalances, MinMax? minMaxModel, super.key}) {
+      {required this.annualBalances, MinMaxDto? minMaxModel, super.key}) {
     minMaxModelState.value = minMaxModel;
   }
 
@@ -134,7 +134,7 @@ class StatisticsSavingsEightYearsLineChart extends ConsumerWidget {
   LineChartBarData quantityChartBarData() {
     // Dictionary with years and gross quantities per year
     Map<int, double> spotsMap = {};
-    for (AnnualBalanceEntity annualBalance in annualBalances) {
+    for (AnnualSavingEntity annualBalance in annualBalances) {
       if (spotsMap.containsKey(annualBalance.year)) {
         spotsMap[annualBalance.year] =
             spotsMap[annualBalance.year]! + annualBalance.grossQuantity;
@@ -175,7 +175,7 @@ class StatisticsSavingsEightYearsLineChart extends ConsumerWidget {
   LineChartBarData expectedChartBarData() {
     // Dictionary with years and expected quantities per year
     Map<int, double> spotsMap = {};
-    for (AnnualBalanceEntity annualBalance in annualBalances) {
+    for (AnnualSavingEntity annualBalance in annualBalances) {
       spotsMap[annualBalance.year] = annualBalance.expectedQuantity;
       spotsMap[annualBalance.year] =
           (spotsMap[annualBalance.year]! * 100).roundToDouble() / 100;
@@ -208,13 +208,13 @@ class StatisticsSavingsEightYearsLineChart extends ConsumerWidget {
   }
 
   @visibleForTesting
-  MinMax getMinMaxQuantity() {
+  MinMaxDto getMinMaxQuantity() {
     if (minMaxModelState.value != null) return minMaxModelState.value!;
     double maxQuantity = 4.0;
     double minQuantity = 0.0;
     Map<String, double> quantityMap = {};
     Map<String, double> expectedMap = {};
-    for (AnnualBalanceEntity annualBalance in annualBalances) {
+    for (AnnualSavingEntity annualBalance in annualBalances) {
       String key = "${annualBalance.year}";
       if (quantityMap.containsKey(key)) {
         quantityMap[key] = quantityMap[key]! + annualBalance.grossQuantity;
@@ -237,7 +237,7 @@ class StatisticsSavingsEightYearsLineChart extends ConsumerWidget {
     }
     if (maxQuantity < 4) maxQuantity = 4;
     if (minQuantity > 0) minQuantity = 0;
-    minMaxModelState.value = MinMax(min: minQuantity, max: maxQuantity);
+    minMaxModelState.value = MinMaxDto(min: minQuantity, max: maxQuantity);
     return minMaxModelState.value!;
   }
 }

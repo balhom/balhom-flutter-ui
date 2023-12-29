@@ -1,7 +1,9 @@
 import 'package:balhom/src/core/providers.dart';
-import 'package:balhom/src/features/auth/application/auth_controller.dart';
-import 'package:balhom/src/features/auth/application/email_verification_controller.dart';
-import 'package:balhom/src/features/auth/application/reset_password_controller.dart';
+import 'package:balhom/src/features/auth/application/email_verification_use_case.dart';
+import 'package:balhom/src/features/auth/application/login_use_case.dart';
+import 'package:balhom/src/features/auth/application/logout_use_case.dart';
+import 'package:balhom/src/features/auth/application/reset_password_use_case.dart';
+import 'package:balhom/src/features/auth/application/silent_login_use_case.dart';
 import 'package:balhom/src/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:balhom/src/features/auth/domain/repositories/email_verification_repository_interface.dart';
 import 'package:balhom/src/features/auth/domain/repositories/reset_password_repository_interface.dart';
@@ -50,23 +52,34 @@ final emailVerificationRepositoryProvider =
 /// Provides a [ValueNotifier] to the app router to redirect on auth state change
 final authStateListenable = ValueNotifier<bool>(false);
 
-final authControllerProvider =
-    StateNotifierProvider<AuthController, AsyncValue<void>>((ref) {
+final loginUseCaseProvider =
+    StateNotifierProvider<LoginUseCase, AsyncValue<void>>((ref) {
   final authRepository = ref.read(authRepositoryProvider);
-  return AuthController(authRepository: authRepository);
+  return LoginUseCase(authRepository: authRepository);
 });
 
-final resetPasswordControllerProvider =
-    StateNotifierProvider<ResetPasswordController, AsyncValue<void>>((ref) {
+final silentLoginUseCaseProvider =
+    StateNotifierProvider<SilentLoginUseCase, AsyncValue<void>>((ref) {
+  final authRepository = ref.read(authRepositoryProvider);
+  return SilentLoginUseCase(authRepository: authRepository);
+});
+
+final logoutUseCaseProvider =
+    StateNotifierProvider<LogoutUseCase, AsyncValue<void>>((ref) {
+  final authRepository = ref.read(authRepositoryProvider);
+  return LogoutUseCase(authRepository: authRepository);
+});
+
+final resetPasswordUseCaseProvider =
+    StateNotifierProvider<ResetPasswordUseCase, AsyncValue<void>>((ref) {
   final resetPasswordRepository = ref.read(resetPasswordRepositoryProvider);
-  return ResetPasswordController(
-      resetPasswordRepository: resetPasswordRepository);
+  return ResetPasswordUseCase(resetPasswordRepository: resetPasswordRepository);
 });
 
-final emailVerificationControllerProvider =
-    StateNotifierProvider<EmailVerificationController, AsyncValue<void>>((ref) {
+final emailVerificationUseCaseProvider =
+    StateNotifierProvider<EmailVerificationUseCase, AsyncValue<void>>((ref) {
   final emailVerificationRepository =
       ref.read(emailVerificationRepositoryProvider);
-  return EmailVerificationController(
+  return EmailVerificationUseCase(
       emailVerificationRepository: emailVerificationRepository);
 });

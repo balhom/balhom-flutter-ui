@@ -52,7 +52,7 @@ class StatisticsCurrencyLineChart extends StatelessWidget {
         reservedSize: 40,
       );
 
-  /// Border chart side tittles setup
+  /// Border chart side titles setup
   FlTitlesData get titlesData => FlTitlesData(
         bottomTitles: AxisTitles(
           sideTitles: bottomTitles,

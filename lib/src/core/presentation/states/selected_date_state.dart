@@ -1,5 +1,5 @@
-import 'package:balhom/src/core/presentation/models/selected_date.dart';
-import 'package:balhom/src/core/presentation/models/selected_date_mode.dart';
+import 'package:balhom/src/core/domain/dtos/selected_date_dto.dart';
+import 'package:balhom/src/core/domain/enums/selected_date_enum.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SelectedDateState extends StateNotifier<SelectedDateDto> {

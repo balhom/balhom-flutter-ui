@@ -1,5 +1,5 @@
+import 'package:balhom/config/app_layout.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class DropdownPickerField extends StatefulWidget {
   final String? name;
@@ -27,24 +27,24 @@ class DropdownPickerField extends StatefulWidget {
 class _DropdownPickerFieldState extends State<DropdownPickerField> {
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context);
     return Center(
       child: Container(
+        padding: const EdgeInsets.all(5),
         margin: const EdgeInsets.fromLTRB(0, 15, 0, 20),
         width: widget.width,
-        color: Theme.of(context).brightness == Brightness.light
-            ? const Color.fromARGB(200, 163, 163, 163)
-            : const Color.fromARGB(198, 104, 104, 104),
+        decoration: BoxDecoration(
+            color: appTheme.colorScheme.background,
+            border: Border.all(color: Colors.black),
+            borderRadius: const BorderRadius.all(
+                Radius.circular(AppLayout.containerBorderRadius))),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           if (widget.name != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 18, 0),
               child: Text(
                 widget.name!,
-                style: GoogleFonts.openSans(
-                    color: Theme.of(context).brightness == Brightness.light
-                        ? Colors.black
-                        : Colors.white,
-                    fontSize: 15),
+                style: appTheme.textTheme.bodyMedium!.copyWith(fontSize: 15),
               ),
             ),
           DropdownButton<String>(

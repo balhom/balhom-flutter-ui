@@ -1,4 +1,4 @@
-import 'package:balhom/src/features/balance/presentation/models/balance_limit_type.dart';
+import 'package:balhom/src/features/balance/domain/enums/balance_limit_type_enum.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BalanceLimitTypeState extends StateNotifier<BalanceLimitTypeEnum> {
