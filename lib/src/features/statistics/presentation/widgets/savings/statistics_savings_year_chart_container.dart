@@ -23,21 +23,22 @@ class StatisticsSavingsYearChartContainer extends ConsumerWidget {
         ref.read(statisticsSavingsSelectedDateProvider.notifier);
     final int selectedYear = selectedDate.year;
 
-    final balanceYearsState = ref.read(balanceYearsUseCaseProvider);
+    final balanceYearsState = ref.watch(balanceYearsUseCaseProvider);
+
+    // Screen sizes:
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double chartLineHeight = (screenHeight * 0.45 <= 200)
+        ? 200
+        : (screenHeight * 0.45 <= 350)
+            ? screenHeight * 0.45
+            : 350;
 
     return balanceYearsState.when<Widget>(data: (balanceYears) {
       // Adding selected year to years list
       if (!balanceYears.contains(selectedYear)) {
         balanceYears.add(selectedYear);
       }
-      // Screen sizes:
-      double screenHeight = MediaQuery.of(context).size.height;
-      double screenWidth = MediaQuery.of(context).size.width;
-      double chartLineHeight = (screenHeight * 0.45 <= 200)
-          ? 200
-          : (screenHeight * 0.45 <= 350)
-              ? screenHeight * 0.45
-              : 350;
       return Expanded(
         child: Column(
           children: [
@@ -72,9 +73,13 @@ class StatisticsSavingsYearChartContainer extends ConsumerWidget {
       );
     }, error: (error, _) {
       return Expanded(
-          child: showError(error: error, text: appLocalizations.genericError));
+          child: SizedBox(
+              height: chartLineHeight,
+              child: showError(
+                  error: error, text: appLocalizations.genericError)));
     }, loading: () {
-      return Expanded(child: showLoading());
+      return Expanded(
+          child: SizedBox(height: chartLineHeight, child: showLoading()));
     });
   }
 }

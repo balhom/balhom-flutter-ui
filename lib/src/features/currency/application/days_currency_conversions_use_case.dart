@@ -13,7 +13,7 @@ class DaysCurrencyConversionsUseCase
   Future<void> handle(final int days) async {
     final dailyStatistics =
         await currencyRepository.getDaysCurrencyConversions(days: days);
-    state = await dailyStatistics.fold((failure) {
+    state = await dailyStatistics.fold((failure) async {
       return AsyncValue.error(failure.detail, StackTrace.empty);
     }, (dateBalanceList) async {
       return AsyncValue.data(dateBalanceList);

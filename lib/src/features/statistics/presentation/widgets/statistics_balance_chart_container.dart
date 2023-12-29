@@ -36,20 +36,21 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
     final selectedMonthAsStr =
         DateUtil.monthNumToString(selectedDate.month, appLocalizations);
 
-    final balanceYearsState = ref.read(balanceYearsUseCaseProvider);
+    final balanceYearsState = ref.watch(balanceYearsUseCaseProvider);
+
+    // Screen sizes:
+    final screenHeight = MediaQuery.of(context).size.height;
+    double chartLineHeight = (screenHeight * 0.45 <= 200)
+        ? 200
+        : (screenHeight * 0.45 <= 350)
+            ? screenHeight * 0.45
+            : 350;
 
     return balanceYearsState.when<Widget>(data: (balanceYears) {
       // Adding selected year to years list
       if (!balanceYears.contains(selectedDate.year)) {
         balanceYears.add(selectedDate.year);
       }
-      // Screen sizes:
-      final screenHeight = MediaQuery.of(context).size.height;
-      double chartLineHeight = (screenHeight * 0.45 <= 200)
-          ? 200
-          : (screenHeight * 0.45 <= 350)
-              ? screenHeight * 0.45
-              : 350;
       return Expanded(
         child: Column(
           children: [
@@ -78,9 +79,13 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
       );
     }, error: (error, _) {
       return Expanded(
-          child: showError(error: error, text: appLocalizations.genericError));
+          child: SizedBox(
+              height: chartLineHeight,
+              child: showError(
+                  error: error, text: appLocalizations.genericError)));
     }, loading: () {
-      return Expanded(child: showLoading());
+      return Expanded(
+          child: SizedBox(height: chartLineHeight, child: showLoading()));
     });
   }
 

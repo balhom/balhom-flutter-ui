@@ -21,7 +21,7 @@ class StatisticsUseCase extends StateNotifier<AsyncValue<StatisticsDataDto>> {
     }, (dailyStatistics) async {
       final monthlyStatistics =
           await monthlyStatisticsRepository.list(date.year);
-      return await monthlyStatistics.fold((failure) {
+      return await monthlyStatistics.fold((failure) async {
         return AsyncValue.error(failure.detail, StackTrace.empty);
       }, (monthlyStatistics) async {
         return AsyncValue.data(StatisticsDataDto(

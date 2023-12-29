@@ -14,7 +14,7 @@ class MonthlySavingsUseCase
   Future<void> handle(final SelectedDateDto date) async {
     final dailyStatistics =
         await monthlyBalanceRepository.getMonthlySavings(year: date.year);
-    state = await dailyStatistics.fold((failure) {
+    state = await dailyStatistics.fold((failure) async {
       return AsyncValue.error(failure.detail, StackTrace.empty);
     }, (dateBalanceList) async {
       return AsyncValue.data(dateBalanceList);
