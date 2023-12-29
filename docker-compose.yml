@@ -10,16 +10,11 @@ services:
     volumes:
       #- ./certs:/etc/nginx/ssl:ro # Uncomment for HTTPS
       - ./web:/usr/share/nginx/html # optional (cache)
-    env_file:
-      - ./web.env
+    environment:
+      - USE_HTTPS=false # Set to true to enable HTTPS
     restart: unless-stopped
     networks:
       - balhom_web_net
 
 networks:
   balhom_web_net:
-    name: balhom_web_net
-    ipam:
-      driver: default
-      config:
-        - subnet: "192.168.94.0/24"

@@ -1,0 +1,98 @@
+name: balhom
+description: "Open source application for day-to-day expenses and revenues management."
+publish_to: 'none'
+
+version: 2.0.0+1
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  # Dependencies for internationalization with flutter:
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.18.1
+  # The following adds the Cupertino Icons font to your application.
+  cupertino_icons: ^1.0.2
+  # Get version info
+  package_info_plus: ^5.0.1
+  # Http packages
+  dio: ^5.4.0
+  http_parser: ^4.0.2
+  # Routing
+  go_router: ^13.0.0
+  # Routing
+  flutter_riverpod: ^2.4.9
+  # Fix url in web
+  url_strategy: ^0.2.0
+  # Shared preferences
+  shared_preferences: ^2.2.2
+  # Local database
+  hive: ^2.2.3
+  # Data class generator
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+  # Navigation bar and rail
+  adaptive_navigation: ^0.0.10
+  # Lang widgets
+  language_picker: ^0.4.3
+  # Multiplatform IO package
+  universal_io: ^2.2.2
+  # Flags images
+  flag: ^7.0.0
+  # Graphs widgets
+  fl_chart: ^0.65.0
+  syncfusion_flutter_charts: ^24.1.41
+  # Env code generation
+  envied: ^0.5.2
+  # Functional programing
+  fpdart: ^1.1.0
+  # File picker (used for images)
+  file_picker: ^6.1.1
+  # Path directory provider (not supported for Web)
+  path_provider: ^2.1.1
+  # Google fonts
+  google_fonts: ^6.1.0
+  # Secure storage
+  flutter_secure_storage: ^9.0.0
+  # Equals
+  equatable: ^2.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # Contains a set of recommended lints to encourage good coding practices.
+  flutter_lints: ^2.0.0
+  # Data class generator
+  build_runner: ^2.4.7
+  freezed: ^2.4.6
+  json_serializable: ^6.7.1
+  # Env code generator
+  envied_generator: ^0.5.2
+  # Icons generation
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  # Material Icons font is included with your application.
+  uses-material-design: true  
+  # Flag to generate internationalization files
+  generate: true
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/
+    - assets/google_fonts/
+
+flutter_launcher_icons:
+  image_path: "assets/icon/balhom_icon.png"
+  android: true
+  ios: true
+  web:
+    generate: true
+  windows:
+    generate: true
+  macos:
+    generate: true
