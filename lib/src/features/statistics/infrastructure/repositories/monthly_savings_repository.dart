@@ -14,15 +14,6 @@ class MonthlySavingsRepository implements MonthlySavingsRepositoryInterface {
       {required this.monthlyBalanceRemoteDataSource,
       required this.monthlyBalanceLocalDataSource});
 
-  /// Get [MonthlySavingEntity] by `id`.
-  @override
-  Future<Either<Failure, MonthlySavingEntity>> getMonthlySaving(int id) async {
-    final res = await monthlyBalanceRemoteDataSource.get(id);
-    return await res.fold((failure) => left(failure), (monthlyBalance) async {
-      return right(monthlyBalance);
-    });
-  }
-
   /// Get a list of [MonthlySavingEntity].
   @override
   Future<Either<Failure, List<MonthlySavingEntity>>> getMonthlySavings(

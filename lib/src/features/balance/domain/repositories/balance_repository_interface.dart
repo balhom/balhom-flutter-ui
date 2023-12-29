@@ -22,10 +22,10 @@ abstract class BalanceRepositoryInterface {
   Future<List<int>> getBalanceYears(final BalanceTypeEnum balanceTypeEnum);
 
   Future<Either<Failure, List<BalanceSummaryEntity>>> getMonthSummary(
-      final int month, final int year);
+      final BalanceTypeEnum balanceTypeEnum, final int month, final int year);
 
   Future<Either<Failure, List<BalanceSummaryEntity>>> getYearSummary(
-      final int year);
+      final BalanceTypeEnum balanceTypeEnum, final int year);
 
   /// Store a [BalanceEntity].
   Future<Either<Failure, BalanceEntity>> createBalance(BalanceEntity balance);

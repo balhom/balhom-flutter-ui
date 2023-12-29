@@ -59,9 +59,11 @@ class BalanceRemoteDataSource {
   }
 
   Future<Either<Failure, List<BalanceSummaryEntity>>> getMonthSummary(
-      final int month, final int year) async {
+      final BalanceTypeEnum balanceTypeEnum,
+      final int month,
+      final int year) async {
     final String balanceUrl =
-        "${BalhomAPIContract.balanceSummary}/$year/$month";
+        "${BalhomAPIContract.balanceSummary}/${balanceTypeEnum.name.toUpperCase()}/$year/$month";
     final response = await apiClient.getRequest(balanceUrl);
     // Check if there is a request failure
     return response.fold((failure) => left(failure), (value) {
@@ -74,8 +76,9 @@ class BalanceRemoteDataSource {
   }
 
   Future<Either<Failure, List<BalanceSummaryEntity>>> getYearSummary(
-      final int year) async {
-    final String balanceUrl = "${BalhomAPIContract.balanceSummary}/$year";
+      final BalanceTypeEnum balanceTypeEnum, final int year) async {
+    final String balanceUrl =
+        "${BalhomAPIContract.balanceSummary}/${balanceTypeEnum.name.toUpperCase()}/$year";
     final response = await apiClient.getRequest(balanceUrl);
     // Check if there is a request failure
     return response.fold((failure) => left(failure), (value) {

@@ -28,7 +28,7 @@ class BalanceEntity with _$BalanceEntity {
     required double realQuantity,
     // ignore: invalid_annotation_target
     @JsonKey(includeIfNull: false) required double? convertedQuantity,
-    required DateTime date,
+    @DateTimeUtcConverter() required DateTime date,
     required String currencyType,
     required BalanceTypeEntity balanceType,
   }) = _BalanceEntity;
@@ -36,4 +36,18 @@ class BalanceEntity with _$BalanceEntity {
   // Serialization
   factory BalanceEntity.fromJson(Map<String, dynamic> json) =>
       _$BalanceEntityFromJson(json);
+}
+
+class DateTimeUtcConverter implements JsonConverter<DateTime, String> {
+  const DateTimeUtcConverter();
+
+  @override
+  DateTime fromJson(String dateTime) {
+    return DateTime.parse(dateTime).toLocal();
+  }
+
+  @override
+  String toJson(DateTime dateTime) {
+    return dateTime.toUtc().toIso8601String();
+  }
 }

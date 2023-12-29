@@ -4,9 +4,6 @@ import 'package:fpdart/fpdart.dart';
 
 /// Monthly Savings Repository Interface.
 abstract class MonthlySavingsRepositoryInterface {
-  /// Get [MonthlySavingEntity] by `id`.
-  Future<Either<Failure, MonthlySavingEntity>> getMonthlySaving(int id);
-
   /// Get a list of [MonthlySavingEntity].
   Future<Either<Failure, List<MonthlySavingEntity>>> getMonthlySavings(
       {int? year});

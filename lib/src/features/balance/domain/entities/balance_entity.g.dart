@@ -13,7 +13,7 @@ _$BalanceEntityImpl _$$BalanceEntityImplFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String,
       realQuantity: (json['real_quantity'] as num).toDouble(),
       convertedQuantity: (json['converted_quantity'] as num?)?.toDouble(),
-      date: DateTime.parse(json['date'] as String),
+      date: const DateTimeUtcConverter().fromJson(json['date'] as String),
       currencyType: json['currency_type'] as String,
       balanceType: BalanceTypeEntity.fromJson(
           json['balance_type'] as Map<String, dynamic>),
@@ -33,7 +33,7 @@ Map<String, dynamic> _$$BalanceEntityImplToJson(_$BalanceEntityImpl instance) {
   val['description'] = instance.description;
   val['real_quantity'] = instance.realQuantity;
   writeNotNull('converted_quantity', instance.convertedQuantity);
-  val['date'] = instance.date.toIso8601String();
+  val['date'] = const DateTimeUtcConverter().toJson(instance.date);
   val['currency_type'] = instance.currencyType;
   val['balance_type'] = instance.balanceType;
   return val;

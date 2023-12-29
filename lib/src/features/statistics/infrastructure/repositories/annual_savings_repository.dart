@@ -14,15 +14,6 @@ class AnnualSavingsRepository implements AnnualSavingsRepositoryInterface {
       {required this.annualBalanceRemoteDataSource,
       required this.annualBalanceLocalDataSource});
 
-  /// Get [AnnualSavingEntity] by `id`.
-  @override
-  Future<Either<Failure, AnnualSavingEntity>> getAnnualSaving(int id) async {
-    final res = await annualBalanceRemoteDataSource.get(id);
-    return await res.fold((failure) => left(failure), (annualBalance) async {
-      return right(annualBalance);
-    });
-  }
-
   /// Get a list of [AnnualSavingEntity].
   @override
   Future<Either<Failure, List<AnnualSavingEntity>>> getAnnualSavings() async {

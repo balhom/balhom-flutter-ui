@@ -1,6 +1,5 @@
 import 'package:balhom/src/core/presentation/widgets/responsive_layout.dart';
 import 'package:balhom/src/core/utils/widget_utils.dart';
-import 'package:balhom/src/features/balance/providers.dart';
 import 'package:balhom/src/features/currency/providers.dart';
 import 'package:balhom/src/features/statistics/presentation/views/statistics_view_desktop.dart';
 import 'package:balhom/src/features/statistics/presentation/views/statistics_view_mobile.dart';
@@ -35,7 +34,6 @@ class StatisticsView extends ConsumerWidget {
 
   Future<void> loadData(final WidgetRef ref) async {
     final selectedDate = ref.read(statisticsBalanceSelectedDateProvider);
-    await ref.read(balanceYearsUseCaseProvider.notifier).handle();
     await ref.read(monthlySavingsUseCaseProvider.notifier).handle(selectedDate);
     await ref.read(annualSavingsUseCaseProvider.notifier).handle(selectedDate);
     await ref.read(statisticsUseCaseProvider.notifier).handle(selectedDate);

@@ -21,6 +21,7 @@
     "@_GENERIC":{},
     "version": "Version",
     "confirmation": "Confirmar",
+    "send": "Enviar",
     "create": "Crear",
     "cancel": "Cancelar",
     "orderBy": "Ordenar por",
@@ -39,6 +40,10 @@
     "revenues": "Ingresos",
     "expenses": "Gastos",
     "balance": "Balance",
+
+    "@_EMAIL_VERIFICATION":{},
+    "emailVerifiaction": "Verificación de correo electrónico",
+    "emailVerifiactionAdvice": "Para verificar su dirección de correo electrónico se enviará un correo electrónico",
 
     "@_AUTH":{},
     "login": "Iniciar sesión",
@@ -68,6 +73,7 @@
     "passwordNotMatch": "Las contraseñas no coinciden",
     "shortPassword": "La contraseña debe llevar al menos 8 caracteres",
     "numericPassword": "La contraseña no puede contener solo números",
+    "passwordTooCommon": "Contraseña muy común",
     "resetPassword": "Contraseña olvidada",
     "resetPasswordAdvice": "Si olvidaste tu contraseña a continuación debes introducir una nueva y verificar el código enviado a tu correo",
     "resetPasswordTooManyTries": "Demasiado intentos para cambiar la contraseña, reintentalo mañana",

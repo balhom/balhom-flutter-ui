@@ -1,6 +1,6 @@
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/core/utils/type_util.dart';
-import 'package:balhom/src/features/balance/domain/entities/balance_entity.dart';
+import 'package:balhom/src/features/balance/domain/entities/balance_summary_entity.dart';
 import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -8,11 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BalanceBarChart extends ConsumerWidget {
-  final List<BalanceEntity> balances;
+  final List<BalanceSummaryEntity> balanceSummaryList;
   final BalanceTypeEnum balanceTypeEnum;
 
   const BalanceBarChart(
-      {required this.balances, required this.balanceTypeEnum, super.key});
+      {required this.balanceSummaryList,
+      required this.balanceTypeEnum,
+      super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,36 +47,18 @@ class BalanceBarChart extends ConsumerWidget {
 
   List<ChartData> getBalanceData(AppLocalizations appLocalizations) {
     List<ChartData> chartData = [];
-    Map<String, double> dataMap = {};
-    for (BalanceEntity balance in balances) {
-      String key = balance.balanceType.name;
-      if (dataMap.containsKey(key)) {
-        dataMap[key] = dataMap[key]! + balance.convertedQuantity!;
-      } else {
-        dataMap[key] = balance.convertedQuantity!;
-      }
-    }
-    for (String balanceType in dataMap.keys) {
+    for (final balanceSummary in balanceSummaryList) {
       chartData.add(ChartData(
-          TypeUtil.balanceTypeToString(balanceType, appLocalizations),
-          dataMap[balanceType]!));
+          TypeUtil.balanceTypeToString(balanceSummary.type, appLocalizations),
+          balanceSummary.quantity));
     }
     return chartData;
   }
 
   double getMax() {
-    Map<String, double> dataMap = {};
     double max = 4;
-    for (BalanceEntity balance in balances) {
-      String key = balance.balanceType.name;
-      if (dataMap.containsKey(key)) {
-        dataMap[key] = dataMap[key]! + balance.convertedQuantity!;
-      } else {
-        dataMap[key] = balance.convertedQuantity!;
-      }
-    }
-    for (String balanceType in dataMap.keys) {
-      if (dataMap[balanceType]! > max) max = dataMap[balanceType]!;
+    for (final balanceSummary in balanceSummaryList) {
+      if (balanceSummary.quantity > max) max = balanceSummary.quantity;
     }
     return max.ceilToDouble();
   }

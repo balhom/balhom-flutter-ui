@@ -4,9 +4,6 @@ import 'package:fpdart/fpdart.dart';
 
 /// Annual Savings Repository Interface.
 abstract class AnnualSavingsRepositoryInterface {
-  /// Get [AnnualSavingEntity] by `id`.
-  Future<Either<Failure, AnnualSavingEntity>> getAnnualSaving(int id);
-
   /// Get a list of [AnnualSavingEntity].
   Future<Either<Failure, List<AnnualSavingEntity>>> getAnnualSavings();
 }

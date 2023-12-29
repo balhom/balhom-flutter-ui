@@ -104,7 +104,7 @@ final router = GoRouter(
               redirect: authGuardOrNone,
               pageBuilder: (context, state) => FadeTransitionView(
                   key: _homeScaffoldKey,
-                  child: const HomeView(
+                  child: HomeView(
                       selectedSection: HomeTabEnum.revenues,
                       child: BalanceView(
                         balanceTypeEnum: BalanceTypeEnum.revenue,
@@ -134,7 +134,7 @@ final router = GoRouter(
               redirect: authGuardOrNone,
               pageBuilder: (context, state) => FadeTransitionView(
                   key: _homeScaffoldKey,
-                  child: const HomeView(
+                  child: HomeView(
                       selectedSection: HomeTabEnum.expenses,
                       child: BalanceView(
                         balanceTypeEnum: BalanceTypeEnum.expense,

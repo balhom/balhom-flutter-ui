@@ -5,9 +5,11 @@ import 'package:balhom/src/features/balance/application/balance_create_use_case.
 import 'package:balhom/src/features/balance/application/balance_delete_use_case.dart';
 import 'package:balhom/src/features/balance/application/balance_edit_use_case.dart';
 import 'package:balhom/src/features/balance/application/balance_list_use_case.dart';
+import 'package:balhom/src/features/balance/application/balance_summary_use_case.dart';
 import 'package:balhom/src/features/balance/application/balance_type_list_use_case.dart';
 import 'package:balhom/src/features/balance/application/balance_year_use_case.dart';
 import 'package:balhom/src/features/balance/domain/entities/balance_entity.dart';
+import 'package:balhom/src/features/balance/domain/entities/balance_summary_entity.dart';
 import 'package:balhom/src/features/balance/domain/entities/balance_type_entity.dart';
 import 'package:balhom/src/features/balance/domain/enums/balance_sorting_enum.dart';
 import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart';
@@ -22,6 +24,8 @@ import 'package:balhom/src/features/balance/domain/enums/balance_limit_type_enum
 import 'package:balhom/src/features/balance/presentation/states/balance_limit_type_state.dart';
 import 'package:balhom/src/features/balance/presentation/states/balance_sorting_state.dart';
 import 'package:balhom/src/core/presentation/states/selected_date_state.dart';
+import 'package:balhom/src/features/statistics/application/statistics_use_case.dart';
+import 'package:balhom/src/features/statistics/domain/dtos/statistics_data_dto.dart';
 import 'package:balhom/src/features/statistics/domain/repositories/annual_savings_repository_interface.dart';
 import 'package:balhom/src/features/statistics/domain/repositories/monthly_savings_repository_interface.dart';
 import 'package:balhom/src/features/statistics/infrastructure/datasources/local/annual_savings_local_data_source.dart';
@@ -30,6 +34,7 @@ import 'package:balhom/src/features/statistics/infrastructure/datasources/remote
 import 'package:balhom/src/features/statistics/infrastructure/datasources/remote/monthly_savings_remote_data_source.dart';
 import 'package:balhom/src/features/statistics/infrastructure/repositories/annual_savings_repository.dart';
 import 'package:balhom/src/features/statistics/infrastructure/repositories/monthly_savings_repository.dart';
+import 'package:balhom/src/features/statistics/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 ///
@@ -117,6 +122,23 @@ final balanceYearsUseCaseProvider =
     StateNotifierProvider<BalanceYearUseCase, AsyncValue<List<int>>>((ref) {
   final balanceRepository = ref.watch(balanceRepositoryProvider);
   return BalanceYearUseCase(balanceRepository: balanceRepository);
+});
+
+final balanceStatisticsUseCaseProvider =
+    StateNotifierProvider<StatisticsUseCase, AsyncValue<StatisticsDataDto>>(
+        (ref) {
+  final dailyStatisticsRepository = ref.read(dailyStatisticsRepositoryProvider);
+  final monthlyStatisticsRepository =
+      ref.read(monthlyStatisticsRepositoryProvider);
+  return StatisticsUseCase(
+      dailyStatisticsRepository: dailyStatisticsRepository,
+      monthlyStatisticsRepository: monthlyStatisticsRepository);
+});
+
+final balanceSummaryUseCaseProvider = StateNotifierProvider<
+    BalanceSummaryUseCase, AsyncValue<List<BalanceSummaryEntity>>>((ref) {
+  final balanceRepository = ref.read(balanceRepositoryProvider);
+  return BalanceSummaryUseCase(balanceRepository: balanceRepository);
 });
 
 ///

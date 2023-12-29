@@ -57,8 +57,11 @@ class BalanceRepository implements BalanceRepositoryInterface {
 
   @override
   Future<Either<Failure, List<BalanceSummaryEntity>>> getMonthSummary(
-      final int month, final int year) async {
-    final res = await balanceRemoteDataSource.getMonthSummary(month, year);
+      final BalanceTypeEnum balanceTypeEnum,
+      final int month,
+      final int year) async {
+    final res = await balanceRemoteDataSource.getMonthSummary(
+        balanceTypeEnum, month, year);
     return res.fold((failure) {
       return left(failure);
     }, (value) => right(value));
@@ -66,8 +69,9 @@ class BalanceRepository implements BalanceRepositoryInterface {
 
   @override
   Future<Either<Failure, List<BalanceSummaryEntity>>> getYearSummary(
-      final int year) async {
-    final res = await balanceRemoteDataSource.getYearSummary(year);
+      final BalanceTypeEnum balanceTypeEnum, final int year) async {
+    final res =
+        await balanceRemoteDataSource.getYearSummary(balanceTypeEnum, year);
     return res.fold((failure) {
       return left(failure);
     }, (value) => right(value));

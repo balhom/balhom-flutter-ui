@@ -55,7 +55,7 @@ final localPreferencesClientProvider =
 
 /// Exposes [LocalDbClient] instance
 final localDbClientProvider =
-    Provider((ref) => LocalDbClient(dbName: "balhomDb_v2", tableNames: {
+    Provider((ref) => LocalDbClient(dbName: "balhomDbV2", tableNames: {
           UserLocalDataSource.tableName,
           BalanceTypeLocalDataSource.tableName,
           AnnualSavingsLocalDataSource.tableName,

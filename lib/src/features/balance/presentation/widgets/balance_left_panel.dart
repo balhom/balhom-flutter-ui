@@ -10,7 +10,6 @@ import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart'
 import 'package:balhom/src/features/balance/presentation/widgets/balance_bar_chart.dart';
 import 'package:balhom/src/features/balance/presentation/widgets/balance_line_chart.dart';
 import 'package:balhom/src/features/balance/providers.dart';
-import 'package:balhom/src/features/statistics/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,7 +32,8 @@ class BalanaceLeftPanel extends ConsumerWidget {
         ? ref.watch(expenseSelectedDateProvider)
         : ref.watch(revenueSelectedDateProvider);
 
-    final statisticsState = ref.watch(statisticsUseCaseProvider);
+    final balanceStatisticsState = ref.watch(balanceStatisticsUseCaseProvider);
+    final balanceSummaryState = ref.watch(balanceSummaryUseCaseProvider);
 
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -43,50 +43,61 @@ class BalanaceLeftPanel extends ConsumerWidget {
             ? screenHeight * 0.45
             : 400;
 
-    return statisticsState.when(data: (statisticsDto) {
-      cache.value = Container(
-        constraints: const BoxConstraints.expand(),
-        color: balanceTypeEnum.isExpense()
-            ? theme == AppTheme.darkTheme
-                ? AppColors.expenseBackgroundDarkColor
-                : AppColors.expenseBackgroundLightColor
-            : theme == AppTheme.darkTheme
-                ? AppColors.revenueBackgroundDarkColor
-                : AppColors.revenueBackgroundLightColor,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: chartLineHeight * 1.1,
-                width: PlatformUtils.isSmallWindow(context)
-                    ? screenWidth * 0.95
-                    : screenWidth * 0.45,
-                child: BalanceBarChart(
-                    balances: balances, balanceTypeEnum: balanceTypeEnum),
-              ),
-              if (selectedDate.selectedDateMode != SelectedDateEnum.day)
+    return balanceStatisticsState.when(data: (statisticsDto) {
+      return balanceSummaryState.when(data: (balanceSummaryList) {
+        cache.value = Container(
+          constraints: const BoxConstraints.expand(),
+          color: balanceTypeEnum.isExpense()
+              ? theme == AppTheme.darkTheme
+                  ? AppColors.expenseBackgroundDarkColor
+                  : AppColors.expenseBackgroundLightColor
+              : theme == AppTheme.darkTheme
+                  ? AppColors.revenueBackgroundDarkColor
+                  : AppColors.revenueBackgroundLightColor,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
                 SizedBox(
-                  height: chartLineHeight,
+                  height: chartLineHeight * 1.1,
                   width: PlatformUtils.isSmallWindow(context)
                       ? screenWidth * 0.95
                       : screenWidth * 0.45,
-                  child: BalanceLineChart(
-                    selectedDateMode: selectedDate.selectedDateMode,
-                    selectedMonth: selectedDate.month,
-                    selectedYear: selectedDate.year,
-                    monthList:
-                        DateUtil.getMonthDict(appLocalizations).values.toList(),
-                    showExpenses: balanceTypeEnum.isExpense(),
-                    showRevenues: !balanceTypeEnum.isExpense(),
-                    dailyStatisticsList: statisticsDto.dailyStatistics,
-                    monthlyStatisticsList: statisticsDto.monthlyStatistics,
-                  ),
-                )
-            ],
+                  child: BalanceBarChart(
+                      balanceSummaryList: balanceSummaryList,
+                      balanceTypeEnum: balanceTypeEnum),
+                ),
+                if (selectedDate.selectedDateMode != SelectedDateEnum.day)
+                  SizedBox(
+                    height: chartLineHeight,
+                    width: PlatformUtils.isSmallWindow(context)
+                        ? screenWidth * 0.95
+                        : screenWidth * 0.45,
+                    child: BalanceLineChart(
+                      selectedDateMode: selectedDate.selectedDateMode,
+                      selectedMonth: selectedDate.month,
+                      selectedYear: selectedDate.year,
+                      monthList: DateUtil.getMonthDict(appLocalizations)
+                          .values
+                          .toList(),
+                      showExpenses: balanceTypeEnum.isExpense(),
+                      showRevenues: !balanceTypeEnum.isExpense(),
+                      dailyStatisticsList: statisticsDto.dailyStatistics,
+                      monthlyStatisticsList: statisticsDto.monthlyStatistics,
+                    ),
+                  )
+              ],
+            ),
           ),
-        ),
-      );
-      return cache.value;
+        );
+        return cache.value;
+      }, error: (error, _) {
+        return showError(
+            error: error,
+            background: cache.value,
+            text: appLocalizations.genericError);
+      }, loading: () {
+        return showLoading(background: cache.value);
+      });
     }, error: (error, _) {
       return showError(
           error: error,

@@ -1,4 +1,5 @@
 import 'package:balhom/src/core/utils/widget_utils.dart';
+import 'package:balhom/src/features/account/providers.dart';
 import 'package:balhom/src/features/balance/domain/enums/balance_type_enum.dart';
 import 'package:balhom/src/features/balance/presentation/views/balance_panel_view.dart';
 import 'package:balhom/src/features/balance/providers.dart';
@@ -18,9 +19,11 @@ class BalanceView extends ConsumerWidget {
   /// Path route for expenses [BalanceView]
   static const String routeExpensePath = 'expenses';
 
+  final cache = ValueNotifier<Widget>(Container());
+
   final BalanceTypeEnum balanceTypeEnum;
 
-  const BalanceView({required this.balanceTypeEnum, super.key});
+  BalanceView({required this.balanceTypeEnum, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,25 +31,36 @@ class BalanceView extends ConsumerWidget {
         future: loadData(ref),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return showLoading();
+            return showLoading(background: cache.value);
           }
-          return BalancePanelView(balanceTypeEnum: balanceTypeEnum);
+          cache.value = BalancePanelView(balanceTypeEnum: balanceTypeEnum);
+          return cache.value;
         });
   }
 
   Future<void> loadData(WidgetRef ref) async {
-    if (balanceTypeEnum.isExpense()) {
-      final selectedDate = ref.read(expenseSelectedDateProvider);
-      final sorting = ref.read(expenseSortingProvider);
-      await ref
-          .read(balanceListUseCaseProvider.notifier)
-          .handle(selectedDate, BalanceTypeEnum.expense, sorting, 1);
-    } else {
-      final selectedDate = ref.read(revenueSelectedDateProvider);
-      final sorting = ref.read(revenueSortingProvider);
-      await ref
-          .read(balanceListUseCaseProvider.notifier)
-          .handle(selectedDate, BalanceTypeEnum.revenue, sorting, 1);
-    }
+    // Listen account changes
+    ref.watch(accountGetUseCaseProvider);
+
+    final balanceSelectedDateState = balanceTypeEnum.isExpense()
+        ? ref.watch(expenseSelectedDateProvider)
+        : ref.watch(revenueSelectedDateProvider);
+    final balanceSortingState = balanceTypeEnum.isExpense()
+        ? ref.watch(expenseSortingProvider)
+        : ref.watch(revenueSortingProvider);
+    final balanceLimitTypeState = balanceTypeEnum.isExpense()
+        ? ref.watch(expenseLimitTypeProvider)
+        : ref.watch(revenueLimitTypeProvider);
+    await ref.watch(balanceListUseCaseProvider.notifier).handle(
+        balanceSelectedDateState,
+        balanceTypeEnum,
+        balanceSortingState,
+        balanceLimitTypeState);
+    await ref
+        .read(balanceStatisticsUseCaseProvider.notifier)
+        .handle(balanceSelectedDateState);
+    await ref
+        .read(balanceSummaryUseCaseProvider.notifier)
+        .handle(balanceTypeEnum, balanceSelectedDateState);
   }
 }

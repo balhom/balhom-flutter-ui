@@ -29,6 +29,7 @@ mixin _$BalanceEntity {
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(includeIfNull: false)
   double? get convertedQuantity => throw _privateConstructorUsedError;
+  @DateTimeUtcConverter()
   DateTime get date => throw _privateConstructorUsedError;
   String get currencyType => throw _privateConstructorUsedError;
   BalanceTypeEntity get balanceType => throw _privateConstructorUsedError;
@@ -51,7 +52,7 @@ abstract class $BalanceEntityCopyWith<$Res> {
       String description,
       double realQuantity,
       @JsonKey(includeIfNull: false) double? convertedQuantity,
-      DateTime date,
+      @DateTimeUtcConverter() DateTime date,
       String currencyType,
       BalanceTypeEntity balanceType});
 
@@ -139,7 +140,7 @@ abstract class _$$BalanceEntityImplCopyWith<$Res>
       String description,
       double realQuantity,
       @JsonKey(includeIfNull: false) double? convertedQuantity,
-      DateTime date,
+      @DateTimeUtcConverter() DateTime date,
       String currencyType,
       BalanceTypeEntity balanceType});
 
@@ -214,7 +215,7 @@ class _$BalanceEntityImpl extends _BalanceEntity {
       required this.description,
       required this.realQuantity,
       @JsonKey(includeIfNull: false) required this.convertedQuantity,
-      required this.date,
+      @DateTimeUtcConverter() required this.date,
       required this.currencyType,
       required this.balanceType})
       : super._();
@@ -237,6 +238,7 @@ class _$BalanceEntityImpl extends _BalanceEntity {
   @JsonKey(includeIfNull: false)
   final double? convertedQuantity;
   @override
+  @DateTimeUtcConverter()
   final DateTime date;
   @override
   final String currencyType;
@@ -294,7 +296,7 @@ abstract class _BalanceEntity extends BalanceEntity {
       required final String description,
       required final double realQuantity,
       @JsonKey(includeIfNull: false) required final double? convertedQuantity,
-      required final DateTime date,
+      @DateTimeUtcConverter() required final DateTime date,
       required final String currencyType,
       required final BalanceTypeEntity balanceType}) = _$BalanceEntityImpl;
   const _BalanceEntity._() : super._();
@@ -315,6 +317,7 @@ abstract class _BalanceEntity extends BalanceEntity {
   @JsonKey(includeIfNull: false)
   double? get convertedQuantity;
   @override
+  @DateTimeUtcConverter()
   DateTime get date;
   @override
   String get currencyType;

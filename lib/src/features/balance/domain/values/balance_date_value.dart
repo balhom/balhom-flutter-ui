@@ -20,10 +20,10 @@ class BalanceDateTimeValue extends ValueAbstract<DateTime?> {
   const BalanceDateTimeValue._(this._value);
 }
 
-/// * minimum: 0
 Either<Failure, DateTime> _validate(
     AppLocalizations appLocalizations, DateTime? input) {
-  if (input != null && !input.isAfter(DateTime.now())) {
+  if (input != null &&
+      DateTime(input.year, input.month, input.day).isBefore(DateTime.now())) {
     return right(input);
   }
   final String message = input == null

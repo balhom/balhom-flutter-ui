@@ -36,6 +36,9 @@ class BalanceCard extends ConsumerWidget {
     final balanceSortingState = balanceTypeEnum.isExpense()
         ? ref.read(expenseSortingProvider)
         : ref.read(revenueSortingProvider);
+    final balanceLimitTypeState = balanceTypeEnum.isExpense()
+        ? ref.read(expenseLimitTypeProvider)
+        : ref.read(revenueLimitTypeProvider);
 
     return GestureDetector(
       onTap: () {
@@ -89,7 +92,7 @@ class BalanceCard extends ConsumerWidget {
                                 balanceSelectedDateState,
                                 balanceTypeEnum,
                                 balanceSortingState,
-                                1);
+                                balanceLimitTypeState);
                             await accountGetUseCase.handle();
                           }
                         }
