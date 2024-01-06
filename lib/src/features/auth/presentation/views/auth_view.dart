@@ -2,7 +2,7 @@ import 'package:balhom/config/app_colors.dart';
 import 'package:balhom/config/app_layout.dart';
 import 'package:balhom/src/core/presentation/views/app_scaffold.dart';
 import 'package:balhom/src/core/presentation/views/app_title.dart';
-import 'package:balhom/src/core/presentation/widgets/app_will_pop_scope.dart';
+import 'package:balhom/src/core/presentation/widgets/app_pop_scope.dart';
 import 'package:balhom/src/features/auth/presentation/views/auth_background_view.dart';
 import 'package:balhom/src/core/presentation/widgets/app_language_picker_dropdown.dart';
 import 'package:balhom/src/core/providers.dart';

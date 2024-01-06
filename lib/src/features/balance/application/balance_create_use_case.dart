@@ -1,4 +1,4 @@
-import 'package:balhom/src/core/domain/failures/unprocessable_value_failure.dart';
+import 'package:balhom/src/core/domain/failures/invalid_value_failure.dart';
 import 'package:balhom/src/features/balance/domain/dtos/balance_values_dto.dart';
 import 'package:balhom/src/features/balance/domain/repositories/balance_repository_interface.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

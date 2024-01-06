@@ -1,5 +1,5 @@
 import 'package:adaptive_navigation/adaptive_navigation.dart';
-import 'package:balhom/src/core/presentation/widgets/app_will_pop_scope.dart';
+import 'package:balhom/src/core/presentation/widgets/app_pop_scope.dart';
 import 'package:balhom/src/core/providers.dart';
 import 'package:balhom/src/core/utils/platform_utils.dart';
 import 'package:balhom/src/features/balance/presentation/views/balance_view.dart';

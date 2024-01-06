@@ -1,4 +1,4 @@
-import 'package:balhom/src/core/domain/failures/unprocessable_value_failure.dart';
+import 'package:balhom/src/core/domain/failures/invalid_value_failure.dart';
 import 'package:balhom/src/features/account/domain/repositories/account_repository_interface.dart';
 import 'package:balhom/src/features/settings/domain/repositories/settings_repository_interface.dart';
 import 'package:flutter/material.dart';

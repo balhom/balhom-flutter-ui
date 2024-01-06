@@ -1,5 +1,5 @@
 import 'package:balhom/src/core/domain/failures/failure.dart';
-import 'package:balhom/src/core/domain/failures/unprocessable_value_failure.dart';
+import 'package:balhom/src/core/domain/failures/invalid_value_failure.dart';
 import 'package:balhom/src/features/currency/domain/entities/currency_conversion_entity.dart';
 import 'package:balhom/src/features/currency/domain/repositories/currency_repository_interface.dart';
 import 'package:fpdart/fpdart.dart';
