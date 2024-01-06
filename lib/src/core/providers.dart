@@ -1,4 +1,4 @@
-import 'package:balhom/config/app_environment.dart';
+import 'package:balhom/config/app_env_vars.dart';
 import 'package:balhom/config/app_theme.dart';
 import 'package:balhom/src/core/clients/api_client.dart';
 import 'package:balhom/src/core/clients/local_db_client.dart';
@@ -64,14 +64,14 @@ final localDbClientProvider =
 
 /// Exposes balhom [ApiClient] instance
 final balhomApiClientProvider = Provider((ref) {
-  return ApiClient(baseUrl: AppEnvironment.balhomApiUrl);
+  return ApiClient(baseUrl: AppEnvVars.balhomApiUrl);
 });
 
 /// Exposes currency conversion [ApiClient] instance
 final currencyConversionClientProvider = Provider((ref) {
-  return ApiClient(baseUrl: AppEnvironment.currencyConversionApiUrl)
+  return ApiClient(baseUrl: AppEnvVars.currencyConversionApiUrl)
     ..setHeader(HttpHeaders.authorizationHeader,
-        "APIKey ${AppEnvironment.currencyConversionApiKey}");
+        "APIKey ${AppEnvVars.currencyConversionApiKey}");
 });
 
 ///

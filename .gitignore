@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/release
 
 *.env
+
+# Temp files
+*.g.dart
+*.gr.dart
+*.freezed.dart
