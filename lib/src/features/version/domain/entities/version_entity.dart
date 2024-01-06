@@ -7,17 +7,12 @@ part 'version_entity.g.dart';
 @freezed
 class VersionEntity with _$VersionEntity {
   /// Factory constructor
-  /// [access] - [String] access token
-  /// [refresh] - [String] refresh token
   // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory VersionEntity({
-    // ignore: invalid_annotation_target
-    @JsonKey(includeIfNull: false) required String appVersion,
-    // ignore: invalid_annotation_target
-    @JsonKey(includeIfNull: false) required String webVersion,
-    // ignore: invalid_annotation_target
-    @JsonKey(includeIfNull: false) required String apiVersion,
+    required String appVersion,
+    required String webVersion,
+    required String apiVersion,
   }) = _VersionEntity;
 
   // Serialization
