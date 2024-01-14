@@ -1,5 +1,6 @@
 import 'package:balhom/config/app_env_vars.dart';
 import 'package:balhom/config/app_theme.dart';
+import 'package:balhom/config/balhom_api_contract.dart';
 import 'package:balhom/src/core/clients/api_client.dart';
 import 'package:balhom/src/core/clients/local_db_client.dart';
 import 'package:balhom/src/core/clients/local_preferences_client.dart';
@@ -7,15 +8,18 @@ import 'package:balhom/src/core/presentation/states/app_localizations_state.dart
 import 'package:balhom/src/core/presentation/states/theme_data_state.dart';
 import 'package:balhom/src/features/account/infrastructure/datasources/local/account_local_data_source.dart';
 import 'package:balhom/src/features/account/providers.dart';
+import 'package:balhom/src/features/auth/domain/entities/jwt_entity.dart';
 import 'package:balhom/src/features/balance/infrastructure/datasources/local/balance_type_local_data_source.dart';
 import 'package:balhom/src/features/settings/providers.dart';
 import 'package:balhom/src/features/statistics/infrastructure/datasources/local/annual_savings_local_data_source.dart';
 import 'package:balhom/src/features/statistics/infrastructure/datasources/local/monthly_savings_local_data_source.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_io/io.dart';
 
 /// Triggered from bootstrap() to complete futures
@@ -64,7 +68,42 @@ final localDbClientProvider =
 
 /// Exposes balhom [ApiClient] instance
 final balhomApiClientProvider = Provider((ref) {
-  return ApiClient(baseUrl: AppEnvVars.balhomApiUrl);
+  final apiClient = ApiClient(baseUrl: AppEnvVars.balhomApiUrl);
+  apiClient.addInterceptors([
+    InterceptorsWrapper(onError: (exception, handler) async {
+      if (exception.response?.statusCode == HttpStatus.unauthorized &&
+          exception.requestOptions.path != BalhomAPIContract.authAccess &&
+          exception.requestOptions.path != BalhomAPIContract.authRefresh) {
+        apiClient.dioClient.options.headers
+            .remove(HttpHeaders.authorizationHeader);
+        exception.requestOptions.headers
+            .remove(HttpHeaders.authorizationHeader);
+        final String? storedRefresh =
+            (await SharedPreferences.getInstance()).getString("refreshToken");
+        if (storedRefresh != null) {
+          final response = await apiClient.postRequest(
+              BalhomAPIContract.authRefresh,
+              data: {"refresh_token": storedRefresh});
+          final JwtEntity? newJwt = response.fold(
+              (_) => null, (value) => JwtEntity.fromJson(value.data));
+          if (newJwt != null) {
+            (await SharedPreferences.getInstance())
+                .setString("refreshToken", newJwt.refreshToken!);
+            apiClient.dioClient.options
+                    .headers[HttpHeaders.authorizationHeader] =
+                "Bearer ${newJwt.accessToken}";
+            exception.requestOptions.headers[HttpHeaders.authorizationHeader] =
+                "Bearer ${newJwt.accessToken}";
+            // Repeat the request with the updated header
+            return handler.resolve(
+                await apiClient.dioClient.fetch(exception.requestOptions));
+          }
+        }
+      }
+      return handler.next(exception);
+    })
+  ]);
+  return apiClient;
 });
 
 /// Exposes currency conversion [ApiClient] instance

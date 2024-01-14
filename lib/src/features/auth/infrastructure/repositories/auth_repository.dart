@@ -30,7 +30,6 @@ class AuthRepository implements AuthRepositoryInterface {
             await jwtRemoteDataSource.refresh(refreshToken: refreshToken));
     // Check if there is a request failure
     return await response.fold((failure) => left(failure), (jwtEntity) async {
-      await jwtLocalDataSource.storeAccess(jwtEntity.accessToken!);
       await jwtLocalDataSource.storeRefresh(jwtEntity.refreshToken!);
       jwtRemoteDataSource.setAccessToken(jwtEntity.accessToken!);
       return right(jwtEntity);
@@ -43,7 +42,6 @@ class AuthRepository implements AuthRepositoryInterface {
     final response = await jwtRemoteDataSource.get(credentials);
     // Check if there is a request failure
     return await response.fold((failure) => left(failure), (jwtEntity) async {
-      await jwtLocalDataSource.storeAccess(jwtEntity.accessToken!);
       await jwtLocalDataSource.storeRefresh(jwtEntity.refreshToken!);
       jwtRemoteDataSource.setAccessToken(jwtEntity.accessToken!);
       return right(jwtEntity);

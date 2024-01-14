@@ -24,12 +24,18 @@ class ApiClient {
           receiveTimeout: const Duration(seconds: 5),
           sendTimeout: const Duration(seconds: 5),
           followRedirects: false,
-          validateStatus: (status) => true,
+          validateStatus: (status) =>
+              status != HttpStatus.unauthorized &&
+              status != HttpStatus.internalServerError,
           headers: {
             HttpHeaders.contentTypeHeader: ContentType.json.toString(),
             HttpHeaders.acceptHeader: ContentType.json.toString(),
             HttpHeaders.acceptLanguageHeader: "en"
           });
+  }
+
+  void addInterceptors(Iterable<Interceptor> iterable) {
+    dioClient.interceptors.addAll(iterable);
   }
 
   void setHeader(String key, String value) async {
