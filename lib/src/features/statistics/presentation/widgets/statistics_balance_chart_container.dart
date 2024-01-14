@@ -64,10 +64,8 @@ class StatisticsBalanceChartContainer extends ConsumerWidget {
             SizedBox(
                 height: chartLineHeight,
                 child: BalanceLineChart(
-                  monthList: DateUtil.getMonthDict(appLocalizations,
-                          year: selectedDate.year)
-                      .values
-                      .toList(),
+                  monthList:
+                      DateUtil.getMonthDict(appLocalizations).values.toList(),
                   dailyStatisticsList: dailyStatistics,
                   monthlyStatisticsList: monthlyStatistics,
                   selectedDateMode: dateMode,

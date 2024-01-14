@@ -35,7 +35,7 @@ class BalanceLineChart extends ConsumerWidget {
           final style = GoogleFonts.openSans(
             fontSize: 12,
           );
-          final title = (selectedDateMode == SelectedDateEnum.year)
+          final title = selectedDateMode == SelectedDateEnum.year
               ? monthList[value.toInt() - 1]
               : "${value.toInt()}";
           return SideTitleWidget(

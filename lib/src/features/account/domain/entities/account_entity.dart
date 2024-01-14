@@ -10,7 +10,7 @@ class AccountEntity with _$AccountEntity {
   /// [username] - [String] username
   /// [email] - [String] email
   /// [receiveEmailBalance] - [bool] receive email balance
-  /// [cuurentBalance] - [double] cuurent balance
+  /// [currentBalance] - [double] cuurent balance
   /// [expectedAnnualBalance] - [double] expected annual balance
   /// [expectedMonthlyBalance] - [double] expected monthly balance
   /// [locale] - [double] locale

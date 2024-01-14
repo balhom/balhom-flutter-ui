@@ -57,8 +57,6 @@ dependencies:
   path_provider: ^2.1.1
   # Google fonts
   google_fonts: ^6.1.0
-  # Secure storage
-  flutter_secure_storage: ^9.0.0
   # Equals
   equatable: ^2.0.5
 

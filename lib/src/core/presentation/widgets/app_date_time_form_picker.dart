@@ -27,16 +27,41 @@ class AppDateTimeFormPicker extends StatelessWidget {
         FocusScope.of(context).requestFocus(FocusNode());
         // Show Date Picker
         final DateTime? newDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime.now());
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime.now(),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.black, // button text color
+                  ),
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
         if (newDate != null) {
           // Show Time Picker
           // ignore: use_build_context_synchronously
           final TimeOfDay? newTime = await showTimePicker(
             context: context,
             initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  textButtonTheme: TextButtonThemeData(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.black, // button text color
+                    ),
+                  ),
+                ),
+                child: child!,
+              );
+            },
           );
 
           if (newTime != null) {
