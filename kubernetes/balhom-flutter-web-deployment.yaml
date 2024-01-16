@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balhom-web-flutter-deployment
+  namespace: balhom
+spec:
+  selector:
+    matchLabels:
+      app: balhom-web-flutter
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: balhom-web-flutter
+    spec:
+      containers:
+        - name: balhom-web-flutter
+          image: fabbo/balhom-web:flutter-2.0.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: balhom-web-flutter-volume
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: balhom-web-flutter-volume
+          hostPath:
+            path: /balhom/web
+            type: Directory
