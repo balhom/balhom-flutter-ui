@@ -5,6 +5,7 @@ RUN mkdir /confs
 ADD ./nginx /confs/
 
 # Copy flutter web files
+RUN rm /usr/share/nginx/html/*
 ADD ./build/web /usr/share/nginx/html/
 
 # Create app directory
