@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: balhom-web-flutter-configmap
+  namespace: balhom
+  labels:
+    app: balhom-web-flutter
+data:
+  balhom-api-url: http://127.0.0.1:8000
+  currency-conversion-api-url: http://127.0.0.1:18070
+  currency-conversion-api-key: secret

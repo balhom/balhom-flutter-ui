@@ -7,7 +7,10 @@
         {
             "name": "flutter",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file", "app.env"
+            ]
         },
         {
             "name": "web-html",
@@ -16,7 +19,8 @@
             "deviceId": "chrome",
             "args": [
                 "--web-renderer", "html",
-                "--web-port", "5000"
+                "--web-port", "5000",
+                "--dart-define-from-file", "app.env"
             ]
         },
         {
@@ -26,7 +30,8 @@
             "deviceId": "chrome",
             "args": [
                 "--web-renderer", "canvaskit",
-                "--web-port", "5000"
+                "--web-port", "5000",
+                "--dart-define-from-file", "app.env"
             ]
         }
     ]

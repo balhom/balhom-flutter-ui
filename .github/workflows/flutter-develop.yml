@@ -16,18 +16,18 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.7'
-          channel: 'stable'
+          flutter-version: "3.16.3"
+          channel: "stable"
 
       - name: Create sample env file
         run: |
-          cp app.env.example app.env
+          cp app.env.pipe app.env
         working-directory: ./flutter
 
       - name: Install dependencies
         run: |
           flutter pub get
-        
+
       - name: Generate temporary files
         run: |
           flutter pub run build_runner build --delete-conflicting-outputs
@@ -38,8 +38,8 @@ jobs:
 
       - name: Build web
         run: |
-          flutter build web --release
-        
+          flutter build web --release --web-renderer html --dart-define-from-file app.env
+
       - name: Check build Docker Image
         run: |
           export APP_VERSION=$(grep -m 1 version pubspec.yaml | tr -s ' ' | cut -d' ' -f2 | cut -d'+' -f1 | tr -d '\n' | tr -d '\r')

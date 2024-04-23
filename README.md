@@ -34,6 +34,28 @@ For seamless navigation within the application, **BalHom** uses **GoRouter**. Th
 
 ### [Flutter clean architecture with riverpod](https://otakoyi.software/blog/flutter-clean-architecture-with-riverpod-and-supabase)
 
+## Environment Variables
+
+| NAME                        | DESCRIPTION                 |
+| --------------------------- | --------------------------- |
+| BALHOM_API_URL              | Balhom API url              |
+| CURRENCY_CONVERSION_API_URL | Currency conversion API url |
+| CURRENCY_CONVERSION_API_KEY | Currency conversion API url |
+
+## FVM Setup
+
+Activate fvm plugin
+
+~~~
+dart pub global activate fvm
+~~~
+
+Download flutter sdk
+
+~~~
+fvm use 3.16.3
+~~~
+
 ## Contributions
 
 We welcome contributions from the community. If you encounter any issues or have ideas for improvements, feel free to open an issue or submit a pull request.

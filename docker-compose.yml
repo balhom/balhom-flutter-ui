@@ -7,11 +7,13 @@ services:
     ports:
       - "9000:80"
       #- "9001:443" # Uncomment for HTTPS
-    volumes:
+    #volumes:
       #- ./certs:/etc/nginx/ssl:ro # Uncomment for HTTPS
-      - ./web:/usr/share/nginx/html # optional (cache)
     environment:
       - USE_HTTPS=false # Set to true to enable HTTPS
+      - BALHOM_API_URL=http://127.0.0.1:8000
+      - CURRENCY_CONVERSION_API_URL=http://127.0.0.1:18070
+      - CURRENCY_CONVERSION_API_KEY=secret
     restart: unless-stopped
     networks:
       - balhom_web_net
