@@ -22,7 +22,6 @@ jobs:
       - name: Create sample env file
         run: |
           cp app.env.pipe app.env
-        working-directory: ./flutter
 
       - name: Install dependencies
         run: |
