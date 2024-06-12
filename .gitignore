@@ -42,8 +42,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-*.env
-
 # Temp files
 *.g.dart
 *.gr.dart
